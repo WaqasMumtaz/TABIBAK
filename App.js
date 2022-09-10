@@ -1,13 +1,7 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
 
-import React from 'react';
-import type {Node} from 'react';
+
+import React, { useEffect } from 'react';
+
 import {
   SafeAreaView,
   ScrollView,
@@ -25,10 +19,16 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+
+import SplashScreen from 'react-native-splash-screen';
+
+import Components from './src/Components';
+import Navigation from './src/Navigation';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
-const Section = ({children, title}): Node => {
+const Section = ({children, title}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -54,20 +54,40 @@ const Section = ({children, title}): Node => {
   );
 };
 
-const App: () => Node = () => {
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'white',
+  },
+};
+
+const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const statusBarStyle = {
+    backgroundColor: 'red',
+  }
+
+  useEffect(()=>{
+    SplashScreen.hide();
+  },[])
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
+    <SafeAreaView style={[backgroundStyle, {flex:1}]}>
+      <Components.MyStatusBar/>
+      {/* <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
+        backgroundColor={statusBarStyle.backgroundColor}
+      /> */}
+      <NavigationContainer theme={MyTheme}>
+          <Navigation />
+        </NavigationContainer>
+      {/* <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
@@ -90,7 +110,7 @@ const App: () => Node = () => {
           </Section>
           <LearnMoreLinks />
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </SafeAreaView>
   );
 };
