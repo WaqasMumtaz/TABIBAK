@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native
 import Components from '../../Components'
 import Global from '../../Global'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useTranslation } from 'react-i18next'
+
 
 const SignUp = ({ handleState }) => {
     const [authObj, setAuthObj] = useState({
@@ -10,7 +12,8 @@ const SignUp = ({ handleState }) => {
         last_name:'',
         email: '',
         phone:'',
-        password: ''
+        password: '',
+        family_key:''
     })
 
     const [errorObj, setErrorObj] = useState({
@@ -20,6 +23,8 @@ const SignUp = ({ handleState }) => {
         phone:'',
         password: ''
     })
+
+    const {t , i18n} = useTranslation();
 
     function handleChange(name, value) {
         console.log('Name >>>>>>', name, 'Value >>>>>>', value);
@@ -79,6 +84,13 @@ const SignUp = ({ handleState }) => {
                     {errorObj.email ? <Text style={styles.error}>{errorObj.email}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
+                        placeholder="Family key (Optional)"
+                        name={'family_key'}
+                        handleChange={(name, value) => handleChange(name, value)}
+                        value={authObj.family_key}
+                    />
+                    <View style={{ marginBottom: 15 }} />
+                    <Components.InputField
                         placeholder="Password"
                         secureTextEntry={!authObj.showPass}
                         name={'password'}
@@ -97,15 +109,15 @@ const SignUp = ({ handleState }) => {
                     )}
                     <View style={{ margin: 15 }} />
                     <Components.MyButton
-                        title='Login'
+                        title={t('signUp')}
                         onClick={handleLogin}
                     />
 
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                         <TouchableOpacity style={{}} onPress={()=> handleState(1)}>
                             <Text style={{ color: 'gray' }}>
-                                Already registerd ?{' '}
-                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>Login</Text>
+                                {t('already_registerd')}{' '}
+                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('Login')}</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>

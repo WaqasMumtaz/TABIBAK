@@ -1,0 +1,10 @@
+{
+    "translation":{
+        "Login":"Login",
+        "signUp":"SignUp",
+        "forgot_password":"Forgot Password",
+        "not_register":"Not register yet?",
+        "create_account": "Create Account",
+        "already_registerd":"Already registerd ?"
+    }
+}

@@ -5,18 +5,29 @@ import Global from '../../Global'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import FontIcon from 'react-native-vector-icons/FontAwesome5';
 import ActionSheet from 'react-native-actionsheet';
+import { useSelector, useDispatch } from 'react-redux'
+import { changeLanguage }  from '../../Redux/reducersActions/changeLanguage';
+import { useTranslation } from 'react-i18next'
 
 const Login = ({ handleState }) => {
     let actionSheet = useRef();
+    let dispatch = useDispatch();
     const [authObj, setAuthObj] = useState({
         email: '',
         password: ''
     })
 
+    const {t , i18n} = useTranslation();
+  
     const [errorObj, setErrorObj] = useState({
         email: '',
         password: ''
     })
+
+    const { default_language,  userReducer} = useSelector(state => state.persistedReducer);
+    console.log('<<<<<****** userData *******>>>>>', userReducer);
+
+    // useSelector(state => console.log('<<<<******* Redux Data ******>>>>>>', state.persistedReducer));
 
     let optionArray = [
         'English',
@@ -42,7 +53,18 @@ const Login = ({ handleState }) => {
 
     async function selectLang(index) {
         console.log('Language index >>>>>>>>>', index);
+            dispatch(changeLanguage(index == 0 ? 'English' : 'عربى'))
     }
+
+    useEffect(() => {
+        if(default_language === 'عربى'){
+            i18n.changeLanguage('ar')
+        }
+        else if(default_language === 'English'){
+            i18n.changeLanguage('en')
+        }
+       
+    }, [default_language])
 
     return (
         <KeyboardAwareScrollView
@@ -84,26 +106,26 @@ const Login = ({ handleState }) => {
                     )}
                     <View style={{ margin: 15 }} />
                     <Components.MyButton
-                        title='Login'
+                        title={t('Login')}
                         onClick={handleLogin}
                     />
 
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
+                    <View style={{ flex: 0.5, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                         <TouchableOpacity style={{ margin: 15 }} onPress={() => handleState(3)}>
-                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>Forgot Password</Text>
+                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('forgot_password')}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{}} onPress={() => handleState(2)}>
+                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={() => handleState(2)}>
                             <Text style={{ color: 'gray' }}>
-                                Not register yet ?{' '}
-                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>Create Account</Text>
+                                {t('not_register')}{' '}
+                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('create_account')}</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end',marginBottom:10 }}>
                 <TouchableOpacity style={styles.languageBox} onPress={() => openSheet()}>
-                    <Text>English</Text>
+                    <Text style={{fontWeight:'bold'}}>{default_language}</Text>
                     <View style={{ marginLeft: 10 }}>
                         <FontIcon name="globe" color={Global.buttons_bg} size={20} />
                     </View>
@@ -143,7 +165,7 @@ const styles = StyleSheet.create({
         height: 40,
         backgroundColor: Global.inputs_bg,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         flexDirection: 'row',
         borderRadius: 12,
         paddingHorizontal: 10,
@@ -152,5 +174,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 15,
+        width:100
     }
 })

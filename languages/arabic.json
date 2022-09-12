@@ -1,0 +1,10 @@
+{
+    "translation":{
+        "Login":"تسجيل الدخول",
+        "signUp":"اشتراك",
+        "forgot_password":"هل نسيت كلمة السر",
+        "not_register" : "لم تسجل بعد؟",
+        "create_account" : "إصنع حساب",
+        "already_registerd":"مسجل بالفعل ؟"
+    }
+}
