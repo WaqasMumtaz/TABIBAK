@@ -5,6 +5,8 @@ import Global from '../Global';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next'
+
 
 const Tab = createBottomTabNavigator();
 
@@ -13,6 +15,8 @@ const Check=()=>(
 )
 
 const BottomNavigation = () => {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
     screenOptions={({ route })=>({
@@ -22,20 +26,19 @@ const BottomNavigation = () => {
         tabBarLabelStyle:{fontSize:12,marginBottom:6},
     })}
     >
-      <Tab.Screen name="Home" component={Screens.Home} 
+      <Tab.Screen name={t('home')} component={Screens.Home} 
       options={{
         tabBarIcon: ({ color, size , focused }) => (
           <FontAwesomeIcon size={size} color={color} name='home'/>
        )}}
       />
-      <Tab.Screen name="List" component={Screens.List} 
+      <Tab.Screen name={t('list')} component={Screens.List} 
       options={{
         tabBarIcon: ({ color, size , focused }) => (
           <FontAwesomeIcon size={size} color={color} name='list'/>
        )}}
       />
-      <Tab.Screen name="More" component={Screens.More} 
-      
+      <Tab.Screen name={t('more')} component={Screens.More} 
       options={{
         tabBarIcon: ({ color, size , focused }) => (
           <IonicIcon size={size} color={color} name='ellipsis-horizontal-outline'/>

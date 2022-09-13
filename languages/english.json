@@ -8,6 +8,20 @@
         "already_registerd":"Already registerd ?",
         "not_now":"Not now ?",
         "email_validation":"Please Enter a Valid Email",
-        "password_validation":"Password Length should be 8 characters or more"
+        "password_validation":"Password Length should be 8 characters or more",
+        "home":"Home",
+        "list":"List",
+        "more":"More",
+        "lang":"Language",
+        "profile":"Profile",
+        "licence":"Licence",
+        "setting":"Setting",
+        "about":"About",
+        "logout":"Logout",
+        "choose_lang":"Choose your language ?",
+        "alert":"Alert",
+        "logout_alert":"Are you sure you want to logout ?",
+        "no":"No",
+        "yes":"Yes"
     }
 }
