@@ -7,5 +7,6 @@ export default {
     gray_clr:'#F2F4FA',
     bullets_unicode:'\u25CF',
     inputs_bg:'#F2F2F2',
-    buttons_bg:'#0e71b4'
+    buttons_bg:'#0e71b4',
+    email_validation: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/,
 }

@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native
 import Components from '../../Components'
 import Global from '../../Global'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useTranslation } from 'react-i18next'
+
 
 const ForgotPassword = ({ handleState }) => {
     const [authObj, setAuthObj] = useState({
@@ -14,6 +16,8 @@ const ForgotPassword = ({ handleState }) => {
         email: '',
         password: ''
     })
+    const { t } = useTranslation();
+
 
     function handleChange(name, value) {
         console.log('Name >>>>>>', name, 'Value >>>>>>', value);
@@ -49,15 +53,15 @@ const ForgotPassword = ({ handleState }) => {
                 
                 <View style={{ margin: 15 }} />
                 <Components.MyButton
-                    title='Forgot Password'
+                    title= {t('forgot_password')}
                     onClick={handleLogin}
                 />
 
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                     <TouchableOpacity style={{}} onPress={()=> handleState(1)}>
                         <Text style={{ color: 'gray' }}>
-                            Not now ?{' '}
-                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>Login</Text>
+                            {t('not_now')}{' '}
+                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('Login')}</Text>
                         </Text>
                     </TouchableOpacity>
                 </View>

@@ -24,7 +24,7 @@ const SignUp = ({ handleState }) => {
         password: ''
     })
 
-    const {t , i18n} = useTranslation();
+    const { t } = useTranslation();
 
     function handleChange(name, value) {
         console.log('Name >>>>>>', name, 'Value >>>>>>', value);

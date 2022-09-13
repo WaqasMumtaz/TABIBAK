@@ -5,6 +5,9 @@
         "forgot_password":"هل نسيت كلمة السر",
         "not_register" : "لم تسجل بعد؟",
         "create_account" : "إصنع حساب",
-        "already_registerd":"مسجل بالفعل ؟"
+        "already_registerd":"مسجل بالفعل ؟",
+        "not_now":"ليس الان ؟",
+        "email_validation":"يرجى إدخال البريد الإلكتروني الصحيح",
+        "password_validation":"يجب أن يكون طول كلمة المرور 8 أحرف أو أكثر"
     }
 }

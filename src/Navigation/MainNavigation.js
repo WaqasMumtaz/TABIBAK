@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Screens from '../Screens';
 import BottomNavigation from './BottomNavigation';
+import { useSelector } from 'react-redux';
 
 
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
-  const [userData, setUserData] = useState(0);
+  // const [userData, setUserData] = useState(0);
+  const { userData } = useSelector(state => state.persistedReducer.userReducer);
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      {userData == 0 ?
+      {userData == null ?
         <Stack.Screen name="Auth" component={Screens.Auth} />
         :
         <>

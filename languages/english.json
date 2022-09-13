@@ -5,6 +5,9 @@
         "forgot_password":"Forgot Password",
         "not_register":"Not register yet?",
         "create_account": "Create Account",
-        "already_registerd":"Already registerd ?"
+        "already_registerd":"Already registerd ?",
+        "not_now":"Not now ?",
+        "email_validation":"Please Enter a Valid Email",
+        "password_validation":"Password Length should be 8 characters or more"
     }
 }

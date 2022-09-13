@@ -1,31 +1,34 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Platform, ActivityIndicator } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import FontIcon from 'react-native-vector-icons/FontAwesome5';
 import ActionSheet from 'react-native-actionsheet';
 import { useSelector, useDispatch } from 'react-redux'
-import { changeLanguage }  from '../../Redux/reducersActions/changeLanguage';
+import { changeLanguage } from '../../Redux/reducersActions/changeLanguage';
+import { updateUser } from '../../Redux/reducersActions/userReducer';
 import { useTranslation } from 'react-i18next'
 
 const Login = ({ handleState }) => {
     let actionSheet = useRef();
     let dispatch = useDispatch();
+    const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    console.log('<<<<<****** userData *******>>>>>', userData, default_language);
+    const [loader , setLoader] = useState(false);
+
     const [authObj, setAuthObj] = useState({
         email: '',
         password: ''
     })
 
-    const {t , i18n} = useTranslation();
-  
     const [errorObj, setErrorObj] = useState({
         email: '',
         password: ''
     })
 
-    const { default_language,  userReducer} = useSelector(state => state.persistedReducer);
-    console.log('<<<<<****** userData *******>>>>>', userReducer);
+    const { t, i18n } = useTranslation();
 
     // useSelector(state => console.log('<<<<******* Redux Data ******>>>>>>', state.persistedReducer));
 
@@ -40,7 +43,7 @@ const Login = ({ handleState }) => {
     }
 
     function handleChange(name, value) {
-        console.log('Name >>>>>>', name, 'Value >>>>>>', value);
+        // console.log('Name >>>>>>', name, 'Value >>>>>>', value);
         setAuthObj({
             ...authObj,
             [name]: value,
@@ -49,21 +52,40 @@ const Login = ({ handleState }) => {
 
     function handleLogin() {
         console.log('User Data ****>>>>>', authObj)
+        let { email, password } = authObj;
+        let errors = {};
+        if (Global.email_validation.test(email.replace(' ', '')) === false) {
+            errors.email = 'Please Enter a Valid Email.';
+        }
+
+        if (password.length < 5) {
+            errors.password = 'Password Length should be 8 characters or more.';
+        }
+//return
+        setErrorObj(errors);
+        if (Object.keys(errors).length === 0) {
+            setLoader(true)
+            setTimeout(()=>{
+                setLoader(false);
+                dispatch(updateUser(authObj));
+            },2000)
+        }
+
     }
 
     async function selectLang(index) {
         console.log('Language index >>>>>>>>>', index);
-            dispatch(changeLanguage(index == 0 ? 'English' : 'عربى'))
+        dispatch(changeLanguage(index == 0 ? 'English' : 'عربى'))
     }
 
     useEffect(() => {
-        if(default_language === 'عربى'){
+        if (default_language === 'عربى') {
             i18n.changeLanguage('ar')
         }
-        else if(default_language === 'English'){
+        else if (default_language === 'English') {
             i18n.changeLanguage('en')
         }
-       
+
     }, [default_language])
 
     return (
@@ -85,7 +107,7 @@ const Login = ({ handleState }) => {
                         value={authObj.email}
                         keyboardType={'email-address'}
                     />
-                    {errorObj.email ? <Text style={styles.error}>{errorObj.email}</Text> : null}
+                    {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
                         placeholder="Password"
@@ -100,7 +122,7 @@ const Login = ({ handleState }) => {
                             })}
                     />
                     {errorObj.password ? (
-                        <Text style={styles.error}>{errorObj.password}</Text>
+                        <Text style={styles.error}>{t('password_validation')}</Text>
                     ) : (
                         null
                     )}
@@ -108,13 +130,14 @@ const Login = ({ handleState }) => {
                     <Components.MyButton
                         title={t('Login')}
                         onClick={handleLogin}
+                        loader={loader}
                     />
 
                     <View style={{ flex: 0.5, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                         <TouchableOpacity style={{ margin: 15 }} onPress={() => handleState(3)}>
                             <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('forgot_password')}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={() => handleState(2)}>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleState(2)}>
                             <Text style={{ color: 'gray' }}>
                                 {t('not_register')}{' '}
                                 <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('create_account')}</Text>
@@ -123,9 +146,9 @@ const Login = ({ handleState }) => {
                     </View>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end',marginBottom:10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <TouchableOpacity style={styles.languageBox} onPress={() => openSheet()}>
-                    <Text style={{fontWeight:'bold'}}>{default_language}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>{default_language}</Text>
                     <View style={{ marginLeft: 10 }}>
                         <FontIcon name="globe" color={Global.buttons_bg} size={20} />
                     </View>
@@ -174,6 +197,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 15,
-        width:100
+        width: 100
     }
 })
