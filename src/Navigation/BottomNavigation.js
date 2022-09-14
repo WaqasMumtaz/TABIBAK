@@ -24,6 +24,7 @@ const BottomNavigation = () => {
         tabBarActiveTintColor: Global.main_color,
         tabBarStyle:{height: 60},
         tabBarLabelStyle:{fontSize:12,marginBottom:6},
+        
     })}
     >
       <Tab.Screen name={t('home')} component={Screens.Home} 

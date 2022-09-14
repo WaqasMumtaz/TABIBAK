@@ -9,18 +9,17 @@ import { useTranslation } from 'react-i18next'
 const ForgotPassword = ({ handleState }) => {
     const [authObj, setAuthObj] = useState({
         email: '',
-        password: ''
+       
     })
 
     const [errorObj, setErrorObj] = useState({
         email: '',
-        password: ''
     })
     const { t } = useTranslation();
 
 
     function handleChange(name, value) {
-        console.log('Name >>>>>>', name, 'Value >>>>>>', value);
+        // console.log('Name >>>>>>', name, 'Value >>>>>>', value);
         setAuthObj({
             ...authObj,
             [name]: value,
@@ -29,6 +28,14 @@ const ForgotPassword = ({ handleState }) => {
 
     function handleLogin() {
         console.log('User Data ****>>>>>', authObj)
+        const { email } = authObj;
+        let errors = {};
+        if (Global.email_validation.test(email.replace(' ', '')) === false) {
+            errors.email = 'Please Enter a Valid Email.';
+        }
+        setErrorObj(errors);
+
+
     }
     return (
         <KeyboardAwareScrollView
@@ -49,7 +56,7 @@ const ForgotPassword = ({ handleState }) => {
                     value={authObj.email}
                     keyboardType={'email-address'}
                 />
-                {errorObj.email ? <Text style={styles.error}>{errorObj.email}</Text> : null}
+                {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                 
                 <View style={{ margin: 15 }} />
                 <Components.MyButton

@@ -4,6 +4,8 @@ import MyCard from "./Card";
 import MyButton from "./Button";
 import TopBar from "./TopBar";
 import Logo from "./Logo";
+import PhoneNumberInput from './PhoneInput';
+import SearchInput from "./SearchInput";
 
 
 export default {
@@ -13,5 +15,7 @@ export default {
     MyCard,
     MyButton,
     TopBar,
-    Logo
+    Logo,
+    PhoneNumberInput,
+    SearchInput
 }

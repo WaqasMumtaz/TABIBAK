@@ -9,6 +9,9 @@
         "not_now":"Not now ?",
         "email_validation":"Please Enter a Valid Email",
         "password_validation":"Password Length should be 8 characters or more",
+        "first_name":"First Name is required and may only contain letters",
+        "last_name":"Last Name is required and may only contain letters",
+        "phone_validation":"Phone number is not valid",
         "home":"Home",
         "list":"List",
         "more":"More",
@@ -22,6 +25,7 @@
         "alert":"Alert",
         "logout_alert":"Are you sure you want to logout ?",
         "no":"No",
-        "yes":"Yes"
+        "yes":"Yes",
+        "search":"Search by name"
     }
 }

@@ -1,5 +1,5 @@
 export default {
-    main_color:'#00c04b',
+    main_color:'#0e71b4',
     lightGray: '#676767',
     inputFieldPlaceHolder: '#c6c7c9',
     iconBackground: '#c6c6c6',
