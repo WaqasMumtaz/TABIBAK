@@ -1,18 +1,25 @@
-import React from 'react'
-import { StyleSheet, Text, View, StatusBar, useColorScheme, } from 'react-native'
-import Global from '../../Global';
+import React from 'react';
+import {
+    StyleSheet,
+    View,
+    StatusBar,
+    SafeAreaView
+} from 'react-native';
 
-export default function MyStatusBar() {
-    const isDarkMode = useColorScheme() === 'dark';
-    const statusBarStyle = {
-        backgroundColor: Global.main_color,
-    }
-    return (
-        <StatusBar
-            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            backgroundColor={statusBarStyle.backgroundColor}
-        />
-    )
-}
+const STATUSBAR_HEIGHT = StatusBar.currentHeight;
 
+const MyStatusBar = ({backgroundColor, ...props}) => (
+  <View style={[styles.statusBar, { backgroundColor }]}>
+    <SafeAreaView>
+      <StatusBar translucent backgroundColor={backgroundColor} {...props} />
+    </SafeAreaView>
+  </View>
+);
+ 
+export default MyStatusBar;
 
+const styles = StyleSheet.create({
+  statusBar: {
+    height: STATUSBAR_HEIGHT,
+  },
+})

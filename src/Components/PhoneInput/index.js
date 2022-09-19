@@ -8,13 +8,16 @@ const PhoneNumberInput = ({
     name,
     handleChange,
     handleChangeFormatted,
-    phoneInput
+    phoneInput,
+    disabled
 }) => {
 
     return (
         <PhoneInput
             ref={phoneInput}
             defaultValue={value}
+            // disabled={disabled}
+            // disableArrowIcon={disabled}
             defaultCode="DM"
             layout="first"
             // onChangeText={(text) => {

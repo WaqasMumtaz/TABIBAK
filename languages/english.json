@@ -22,10 +22,15 @@
         "about":"About",
         "logout":"Logout",
         "choose_lang":"Choose your language ?",
+        "choose_pic":"Which one do you like ?",
         "alert":"Alert",
         "logout_alert":"Are you sure you want to logout ?",
         "no":"No",
         "yes":"Yes",
-        "search":"Search by name"
+        "search":"Search by name",
+        "cancel":"Cancel",
+        "save":"Save",
+        "gallery":"Gallery",
+        "camera":"Camera"
     }
 }

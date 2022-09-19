@@ -5,18 +5,18 @@ import Global from '../../Global';
 
 
 
-const MyCard = ({title , subTitle , uri, time , btn_title_1, btn_title_2, gif_style, handleSubmit}) => (
-  <View style={styles.card} elevation={5}>
+const MyCard = ({ data }) => (
+  <View style={styles.card} elevation={3} key={data.id}>
     {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
     <View>
-      <Text style={[styles.textStyle, {fontSize:18}]}>{title}</Text>
-      <Text style={[styles.textStyle, {fontSize:14}]}>{subTitle}</Text>
-      <Text style={[styles.textStyle, {fontSize:12}]}>{time}</Text>
+      <Text style={[styles.textStyle, {fontSize:18}]}>{data.name}</Text>
+      <Text style={[styles.textStyle, {fontSize:14}]}>{data.subTitle}</Text>
+      <Text style={[styles.textStyle, {fontSize:12}]}>{data.timeStamp}</Text>
     </View>
-     <View>
-      <Image source={uri} style={gif_style ? gif_style : styles.imageStyle}/>
+     <View style={{alignItems:'center'}}>
+      <Image source={data.avatarUrl} style={styles.imageStyle}/>
      </View>
-    <View style={{flexDirection:'row',justifyContent:'flex-end', margin:10 }}>
+    {/* <View style={{flexDirection:'row',justifyContent:'flex-end', margin:10 }}>
        <MyButton
        title={btn_title_1}
        onClick={()=> handleSubmit(btn_title_1)}
@@ -28,7 +28,7 @@ const MyCard = ({title , subTitle , uri, time , btn_title_1, btn_title_2, gif_st
        styleBtn={styles.btn_style}
        titleStyle={styles.titleStyle}
        />
-    </View>
+    </View> */}
     {/* <Card.Actions>
       <Button onClick>Cancel</Button>
       <Button>Ok</Button>
@@ -40,9 +40,11 @@ export default MyCard;
 
 const styles = StyleSheet.create({
   card:{
+    margin:8,
+    width:'41%',
     borderRadius:10,
     padding:10,
-    backgroundColor:Global.white,
+    backgroundColor:Global.inputs_bg,
     shadowColor: "#000000",
     shadowOpacity: 0.8,
     shadowRadius: 2,
@@ -64,8 +66,9 @@ const styles = StyleSheet.create({
   },
   imageStyle:{
     resizeMode:'cover',
-    height:150,
-    width:'100%'
+    height:120, 
+    width:120, 
+    borderRadius:120/2
   },
   textStyle:{
     marginVertical:5

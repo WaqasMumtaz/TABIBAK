@@ -1,3 +1,7 @@
+
+//import { useRTL } from "../../Functions"
+//const isRTL = useRTL()
+
 export default {
     main_color:'#0e71b4',
     lightGray: '#676767',
@@ -9,4 +13,5 @@ export default {
     inputs_bg:'#F2F2F2',
     buttons_bg:'#0e71b4',
     email_validation: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/,
+    dark_gray:'#a9a9a9'
 }

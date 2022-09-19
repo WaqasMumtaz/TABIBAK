@@ -20,6 +20,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import Global from './src/Global';
 
 import SplashScreen from 'react-native-splash-screen';
 
@@ -78,8 +79,9 @@ const App = () => {
   },[])
 
   return (
+    <>
+      <Components.MyStatusBar backgroundColor={Global.main_color} barStyle="light-content"/>
     <SafeAreaView style={[backgroundStyle, {flex:1}]}>
-      <Components.MyStatusBar/>
       {/* <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={statusBarStyle.backgroundColor}
@@ -112,6 +114,7 @@ const App = () => {
         </View>
       </ScrollView> */}
     </SafeAreaView>
+    </>
   );
 };
 

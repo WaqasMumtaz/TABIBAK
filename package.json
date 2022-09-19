@@ -21,6 +21,7 @@
     "react-native": "0.70.0",
     "react-native-actionsheet": "^2.4.2",
     "react-native-elements": "^3.4.2",
+    "react-native-image-crop-picker": "^0.38.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-paper": "^4.12.4",
     "react-native-phone-number-input": "^2.1.0",

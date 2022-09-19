@@ -83,11 +83,12 @@ const SignUp = ({ handleState }) => {
 
     return (
         <KeyboardAwareScrollView
-            style={{ flexGrow: 1, backgroundColor: 'white' }}
+            style={{backgroundColor: 'white' }}
             contentContainerStyle={{ flexGrow: 1 }}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+            //  keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+             enableOnAndroid={true}
         >
-            <View style={styles.container}>
+             <View style={styles.container}>
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Components.Logo />
                 </View>
@@ -171,7 +172,7 @@ const SignUp = ({ handleState }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+             </View> 
         </KeyboardAwareScrollView>
     )
 }

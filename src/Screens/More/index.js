@@ -78,6 +78,10 @@ const More = () => {
     else if (title === t('lang')) {
       openSheet()
     }
+    else if (title === t('profile')){
+      navigation.navigate('Profile');
+    }
+
     // navigation.navigate('Detail', { title , detail, point_1, point_2, point_3 });
   }
 
