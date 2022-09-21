@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, SafeAreaView, FlatList, TouchableOpacity, Alert } from 'react-native'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react';
+import Components from '../../Components';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,6 +18,8 @@ const More = () => {
   const dispatch = useDispatch();
   const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
   const { t, i18n } = useTranslation();
+
+  const isRTL = i18n.dir();
 
   let optionArray = [
     'English',
@@ -39,8 +42,10 @@ const More = () => {
 
   }, {
     id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title: t('licence'),
-    icon: "logo-usd",
+    title:t('member'),
+    icon:'person-add'
+    // title: t('licence'),
+    // icon: "logo-usd",
 
   }, {
     id: "68694a0f-3da1-431f-bd56-142371e29d72",
@@ -81,6 +86,9 @@ const More = () => {
     else if (title === t('profile')){
       navigation.navigate('Profile');
     }
+    else if(title === t('member')) {
+      navigation.navigate('Family Members');
+    }
 
     // navigation.navigate('Detail', { title , detail, point_1, point_2, point_3 });
   }
@@ -101,9 +109,9 @@ const More = () => {
   }, [default_language])
 
 
-  const renderItemEnglish = ({ item }) => (
+  const renderItems = ({ item }) => (
     <TouchableOpacity
-      style={styles.cardList}
+      style={[styles.cardList, {flexDirection: isRTL === 'rtl' ? 'row-reverse' : 'row'}]}
       onPress={() => handleNavigate(item.title)}
     >
       <View style={{ marginLeft: 10 }}>
@@ -115,26 +123,17 @@ const More = () => {
     </TouchableOpacity>
   )
 
-  const renderItemArabic = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.cardList, { justifyContent: 'flex-end' }]}
-      onPress={() => handleNavigate(item.title)}
-    >
-      <View style={{ marginRight: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.title}</Text>
-      </View>
-      <View style={{ marginRight: 10 }}>
-        <IonicIcon name={item.icon} color={Global.main_color} size={30} />
-      </View>
-    </TouchableOpacity>
-  )
+
+  console.log('RTL >>>>', isRTL);
+  //isRTL === 'rtl' ? 'right' : 'left'
 
   return (
     <SafeAreaView style={styles.container}>
+      <Components.TopBar title={t('more')} />
       <View style={{ flex: 1, marginTop: 20 }}>
         <FlatList
           data={DATA}
-          renderItem={default_language === 'English' ? renderItemEnglish : renderItemArabic}
+          renderItem={renderItems}
           keyExtractor={item => `item_${item.id}`}
           ItemSeparatorComponent={() => (<View style={{ borderWidth: 1.5, borderColor: Global.gray_clr }}></View>)}
         />
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   cardList: {
-    flexDirection: 'row',
+    // flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Global.white,
     padding: 10,

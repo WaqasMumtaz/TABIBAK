@@ -6,18 +6,18 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next'
 import SearchInput from '../SearchInput';
 
-export default function TopBar({ title, home = false, backBtn }) {
+export default function TopBar({ title, home = false, backBtn, backIcon = false }) {
   const navigation = useNavigation();
-  const [searchValue , setSearchValue] = useState({
-    name:''
+  const [searchValue, setSearchValue] = useState({
+    name: ''
   });
 
-  const { t  } = useTranslation();
+  const { t } = useTranslation();
 
-  function handleChange(name , value) {
+  function handleChange(name, value) {
     setSearchValue({
       ...searchValue,
-      [name]:value
+      [name]: value
     })
   }
 
@@ -28,18 +28,18 @@ export default function TopBar({ title, home = false, backBtn }) {
         <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{title}</Text>
       </View>
       <View style={styles.containerText}>
-          {/* <Text>Hello waqas</Text> */}
-          <SearchInput
-           placeholder={t('search')}
-           name={'search'}
-           handleChange={(name, value) => handleChange(name, value)}
-           value={searchValue}
-           icon='search-outline'
-          />
+        {/* <Text>Hello waqas</Text> */}
+        <SearchInput
+          placeholder={t('search')}
+          name={'search'}
+          handleChange={(name, value) => handleChange(name, value)}
+          value={searchValue}
+          icon='search-outline'
+        />
       </View>
     </View>
 
-  ) : (
+  ) : backIcon ? (
     <View style={[Platform.OS === 'android' ? styles.androidTopBarWithIcon : styles.iosWithIcon]}>
       <TouchableOpacity
         onPress={() => (backBtn ? backBtn() : navigation.goBack())}
@@ -53,11 +53,16 @@ export default function TopBar({ title, home = false, backBtn }) {
           {title}
         </Text>
       </View>
-
-
-
     </View>
-  );
+  )
+    :
+    (
+      <View style={styles.androidTopBar}>
+        <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>
+          {title}
+        </Text>
+      </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -67,7 +72,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: Global.main_color,
-    
+
     // marginTop:20
   },
   homeTopBarStyle: {
@@ -81,11 +86,11 @@ const styles = StyleSheet.create({
   containerText: {
     position: 'relative',
     elevation: 3,
-   //  backgroundColor: '#FB8500',
+    //  backgroundColor: '#FB8500',
     // padding: 3,
     borderRadius: 12,
-    marginHorizontal:'6%',
-    top:37,
+    marginHorizontal: '6%',
+    top: 37,
     // left:-30,
     // right:-30
     // marginTop: 30,

@@ -24,6 +24,7 @@ function Navigation() {
           <Stack.Screen name="Bottom Tabs" component={BottomNavigation} />
           <Stack.Screen name="Detail" component={Screens.DetailsPage} />
           <Stack.Screen name="Profile" component={Screens.Profile}/>
+          <Stack.Screen name="Family Members" component={Screens.FamilyMembers}/>
         </>
       }
 

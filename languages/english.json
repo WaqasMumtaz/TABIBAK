@@ -31,6 +31,9 @@
         "cancel":"Cancel",
         "save":"Save",
         "gallery":"Gallery",
-        "camera":"Camera"
+        "camera":"Camera",
+        "member":"Family Members",
+        "users":"Users List",
+        "add_member":"Add Member"
     }
 }

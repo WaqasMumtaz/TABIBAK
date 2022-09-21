@@ -4,6 +4,7 @@ import More from "./More";
 import DetailsPage from "./Details";
 import Auth from "./Auth";
 import Profile from "./Profile";
+import FamilyMembers from './FamilyMembers';
 
 export default {
     Home,
@@ -11,5 +12,6 @@ export default {
     More,
     DetailsPage,
     Auth,
-    Profile
+    Profile,
+    FamilyMembers
 }

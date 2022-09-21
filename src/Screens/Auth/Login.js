@@ -15,7 +15,7 @@ const Login = ({ handleState }) => {
     let dispatch = useDispatch();
     const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
-    console.log('<<<<<****** userData *******>>>>>', userData, default_language);
+   // console.log('<<<<<****** userData *******>>>>>', userData, default_language);
     const [loader , setLoader] = useState(false);
 
     const [authObj, setAuthObj] = useState({
