@@ -1,16 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
 import Components from '../../Components'
 import translate from 'translate-google-api';
 import { useTranslation } from 'react-i18next';
 import Global from '../../Global';
 
+
 const FamilyMembers = () => {
+    const phoneInput = useRef(null);
     const [DATA, setDATA] = useState(null);
     const [visible, setVisible] = useState(true);
     const [modal, setModal] = useState(false);
 
     const { t, i18n } = useTranslation();
+
+
+    const [authObj, setAuthObj] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        password: '',
+        family_key: ''
+    })
+
+    const [errorObj, setErrorObj] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        password: ''
+    })
+
 
     const isRTL = i18n.dir();
 
@@ -20,6 +41,17 @@ const FamilyMembers = () => {
 
     function handleModal() {
         setModal(modal => !modal)
+    }
+
+    function handleChange(name, value) {
+        // console.log('Name >>>>>>', name, 'Value >>>>>>', value);
+        setAuthObj({
+            ...authObj,
+            [name]: value,
+        });
+    }
+    function handleChangeFormatted(params) {
+        console.log('Phone Number Formatted *****>>>>>>>>>', params);
     }
 
     async function fetchFamilyMembers(params) {
@@ -90,9 +122,75 @@ const FamilyMembers = () => {
                 title={t('add_member')}
                 handleModal={handleModal}
             >
-                <View>
-                    <Text>This form Screen</Text>
-                </View>
+                <ScrollView keyboardShouldPersistTaps='always'>
+                    <View style={{ flex: 1, marginHorizontal: 20 }}>
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.InputField
+                            placeholder="First Name"
+                            name={'first_name'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.first_name}
+                        />
+                        {errorObj.first_name ? <Text style={styles.error}>{t('first_name')}</Text> : null}
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.InputField
+                            placeholder="Last Name"
+                            name={'last_name'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.last_name}
+                        />
+                        {errorObj.last_name ? <Text style={styles.error}>{t('last_name')}</Text> : null}
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.PhoneNumberInput
+                            name='phone'
+                            handleChange={handleChange}
+                            handleChangeFormatted={handleChangeFormatted}
+                            phoneInput={phoneInput}
+                        />
+                        {/* <Components.InputField
+                        placeholder="Phone"
+                        name={'phone'}
+                        handleChange={(name, value) => handleChange(name, value)}
+                        value={authObj.phone}
+                    /> */}
+                        {errorObj.phone ? <Text style={styles.error}>{t('phone_validation')}</Text> : null}
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.InputField
+                            placeholder="Email"
+                            name={'email'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.email}
+                            keyboardType={'email-address'}
+                        />
+                        {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.InputField
+                            placeholder="Family key (Optional)"
+                            name={'family_key'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.family_key}
+                        />
+                        <View style={{ marginBottom: 15 }} />
+                        <Components.InputField
+                            placeholder="Password"
+                            secureTextEntry={!authObj.showPass}
+                            name={'password'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.password}
+                            onPress={() =>
+                                setAuthObj({
+                                    ...authObj,
+                                    showPass: !authObj.showPass,
+                                })}
+                        />
+                        {errorObj.password ? (
+                            <Text style={styles.error}>{t('password_validation')}</Text>
+                        ) : (
+                            null
+                        )}
+                        <View style={{ margin: 15 }} />
+                    </View>
+                </ScrollView>
             </Components.ModalScreen>
         </SafeAreaView>
     )
