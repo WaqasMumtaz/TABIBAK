@@ -20,12 +20,15 @@ const PhoneNumberInput = ({
             // disableArrowIcon={disabled}
             defaultCode="DM"
             layout="first"
-            // onChangeText={(text) => {
+            onChangeText={(text) => {
+                handleChange(name,text);
+            }}
+            // onChangeFormattedText={(text) => {
+            //     // handleChangeFormatted(text);
             //     handleChange(name,text);
             // }}
-            onChangeFormattedText={(text) => {
-                // handleChangeFormatted(text);
-                handleChange(name,text);
+            onChangeCountry={(value)=> {
+                handleChangeFormatted(value)
             }}
             // withDarkTheme
             // withShadow

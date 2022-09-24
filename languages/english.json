@@ -34,6 +34,9 @@
         "camera":"Camera",
         "member":"Family Members",
         "users":"Users List",
-        "add_member":"Add Member"
+        "add_member":"Add Member",
+        "add":"Add",
+        "clear":"Clear"
+
     }
 }

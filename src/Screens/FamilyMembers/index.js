@@ -4,13 +4,15 @@ import Components from '../../Components'
 import translate from 'translate-google-api';
 import { useTranslation } from 'react-i18next';
 import Global from '../../Global';
+import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
 
 
 const FamilyMembers = () => {
-    const phoneInput = useRef(null);
+    let phoneInput = useRef(null);
     const [DATA, setDATA] = useState(null);
     const [visible, setVisible] = useState(true);
     const [modal, setModal] = useState(false);
+    const [loader, setLoader] = useState(false);
 
     const { t, i18n } = useTranslation();
 
@@ -44,14 +46,14 @@ const FamilyMembers = () => {
     }
 
     function handleChange(name, value) {
-        // console.log('Name >>>>>>', name, 'Value >>>>>>', value);
+        console.log('Name >>>>>>', name, 'Value >>>>>>', value);
         setAuthObj({
             ...authObj,
             [name]: value,
         });
     }
     function handleChangeFormatted(params) {
-        console.log('Phone Number Formatted *****>>>>>>>>>', params);
+        console.log('Get Country *****>>>>>>>>>', params);
     }
 
     async function fetchFamilyMembers(params) {
@@ -97,6 +99,80 @@ const FamilyMembers = () => {
 
     }
 
+    function handleSave() {
+        // console.log('User Data ****>>>>>', authObj)
+        let { email, password, first_name, last_name, phone, family_key } = authObj;
+        let errors = {};
+        // console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
+        //   return
+        if (Global.email_validation.test(email.replace(' ', '')) === false) {
+            errors.email = 'Please enter a valid email.';
+        }
+        console.log('Password Error >>', hasValidLength(password));
+        if (!hasValidLength(password)) {
+            errors.password = "Your password must have 8 or more characters"
+        }
+        // else {
+        //     errors.password = ''
+        // }
+        if (!hasMixed(password)) {
+            errors.password = "Your password must have upper & lowercase letters"
+
+        }
+        if (!hasNumber(password)) {
+            errors.password = "Your password must have at least one number"
+
+        }
+        if (!hasSpecial(password)) {
+            errors.password = "Your password must have at least one special character"
+        }
+
+        if (first_name == '' || !/^[a-zA-Z]+$/.test(first_name)) {
+            errors.first_name = 'First Name is required and may only contain letters';
+
+        }
+        if (last_name == '' || !/^[a-zA-Z]+$/.test(last_name)) {
+            errors.last_name = 'Last Name is required and may only contain letters';
+
+        }
+        // console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
+        // if (phoneInput.current?.isValidNumber(phone) == false) {
+        //     errors.phone = 'Phone number is not valid';
+
+        // }
+        console.log('Errors Details >>>>', errors);
+        setErrorObj(errors);
+        if (Object.keys(errors).length === 0) {
+            setLoader(true)
+            // setTimeout(()=>{
+            //     setLoader(false);
+            //     dispatch(updateUser(authObj));
+            // },2000)
+        }
+    }
+
+    function handleClear() {
+        //alert('Clear form')
+        // phoneInput = null;
+        setAuthObj({
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone: '',
+            password: '',
+            family_key: '',
+        })
+        setErrorObj({
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone: '',
+            password: ''
+        })
+        setLoader(false);
+    }
+
+
     useEffect(() => {
         fetchFamilyMembers();
     }, [])
@@ -141,18 +217,20 @@ const FamilyMembers = () => {
                         />
                         {errorObj.last_name ? <Text style={styles.error}>{t('last_name')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
-                        <Components.PhoneNumberInput
+                        {/* <Components.PhoneNumberInput
                             name='phone'
+                            value={authObj.phone}
                             handleChange={handleChange}
                             handleChangeFormatted={handleChangeFormatted}
                             phoneInput={phoneInput}
+                        /> */}
+                        <Components.InputField
+                            placeholder="Phone"
+                            name={'phone'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.phone}
+                            keyboardType='phone-pad'
                         />
-                        {/* <Components.InputField
-                        placeholder="Phone"
-                        name={'phone'}
-                        handleChange={(name, value) => handleChange(name, value)}
-                        value={authObj.phone}
-                    /> */}
                         {errorObj.phone ? <Text style={styles.error}>{t('phone_validation')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
                         <Components.InputField
@@ -188,7 +266,25 @@ const FamilyMembers = () => {
                         ) : (
                             null
                         )}
-                        <View style={{ margin: 15 }} />
+                        <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ margin: 10 }}>
+                                <Components.MyButton
+                                    title={t('add')}
+                                    styleBtn={{ width: 120 }}
+                                    loader={loader}
+                                    onClick={handleSave}
+                                />
+                            </View>
+                            <View style={{ margin: 10 }}>
+                                <Components.MyButton
+                                    title={t('clear')}
+                                    styleBtn={{ width: 120, backgroundColor: Global.inputs_bg }}
+                                    titleStyle={{ color: 'black' }}
+                                    onClick={handleClear}
+                                />
+
+                            </View>
+                        </View>
                     </View>
                 </ScrollView>
             </Components.ModalScreen>
@@ -202,5 +298,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
+    },
+    error: {
+        textAlign: 'center',
+        color: 'red',
     }
 })

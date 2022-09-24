@@ -9,6 +9,7 @@ const hasNumber = value => {
     return new RegExp(/[!#@$%^&*)(+=._-]/).test(value);
  }
  const hasValidLength=value=>{
+     console.log('HasLength >>>>>', value.length)
      if(value.length < 8 )
      return false
 
