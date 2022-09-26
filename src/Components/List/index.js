@@ -5,11 +5,12 @@ import FontIcon from 'react-native-vector-icons/FontAwesome5'
 import Global from '../../Global'
 import Components from '..'
 
-const MembersList = ({ data, userOperation, listStyle }) => {
+const MembersList = ({ data, userOperation, listStyle, isRTL }) => {
 
     function renderItems({ item }) {
 
         let listContainer = {
+            flexDirection:'row',
             marginHorizontal: 18,
             margin: 8,
             paddingVertical: 8,
@@ -19,15 +20,18 @@ const MembersList = ({ data, userOperation, listStyle }) => {
         return (
             <View style={{ ...listContainer, ...listStyle }}>
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize:17, fontWeight:'bold' }}>{item.label}</Text>
+                    <Text style={{ fontSize:17, fontWeight:'bold' }}>{`${item.first_name} ${item.last_name}`}</Text>
                 </View>
                 <View style={styles.options}>
-                    <TouchableOpacity onPress={() => userOperation('edit', item.value)}>
+                    <TouchableOpacity onPress={() => userOperation('edit', item)}>
                         <FontIcon name="pencil-alt" color={Global.main_color} size={18} />
                         {/* <Text style={[styles.btnText, { textDecorationLine: 'underline' }]}>Edit</Text> */}
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => userOperation('delete', item.value)}>
+                    <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => userOperation('delete', item)}>
                         <Icon name="trash-outline" color={Global.main_color} size={20} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => userOperation('view', item)}>
+                        <Icon name="open-outline" color={Global.main_color} size={20} />
                     </TouchableOpacity>
                 </View>
 

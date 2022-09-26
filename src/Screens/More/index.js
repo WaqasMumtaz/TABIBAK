@@ -130,12 +130,12 @@ const More = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Components.TopBar title={t('more')} />
-      <View style={{ flex: 1, marginTop: 20 }}>
+      <View style={{ flex: 1, }}>
         <FlatList
           data={DATA}
           renderItem={renderItems}
           keyExtractor={item => `item_${item.id}`}
-          ItemSeparatorComponent={() => (<View style={{ borderWidth: 1.5, borderColor: Global.gray_clr }}></View>)}
+          ItemSeparatorComponent={() => (<View></View>)}
         />
       </View>
       <ActionSheet
@@ -156,13 +156,15 @@ export default More
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor:'white'
   },
   cardList: {
     // flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Global.white,
+    backgroundColor: Global.inputs_bg,
     padding: 10,
-    height: 70
+    height: 70,
+    marginTop:15
   }
 })

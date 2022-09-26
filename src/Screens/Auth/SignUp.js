@@ -53,17 +53,17 @@ const SignUp = ({ handleState }) => {
         if (!hasValidLength(password)) {
             errors.password = "Your password must have 8 or more characters"
         }
-        if (!hasMixed(password)) {
-            errors.password = "Your password must have upper & lowercase letters"
+        // if (!hasMixed(password)) {
+        //     errors.password = "Your password must have upper & lowercase letters"
 
-        }
-        if (!hasNumber(password)) {
-            errors.password = "Your password must have at least one number"
+        // }
+        // if (!hasNumber(password)) {
+        //     errors.password = "Your password must have at least one number"
 
-        }
-        if (!hasSpecial(password)) {
-            errors.password = "Your password must have at least one special character"
-        }
+        // }
+        // if (!hasSpecial(password)) {
+        //     errors.password = "Your password must have at least one special character"
+        // }
 
         if (first_name == '' || !/^[a-zA-Z]+$/.test(first_name)) {
             errors.first_name = 'First Name is required and may only contain letters';

@@ -36,7 +36,9 @@
         "users":"Users List",
         "add_member":"Add Member",
         "add":"Add",
-        "clear":"Clear"
+        "clear":"Clear",
+        "delete_member":"Are you sure to remove this member ?",
+        "ok":"OK"
 
     }
 }

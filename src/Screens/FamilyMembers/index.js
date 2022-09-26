@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, Alert } from 'react-native'
 import Components from '../../Components'
 import translate from 'translate-google-api';
 import { useTranslation } from 'react-i18next';
 import Global from '../../Global';
 import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
+import { alertDialog ,showAlert} from '../../../Functions';
 
 
 const FamilyMembers = () => {
@@ -23,7 +24,8 @@ const FamilyMembers = () => {
         email: '',
         phone: '',
         password: '',
-        family_key: ''
+        family_key: '',
+        form_type: 'add'
     })
 
     const [errorObj, setErrorObj] = useState({
@@ -37,8 +39,41 @@ const FamilyMembers = () => {
 
     const isRTL = i18n.dir();
 
-    function userOperation(params) {
-        console.log('Params >>>', params);
+    function deleteMember(i) {
+        console.log('iiiii member >>>', i);
+        let users = [...DATA];
+        let indx = users.findIndex(x => x.value === i);
+        if(indx != -1){
+             users.splice(indx, 1);
+             showAlert(t('alert'),isRTL == 'rtl' ? 'تمت إزالة المستخدم بنجاح' : 'User successfully removed', t('ok'));
+             setDATA(users)
+        }
+
+    }
+
+    function userOperation(params, data) {
+        console.log('Params >>>', params, data);
+        if (params === 'edit'){ 
+            setAuthObj({
+                ...authObj,
+                first_name:data.first_name,
+                last_name:data.last_name,
+                fullName:data.label,
+                form_type:'edit'
+            })
+            setModal(modal => !modal);
+        }
+        else if (params === 'delete') alertDialog(t('alert'), t('delete_member'), deleteMember, data.value, options={yes:t('yes'), no:t('no')});
+        else if (params === 'view') {
+            setAuthObj({
+                ...authObj,
+                first_name:data.first_name,
+                last_name:data.last_name,
+                fullName:data.label,
+                form_type:'view'
+            })
+            setModal(modal => !modal);
+        }
     }
 
     function handleModal() {
@@ -60,42 +95,50 @@ const FamilyMembers = () => {
         let data = [];
         const res = [{
             value: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-            label: 'Ahmed',
+            first_name: 'Ahmed',
+            last_name:'Ali'
 
         }, {
             value: "58694a0f-3da1-471f-bd96-145571e29d72",
-            label: 'Zain',
+            first_name: 'Zain',
+            last_name:'Abbas'
 
         }, {
             value: "68694a0f-3da1-431f-bd56-142371e29d72",
-            label: 'Qureshi'
+            first_name: 'Qureshi',
+            last_name:'Qais'
         }, {
             value: "28694a0f-3da1-471f-bd96-142456e29d72",
-            label: 'Naeem'
+            first_name: 'Naeem',
+            last_name:'Badar'
         },
         {
             value: "28694a0f-3da1-471f-bd96-142456e29d73",
-            label: 'Nabi',
+            first_name: 'Nabi',
+            last_name:'Noor'
         }
         ]
-        if (isRTL === 'rtl') {
-            for (const iterator of res) {
-                const result = await translate(`${iterator.label}`, {
-                    tld: "cn",
-                    to: "ar",
-                });
-                let obj = {
-                    ...iterator,
-                    label: result[0]
-                }
-                data.push(obj);
-            }
-            // console.log('After Change lang name >>>>', data);
-            setDATA(data);
-        }
-        else {
+        setDATA(res);
+
+        // if (isRTL === 'rtl') {
+        //     for (const iterator of res) {
+        //         const result = await translate(`${iterator.first_name}`, {
+        //             tld: "cn",
+        //             to: "ar",
+        //         });
+        //         console.log('After Change lang name >>>>', result);
+        //         // let obj = {
+        //         //     ...iterator,
+        //         //     label: result[0]
+        //         // }
+        //         // data.push(obj);
+        //     }
+        //     // console.log('After Change lang name >>>>', data);
+        //     setDATA(data);
+        // }
+       // else {
             setDATA(res);
-        }
+        //}
 
     }
 
@@ -115,17 +158,17 @@ const FamilyMembers = () => {
         // else {
         //     errors.password = ''
         // }
-        if (!hasMixed(password)) {
-            errors.password = "Your password must have upper & lowercase letters"
+        // if (!hasMixed(password)) {
+        //     errors.password = "Your password must have upper & lowercase letters"
 
-        }
-        if (!hasNumber(password)) {
-            errors.password = "Your password must have at least one number"
+        // }
+        // if (!hasNumber(password)) {
+        //     errors.password = "Your password must have at least one number"
 
-        }
-        if (!hasSpecial(password)) {
-            errors.password = "Your password must have at least one special character"
-        }
+        // }
+        // if (!hasSpecial(password)) {
+        //     errors.password = "Your password must have at least one special character"
+        // }
 
         if (first_name == '' || !/^[a-zA-Z]+$/.test(first_name)) {
             errors.first_name = 'First Name is required and may only contain letters';
@@ -155,6 +198,7 @@ const FamilyMembers = () => {
         //alert('Clear form')
         // phoneInput = null;
         setAuthObj({
+            ...authObj,
             first_name: '',
             last_name: '',
             email: '',
@@ -183,7 +227,8 @@ const FamilyMembers = () => {
             <Components.MembersList
                 data={DATA}
                 userOperation={userOperation}
-                listStyle={{ flexDirection: isRTL === 'rtl' ? 'row-reverse' : 'row' }}
+                // listStyle={{ flexDirection: isRTL === 'rtl' ? 'row-reverse' : 'row' }}
+                isRTL={isRTL}
             />
             <Components.FABComponent
                 visible={visible}
@@ -206,6 +251,8 @@ const FamilyMembers = () => {
                             name={'first_name'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.first_name}
+                            editable={(authObj.form_type === 'add' || authObj.form_type === 'edit') ? true : false}
+                            styleInputs={{textAlign: (isRTL == 'rtl' && authObj.form_type === 'view') ? 'right' : 'left'}}
                         />
                         {errorObj.first_name ? <Text style={styles.error}>{t('first_name')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
@@ -214,6 +261,9 @@ const FamilyMembers = () => {
                             name={'last_name'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.last_name}
+                            editable={(authObj.form_type === 'add' || authObj.form_type === 'edit') ? true : false}
+                            styleInputs={{textAlign: (isRTL == 'rtl' && authObj.form_type === 'view') ? 'right' : 'left'}}
+
                         />
                         {errorObj.last_name ? <Text style={styles.error}>{t('last_name')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
@@ -230,6 +280,9 @@ const FamilyMembers = () => {
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.phone}
                             keyboardType='phone-pad'
+                            editable={(authObj.form_type === 'add' || authObj.form_type === 'edit') ? true : false}
+                            styleInputs={{textAlign: (isRTL == 'rtl' && authObj.form_type === 'view') ? 'right' : 'left'}}
+
                         />
                         {errorObj.phone ? <Text style={styles.error}>{t('phone_validation')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
@@ -239,6 +292,9 @@ const FamilyMembers = () => {
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.email}
                             keyboardType={'email-address'}
+                            editable={(authObj.form_type === 'add' || authObj.form_type === 'edit') ? true : false}
+                            styleInputs={{textAlign: (isRTL == 'rtl' && authObj.form_type === 'view') ? 'right' : 'left'}}
+
                         />
                         {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
@@ -247,44 +303,59 @@ const FamilyMembers = () => {
                             name={'family_key'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.family_key}
+                            editable={(authObj.form_type === 'add' || authObj.form_type === 'edit') ? true : false}
+                            styleInputs={{textAlign: (isRTL == 'rtl' && authObj.form_type === 'view') ? 'right' : 'left'}}
+
                         />
                         <View style={{ marginBottom: 15 }} />
-                        <Components.InputField
-                            placeholder="Password"
-                            secureTextEntry={!authObj.showPass}
-                            name={'password'}
-                            handleChange={(name, value) => handleChange(name, value)}
-                            value={authObj.password}
-                            onPress={() =>
-                                setAuthObj({
-                                    ...authObj,
-                                    showPass: !authObj.showPass,
-                                })}
-                        />
-                        {errorObj.password ? (
-                            <Text style={styles.error}>{t('password_validation')}</Text>
-                        ) : (
+                        {authObj.form_type === 'add' ? (
+                            <>
+                                <Components.InputField
+                                    placeholder="Password"
+                                    secureTextEntry={!authObj.showPass}
+                                    name={'password'}
+                                    handleChange={(name, value) => handleChange(name, value)}
+                                    value={authObj.password}
+                                    onPress={() =>
+                                        setAuthObj({
+                                            ...authObj,
+                                            showPass: !authObj.showPass,
+                                        })}
+                                />
+                                {errorObj.password ? (
+                                    <Text style={styles.error}>{t('password_validation')}</Text>
+                                ) : (
+                                    null
+                                )}
+                            </>
+                        )
+                            :
                             null
-                        )}
-                        <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                            <View style={{ margin: 10 }}>
-                                <Components.MyButton
-                                    title={t('add')}
-                                    styleBtn={{ width: 120 }}
-                                    loader={loader}
-                                    onClick={handleSave}
-                                />
-                            </View>
-                            <View style={{ margin: 10 }}>
-                                <Components.MyButton
-                                    title={t('clear')}
-                                    styleBtn={{ width: 120, backgroundColor: Global.inputs_bg }}
-                                    titleStyle={{ color: 'black' }}
-                                    onClick={handleClear}
-                                />
+                        }
+                        {(authObj.form_type === 'edit' || authObj.form_type === 'add') ? (
+                            <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <View style={{ margin: 10 }}>
+                                    <Components.MyButton
+                                        title={authObj.form_type === 'add' ? t('add') : t('save')}
+                                        styleBtn={{ width: 120 }}
+                                        loader={loader}
+                                        onClick={handleSave}
+                                    />
+                                </View>
+                                <View style={{ margin: 10 }}>
+                                    <Components.MyButton
+                                        title={t('clear')}
+                                        styleBtn={{ width: 120, backgroundColor: Global.inputs_bg }}
+                                        titleStyle={{ color: 'black' }}
+                                        onClick={handleClear}
+                                    />
 
+                                </View>
                             </View>
-                        </View>
+                        )
+                            :
+                            null
+                        }
                     </View>
                 </ScrollView>
             </Components.ModalScreen>
