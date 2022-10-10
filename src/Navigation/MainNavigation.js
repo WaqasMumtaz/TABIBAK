@@ -25,6 +25,10 @@ function Navigation() {
           <Stack.Screen name="Detail" component={Screens.DetailsPage} />
           <Stack.Screen name="Profile" component={Screens.Profile}/>
           <Stack.Screen name="Family Members" component={Screens.FamilyMembers}/>
+          <Stack.Screen name="DoctorsTile" component={Screens.DoctorsTile}/>
+          <Stack.Screen name="DoctorProfile" component={Screens.DoctorProfile}/>
+          <Stack.Screen name="Appointment" component={Screens.AppointmentForm}/>
+
         </>
       }
 

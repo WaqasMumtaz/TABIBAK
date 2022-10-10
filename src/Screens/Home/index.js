@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, FlatList, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, FlatList, ScrollView, TouchableOpacity } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global'
-import case1 from '../../Assets/case_1.jpeg'
-import case2 from '../../Assets/case_2.jpeg'
-import case3 from '../../Assets/case_3.jpeg'
-import case4 from '../../Assets/case_4.jpeg'
-import case5 from '../../Assets/case_5.jpeg'
 import { useTranslation } from 'react-i18next'
+import { useNavigation } from '@react-navigation/native';
 
 
 const Home = () => {
+    const navigation = useNavigation();
     const { t } = useTranslation();
     const [authObj, setAuthObj] = useState({
         search: ''
@@ -24,55 +21,59 @@ const Home = () => {
         });
     }
 
-    const DATA = [{
+
+    const CATEGORIES = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-        name: "Dr. Kumar",
-        timeStamp: "12:47 PM",
-        subTitle: "Specialist",
-        avatarUrl: case1
-        // avatarUrl: "https://www.google.com/search?q=fbr+tax+collection+images&rlz=1C1ONGR_enPK976PK976&sxsrf=ALiCzsbp0_n_n92v8yIfya4WhFIWUOPjEQ:1662404600891&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj229Xdq_75AhWpMlkFHUMMDf8Q_AUoAnoECAEQBA&biw=1280&bih=577&dpr=1.5#imgrc=hLmfBbQJXSDzlM"
+        category: t('category_1')
     }, {
         id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-        name: "Dr. Saif",
-        timeStamp: "11:11 PM",
-        subTitle: "Cardio Specialist",
-        avatarUrl: case2
-        //avatarUrl: "https://www.google.com/search?q=fbr+tax+collection+images&rlz=1C1ONGR_enPK976PK976&sxsrf=ALiCzsbp0_n_n92v8yIfya4WhFIWUOPjEQ:1662404600891&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj229Xdq_75AhWpMlkFHUMMDf8Q_AUoAnoECAEQBA&biw=1280&bih=577&dpr=1.5#imgrc=by_xKEh1YSq2WM"
+        category: t('category_2')
     }, {
         id: "58694a0f-3da1-471f-bd96-145571e29d72",
-        name: "Dr. Rumi",
-        timeStamp: "6:22 PM",
-        subTitle: "Gyani Specialist",
-        avatarUrl: case3
-        //avatarUrl: "https://www.google.com/search?q=fbr+tax+collection+images&rlz=1C1ONGR_enPK976PK976&sxsrf=ALiCzsbp0_n_n92v8yIfya4WhFIWUOPjEQ:1662404600891&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj229Xdq_75AhWpMlkFHUMMDf8Q_AUoAnoECAEQBA&biw=1280&bih=577&dpr=1.5#imgrc=4_ezFtQMlDkR1M"
+        category: t('category_3')
     }, {
         id: "68694a0f-3da1-431f-bd56-142371e29d72",
-        name: "Dr. Dawood",
-        timeStamp: "8:56 PM",
-        subTitle: "Child Specialist",
-        avatarUrl: case4
-        // avatarUrl: "https://www.google.com/search?q=fbr+tax+collection+images&rlz=1C1ONGR_enPK976PK976&sxsrf=ALiCzsbp0_n_n92v8yIfya4WhFIWUOPjEQ:1662404600891&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj229Xdq_75AhWpMlkFHUMMDf8Q_AUoAnoECAEQBA&biw=1280&bih=577&dpr=1.5#imgrc=4_ezFtQMlDkR1M"
+        category: t('category_4')
+
     }, {
         id: "28694a0f-3da1-471f-bd96-142456e29d72",
-        name: "Dr. Noor",
-        timeStamp: "12:47 PM",
-        subTitle: "Specialist",
-        avatarUrl: case5
-        // avatarUrl: "https://www.google.com/search?q=fbr+tax+collection+images&rlz=1C1ONGR_enPK976PK976&sxsrf=ALiCzsbp0_n_n92v8yIfya4WhFIWUOPjEQ:1662404600891&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj229Xdq_75AhWpMlkFHUMMDf8Q_AUoAnoECAEQBA&biw=1280&bih=577&dpr=1.5#imgrc=B_pNo7CE4kUZmM"
+        category: t('category_5')
     }
     ]
 
+    function handleNavigate(data) {
+        console.log('Data clicked >>>>', data);
+        navigation.navigate("DoctorsTile", {
+            category_id: data.id,
+            category_name: data.category
+        })
+    }
+
+
+
     const renderItem = (item) => (
-        <Components.MyCard data={item} key={item.id} />
+        // <Components.MyCard data={item} key={item.id} />
+        <TouchableOpacity
+            key={item.id}
+            style={styles.card} elevation={3} 
+            onPress={()=> handleNavigate(item)}
+        >
+            {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
+            <View>
+                <Text style={[styles.textStyle, { fontSize: 18 }]}>{item.category}</Text>
+            </View>
+        </TouchableOpacity>
     )
+
+
 
     return (
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={t('home')} home={true} />
             <View style={{ flex: 1, marginTop: 20 }}>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <View style={{ flexDirection: 'row', marginTop:3, flexWrap:'wrap', justifyContent:'center'}}>
-                        {DATA.map(item => renderItem(item))}
+                    <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
+                        {CATEGORIES.map(item => renderItem(item))}
                     </View>
                 </ScrollView>
             </View>
@@ -90,5 +91,28 @@ const styles = StyleSheet.create({
     contentContainer: {
         flexGrow: 1,
         paddingVertical: 20
+    },
+    card: {
+        margin: 8,
+        width: '41%',
+        height: 200,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: Global.inputs_bg,
+        shadowColor: "#000000",
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        shadowOffset: {
+            height: 1,
+            width: 1
+        }
+    },
+    textStyle: {
+        fontWeight: 'bold',
+        textAlign: 'center',
+        lineHeight: 28,
+        color: Global.main_color
     }
 })

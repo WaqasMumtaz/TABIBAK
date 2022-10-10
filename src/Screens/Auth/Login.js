@@ -8,7 +8,8 @@ import ActionSheet from 'react-native-actionsheet';
 import { useSelector, useDispatch } from 'react-redux'
 import { changeLanguage } from '../../Redux/reducersActions/changeLanguage';
 import { updateUser } from '../../Redux/reducersActions/userReducer';
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
+import HttpUtilsFile from '../../Services/HttpUtils'
 
 const Login = ({ handleState }) => {
     let actionSheet = useRef();
@@ -50,7 +51,7 @@ const Login = ({ handleState }) => {
         });
     }
 
-    function handleLogin() {
+    async function handleLogin() {
         console.log('User Data ****>>>>>', authObj)
         let { email, password } = authObj;
         let errors = {};
@@ -65,10 +66,17 @@ const Login = ({ handleState }) => {
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
             setLoader(true)
-            setTimeout(()=>{
-                setLoader(false);
-                dispatch(updateUser(authObj));
-            },2000)
+            let userData={
+                password,
+                email
+            }
+            let req = await HttpUtilsFile.post('login', userData);
+            console.log('REq Response >>>>', req);
+            setLoader(false);
+            alert(req.message);
+            dispatch(updateUser(userData));
+            // if(req.data.length == 0) alert(req.message);
+            // else dispatch(updateUser(userData));
         }
 
     }

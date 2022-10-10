@@ -1,7 +1,8 @@
 {
     "translation":{
+        "lan":"English",
         "Login":"Login",
-        "signUp":"SignUp",
+        "signUp":"Register",
         "forgot_password":"Forgot Password",
         "not_register":"Not register yet?",
         "create_account": "Create Account",
@@ -38,7 +39,14 @@
         "add":"Add",
         "clear":"Clear",
         "delete_member":"Are you sure to remove this member ?",
-        "ok":"OK"
+        "ok":"OK",
+        "category_1":"Doctor Consultation Visit",
+        "category_2":"Nurse Visit",
+        "category_3":"Physiotherapy & Rehabilization",
+        "category_4":"Online Doctor Consultation",
+        "category_5":"Cardiologist",
+        "profile_view":"Profile View",
+        "make_appointment":"Make Appointment"
 
     }
 }

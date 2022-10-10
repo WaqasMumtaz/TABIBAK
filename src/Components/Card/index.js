@@ -1,38 +1,29 @@
 import * as React from 'react';
-import { View , Text, StyleSheet, Image} from 'react-native';
+import { View , Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import MyButton from '../Button';
 import Global from '../../Global';
-
+import IonicIcon from 'react-native-vector-icons/Ionicons'
 
 
 const MyCard = ({ data }) => (
-  <View style={styles.card} elevation={3} key={data.id}>
+  <View style={styles.card} elevation={3} >
     {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
     <View>
-      <Text style={[styles.textStyle, {fontSize:18}]}>{data.name}</Text>
-      <Text style={[styles.textStyle, {fontSize:14}]}>{data.subTitle}</Text>
+      <View style={{flexDirection:'row', alignItems:'center'}}>
+         <View style={{flex:1}}>
+            <Text style={[styles.textStyle, {fontSize:18}]}>{data.name}</Text>
+         </View>
+         <TouchableOpacity>
+           <IonicIcon name="ellipsis-vertical" size={20} color={Global.dark_gray}/>
+         </TouchableOpacity>
+      </View>
+      {/* <Text style={[styles.textStyle, {fontSize:14}]}>{data.subTitle}</Text> */}
       <Text style={[styles.textStyle, {fontSize:12}]}>{data.timeStamp}</Text>
     </View>
-     <View style={{alignItems:'center'}}>
-      <Image source={data.avatarUrl} style={styles.imageStyle}/>
+     <View style={{justifyContent:'center', alignItems:'center'}}>
+      {/* <Image source={data.avatarUrl} style={styles.imageStyle}/> */}
+      <IonicIcon name="person" size={80} color={Global.dark_gray}/>
      </View>
-    {/* <View style={{flexDirection:'row',justifyContent:'flex-end', margin:10 }}>
-       <MyButton
-       title={btn_title_1}
-       onClick={()=> handleSubmit(btn_title_1)}
-       />
-       <View style={{margin:10}}/>
-        <MyButton
-       title={btn_title_2}
-       onClick={()=> handleSubmit(btn_title_2)}
-       styleBtn={styles.btn_style}
-       titleStyle={styles.titleStyle}
-       />
-    </View> */}
-    {/* <Card.Actions>
-      <Button onClick>Cancel</Button>
-      <Button>Ok</Button>
-    </Card.Actions> */}
   </View>
 );
 
@@ -40,8 +31,8 @@ export default MyCard;
 
 const styles = StyleSheet.create({
   card:{
-    margin:8,
-    width:'41%',
+    margin:10,
+    width:'45%',
     borderRadius:10,
     padding:10,
     backgroundColor:Global.inputs_bg,

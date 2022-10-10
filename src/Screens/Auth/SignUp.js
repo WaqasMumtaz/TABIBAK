@@ -5,18 +5,20 @@ import Global from '../../Global'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useTranslation } from 'react-i18next'
 import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
-
+import HttpUtilsFile from '../../Services/HttpUtils';
 
 const SignUp = ({ handleState }) => {
     const phoneInput = useRef(null);
+    const [loader , setLoader] = useState(false);
 
     const [authObj, setAuthObj] = useState({
         first_name: '',
         last_name: '',
         email: '',
         phone: '',
+        country_code:'',
         password: '',
-        family_key: ''
+        family_key: null
     })
 
     const [errorObj, setErrorObj] = useState({
@@ -30,7 +32,7 @@ const SignUp = ({ handleState }) => {
     const { t } = useTranslation();
 
     function handleChange(name, value) {
-        // console.log('Name >>>>>>', name, 'Value >>>>>>', value);
+        //  console.log('Name >>>>>>', name, 'Value >>>>>>', value);
         setAuthObj({
             ...authObj,
             [name]: value,
@@ -38,11 +40,15 @@ const SignUp = ({ handleState }) => {
     }
     function handleChangeFormatted(params) {
         console.log('Phone Number Formatted *****>>>>>>>>>', params);
+        setAuthObj({
+            ...authObj,
+            country_code: params.callingCode[0],
+        });
     }
 
-    function handleLogin() {
+    async function handleLogin() {
         // console.log('User Data ****>>>>>', authObj)
-        let { email, password, first_name, last_name, phone, family_key } = authObj;
+        let { email, password, first_name, last_name, phone, family_key , country_code} = authObj;
         let errors = {};
         // console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
         //   return
@@ -79,6 +85,43 @@ const SignUp = ({ handleState }) => {
 
         }
         setErrorObj(errors);
+        if (Object.keys(errors).length === 0) {
+            setLoader(true);
+            let data = {
+                email, 
+                name: `${first_name} ${last_name}`, 
+                phone: `${country_code}${phone}`, 
+                password,
+                family_key,
+                role:'patient'
+            }
+            let req = await HttpUtilsFile.post('register', data);
+            console.log('REgister Request Response >>>>', req);
+            setLoader(false);
+            if(req.message === 'Email Already Exist'){
+                alert(req.message)
+            }
+            else {
+                alert(req.message);
+                console.log('Else User Data >>>>', data);
+                if(req.message === 'Patient Registered'){
+                    clearForm();
+                }
+
+            }
+        }
+    }
+
+    function clearForm() {
+        setAuthObj({
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone: '',
+            country_code:'',
+            password: '',
+            family_key: null
+        })
     }
 
     return (
@@ -161,6 +204,7 @@ const SignUp = ({ handleState }) => {
                     <Components.MyButton
                         title={t('signUp')}
                         onClick={handleLogin}
+                        loader={loader}
                     />
 
                     <View style={{margin:30, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>

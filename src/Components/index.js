@@ -12,6 +12,7 @@ import ModalSpinner from "./SpinnerModal";
 import NoRecord from "./NoData";
 import FABComponent from './FABbtn';
 import ModalScreen from './ModalScreen';
+import AlertModal from "./AlertModal";
 
 export default {
     MyStatusBar,
@@ -28,5 +29,6 @@ export default {
     ModalSpinner,
     NoRecord,
     FABComponent,
-    ModalScreen
+    ModalScreen,
+    AlertModal
 }
