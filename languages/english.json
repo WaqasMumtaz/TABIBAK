@@ -46,7 +46,8 @@
         "category_4":"Online Doctor Consultation",
         "category_5":"Cardiologist",
         "profile_view":"Profile View",
-        "make_appointment":"Make Appointment"
+        "make_appointment":"Make Appointment",
+        "create_appointment":"Create New Appointment"
 
     }
 }

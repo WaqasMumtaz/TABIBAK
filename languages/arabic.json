@@ -46,7 +46,8 @@
         "category_4":"استشارة الطبيب عبر الإنترنت",
         "category_5":"طبيب قلب",
         "profile_view":"عرض الملف الشخصي",
-        "make_appointment":"حدد موعدا"
-
+        "make_appointment":"حدد موعدا",
+        "create_appointment":"إنشاء موعد جديد"
+        
     }
 }

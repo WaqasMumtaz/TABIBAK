@@ -16,8 +16,8 @@ const Login = ({ handleState }) => {
     let dispatch = useDispatch();
     const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
-   // console.log('<<<<<****** userData *******>>>>>', userData, default_language);
-    const [loader , setLoader] = useState(false);
+    // console.log('<<<<<****** userData *******>>>>>', userData, default_language);
+    const [loader, setLoader] = useState(false);
 
     const [authObj, setAuthObj] = useState({
         email: '',
@@ -62,19 +62,27 @@ const Login = ({ handleState }) => {
         if (password.length < 5) {
             errors.password = 'Password Length should be 8 characters or more.';
         }
-//return
+        //return
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
             setLoader(true)
-            let userData={
+            let userData = {
                 password,
                 email
             }
-            let req = await HttpUtilsFile.post('login', userData);
-            console.log('REq Response >>>>', req);
-            setLoader(false);
-            alert(req.message);
-            dispatch(updateUser(userData));
+            try {
+                let req = await HttpUtilsFile.post('login', userData);
+                console.log('REq Response >>>>', req);
+                setLoader(false);
+                alert(req.message);
+                dispatch(updateUser(userData));
+            } catch (error) {
+               console.log('Login Error >>>>>', error);
+               setLoader(false);
+               dispatch(updateUser(userData));
+               alert('Oop something went wrong, try to later');
+            }
+
             // if(req.data.length == 0) alert(req.message);
             // else dispatch(updateUser(userData));
         }

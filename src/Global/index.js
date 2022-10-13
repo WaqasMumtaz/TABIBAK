@@ -13,5 +13,6 @@ export default {
     inputs_bg:'#F2F2F2',
     buttons_bg:'#0e71b4',
     email_validation: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/,
-    dark_gray:'#a9a9a9'
+    dark_gray:'#a9a9a9',
+    orange_clr:'#FFA500'
 }

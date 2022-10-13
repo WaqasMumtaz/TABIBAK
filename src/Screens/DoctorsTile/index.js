@@ -11,8 +11,6 @@ import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 
-
-
 const DoctorsTile = ({ route }) => {
     const navigation = useNavigation();
     const { t, i18n } = useTranslation();
@@ -106,7 +104,10 @@ const DoctorsTile = ({ route }) => {
             });
         }
         else if(params === t('make_appointment')){
-            navigation.navigate('Appointment');
+            navigation.navigate('Appointment', {
+                doctor_name:name,
+                doctor_id:id
+            });
         }
     }
 
