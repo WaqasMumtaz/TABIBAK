@@ -8,6 +8,7 @@ const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled
   const [pickerMode, setPickerMode] = useState(null);
 
   const showDatePicker = () => {
+   // alert(mode)
     setPickerMode(mode);
   };
 
@@ -25,7 +26,7 @@ const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled
   // React.useEffect(() => {
   // setPickerMode(getDateType)
   // }, []);
-  //console.log(getDateType, "getDateType", rest)
+  console.log("pickerMode >>>", pickerMode);
   return (
     <View style={style.root}>
       <TouchableOpacity
@@ -39,7 +40,7 @@ const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled
         <FontAwesomeIcon name="calendar" color={Global.main_color} size={25} />
       </TouchableOpacity>
       <DateTimePickerModal
-        isVisible={pickerMode !== null}
+        isVisible={pickerMode != null}
         mode={mode}
         onConfirm={handleConfirm}
         onCancel={hidePicker}

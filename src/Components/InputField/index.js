@@ -43,7 +43,7 @@ import Global from '../../Global';
         </TouchableOpacity>
       )}
       <TextInput
-        style={{...input, ...styleInputs}}
+        style={[{...input, ...styleInputs}, multiple ? {minHeight:80 , maxHeight:120} : null]}
         placeholder={placeholder}
         onChangeText={(searchString) => handleChange(name, searchString)}
         underlineColorAndroid="transparent"

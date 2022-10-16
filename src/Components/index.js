@@ -15,6 +15,8 @@ import ModalScreen from './ModalScreen';
 import AlertModal from "./AlertModal";
 import DropDown from "./Dropdown";
 import DatePicker from './DateTime';
+import ImagePlaceholder from './Image';
+import DoctorCard from './DoctorCard';
 
 export default {
     MyStatusBar,
@@ -34,5 +36,7 @@ export default {
     ModalScreen,
     AlertModal,
     DropDown,
-    DatePicker
+    DatePicker,
+    ImagePlaceholder,
+    DoctorCard
 }

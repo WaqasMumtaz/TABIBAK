@@ -98,12 +98,14 @@ const DoctorsTile = ({ route }) => {
         console.log('Hanlde click >>>', params);
         const {name , id} = selectedDoctor;
         if(params === t('profile_view')){
+            setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
                 name:name,
                 id:id
             });
         }
         else if(params === t('make_appointment')){
+            setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('Appointment', {
                 doctor_name:name,
                 doctor_id:id
