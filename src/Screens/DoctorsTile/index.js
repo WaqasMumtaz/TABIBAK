@@ -19,7 +19,8 @@ const DoctorsTile = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState({
         name:'',
-        id:''
+        id:'',
+        category:''
     })
 
     const DATA = [{
@@ -89,19 +90,21 @@ const DoctorsTile = ({ route }) => {
     function handleModal(doctor) {
         setSelectedDoctor({
             name:doctor.name,
-            id:doctor.id
+            id:doctor.id,
+            category:doctor.subTitle
         })
         setModalVisible(modalVisible => !modalVisible);
     }
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const {name , id} = selectedDoctor;
+        const {name , id, category} = selectedDoctor;
         if(params === t('profile_view')){
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
                 name:name,
-                id:id
+                id:id,
+                category:category
             });
         }
         else if(params === t('make_appointment')){

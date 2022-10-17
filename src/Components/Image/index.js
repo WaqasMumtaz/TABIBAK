@@ -4,7 +4,7 @@ import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Global from '../../Global';
 
 
-const ImagePlaceholder = ({src , _style, uri}) => {
+const ImagePlaceholder = ({src , _style, uri, size}) => {
 
     const imageStyle={
         height:80,
@@ -17,7 +17,7 @@ const ImagePlaceholder = ({src , _style, uri}) => {
        {(src != undefined || uri != undefined) ? (
         <Image source={uri ? {uri:uri} : src} style={{...imageStyle, ..._style}} resizeMode={'cover'}/>
        ):
-       <IonicIcon name="person" size={80} color={Global.dark_gray} />
+       <IonicIcon name="person" size={size ? size : 80} color={Global.dark_gray} />
     }
     </View>
   )

@@ -17,6 +17,8 @@ import DropDown from "./Dropdown";
 import DatePicker from './DateTime';
 import ImagePlaceholder from './Image';
 import DoctorCard from './DoctorCard';
+import ProfileContainer from './Profile';
+
 
 export default {
     MyStatusBar,
@@ -38,5 +40,6 @@ export default {
     DropDown,
     DatePicker,
     ImagePlaceholder,
-    DoctorCard
+    DoctorCard,
+    ProfileContainer,
 }
