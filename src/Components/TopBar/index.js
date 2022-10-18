@@ -23,12 +23,12 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false 
 
 
   return home ? (
-    <View style={styles.homeTopBarStyle}>
-      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{title}</Text>
-      </View>
-      <View style={styles.containerText}>
-        {/* <Text>Hello waqas</Text> */}
+    <>
+      <View style={styles.homeTopBarStyle}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{title}</Text>
+        </View>
+        {/* <View style={styles.containerText}>
         <SearchInput
           placeholder={t('search')}
           name={'search'}
@@ -36,8 +36,17 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false 
           value={searchValue}
           icon='search-outline'
         />
+      </View> */}
       </View>
-    </View>
+      {/* <View style={{ height: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+        <View style={{height:'100%', width: '42%', backgroundColor: Global.main_color , borderBottomRightRadius:-20
+      }}/>
+        <View style={styles.profile_container}>
+          <Text>Pic</Text>
+        </View>
+        <View style={{height:'100%', width: '42%', backgroundColor: Global.main_color }}/>
+      </View> */}
+    </>
 
   ) : backIcon ? (
     <View style={[Platform.OS === 'android' ? styles.androidTopBarWithIcon : styles.iosWithIcon]}>
@@ -78,10 +87,10 @@ const styles = StyleSheet.create({
   homeTopBarStyle: {
     backgroundColor: Global.main_color,
     // alignItems:"center",
-    height: '16%',
-    borderBottomRightRadius: 20,
-    borderBottomLeftRadius: 20,
-    // padding:8
+    // height: '16%',
+    //borderBottomRightRadius: 20,
+    //borderBottomLeftRadius: 20,
+    padding: 5
   },
   containerText: {
     position: 'relative',
@@ -159,5 +168,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Global.screensBackground
     //marginLeft:12,
+  },
+  profile_container: {
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Global.inputs_bg,
+    height:70,
+    width:70,
+    borderRadius:70/2,
+    shadowColor: "#000000",
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1
+    }
   }
 });

@@ -41,10 +41,10 @@ const hitEndpoint = (method, endpoint, token, body) => {
     let headers = headersFor(token)
     let url = [BASE_URL, endpoint].join('/')
     
-    console.log(method, endpoint, token, body)
+    //console.log(method, endpoint, token, body)
     // console.log('Check HeadersFor >>>>', headers);
-    // console.log('URL >>>', url);
-    //return;
+     //console.log('URL >>>', url);
+   // return;
     return fetch(url, { method, credentials, headers, body }).then((response) => {
         return handleErrors(response)
     }).catch((err) => {

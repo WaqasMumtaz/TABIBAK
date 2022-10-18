@@ -72,14 +72,19 @@ const Login = ({ handleState }) => {
             }
             try {
                 let req = await HttpUtilsFile.post('login', userData);
-                console.log('REq Response >>>>', req);
                 setLoader(false);
-                alert(req.message);
-                dispatch(updateUser(userData));
+                console.log('REq Response >>>>', req);
+                if(req.message === 'Login Successful'){
+                    alert(req.message);
+                    dispatch(updateUser(req.data));
+                }
+                else {
+                    alert(req.message);
+                }
             } catch (error) {
                console.log('Login Error >>>>>', error);
                setLoader(false);
-               dispatch(updateUser(userData));
+            //    dispatch(updateUser(userData));
                alert('Oop something went wrong, try to later');
             }
 

@@ -47,7 +47,9 @@
         "category_5":"Cardiologist",
         "profile_view":"Profile View",
         "make_appointment":"Make Appointment",
-        "create_appointment":"Create New Appointment"
+        "create_appointment":"Create New Appointment",
+        "appointments":"Appointments",
+        "booking":"Booking"
 
     }
 }

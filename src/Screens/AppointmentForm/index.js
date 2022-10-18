@@ -118,7 +118,6 @@ const AppointmentForm = ({ route }) => {
 
     }
 
-
     const CATEGORIES = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
         category: t('category_1'),
@@ -236,7 +235,9 @@ const AppointmentForm = ({ route }) => {
                         </View>
                         {appointmentData.time_slot !== '' && (
                             <>
-                                <Text style={{ color: Global.main_color, fontWeight: 'bold', margin: 10 }}>Category</Text>
+                               <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row'}}>
+                                  <Text style={{ color: Global.main_color, fontWeight: 'bold'}}>{t('category')}</Text>
+                               </View>
                                 <View style={{ margin: 10, flexDirection: 'row', flexWrap: 'wrap' }}>
                                     {CATEGORIES.map(item => renderItem(item))}
                                 </View>

@@ -4,11 +4,23 @@ import Components from '../../Components'
 import Global from '../../Global'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux'
+import HttpUtilsFile from '../../Services/HttpUtils';
+import cardio from '../../Assets/cardio.png';
+import therapy from '../../Assets/therapy.png';
+import online_doctor from '../../Assets/online_doctor.png';
+import doctor from '../../Assets/doctor.png';
+import family from '../../Assets/family.png';
+import nurse from '../../Assets/nurse.png';
+
 
 
 const Home = () => {
     const navigation = useNavigation();
     const { t } = useTranslation();
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    const [categories, setCategories] = useState(null);
+
     const [authObj, setAuthObj] = useState({
         search: ''
     })
@@ -55,26 +67,69 @@ const Home = () => {
         // <Components.MyCard data={item} key={item.id} />
         <TouchableOpacity
             key={item.id}
-            style={styles.card} elevation={3} 
-            onPress={()=> handleNavigate(item)}
+            style={styles.card}
+            elevation={3}
+            onPress={() => handleNavigate(item)}
         >
             {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
             <View>
-                <Text style={[styles.textStyle, { fontSize: 18 }]}>{item.category}</Text>
+                <View style={{ marginVertical: 5 }}>
+                    <Components.ImagePlaceholder
+                        src={item.id == 1 ? doctor : item.id == 2 ? nurse : item.id == 3 ? therapy : item.id == 4 ? online_doctor : item.id == 5 ? cardio : family}
+                        _style={{ height: 60, width: 60 }}
+                    />
+                </View>
+                <View>
+                    <Text style={[styles.textStyle, { fontSize: 18 }]}>{item.name}</Text>
+                </View>
             </View>
         </TouchableOpacity>
     )
 
+    async function fetchCategories() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
 
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('getcategory?' + query);
+            //  console.log('Req of Categories >>', req);
+            if (req.data.length == 0) {
+                setCategories([])
+            }
+            else {
+                let arr = [...req.data];
+                arr.push({ id: 6, name: 'Family Tree' })
+                setCategories(arr)
+            }
+
+        } catch (error) {
+          console.log('Error >>>', error);
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories();
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={t('home')} home={true} />
-            <View style={{ flex: 1, marginTop: 20 }}>
+            <View style={{ flex: 1}}>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
-                        {CATEGORIES.map(item => renderItem(item))}
-                    </View>
+                    {categories == null ?
+                        <Components.Spinner />
+                        : categories?.length == 0 ?
+                            <Components.NoRecord />
+                            :
+                            <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
+                                {categories.map(item => renderItem(item))}
+                            </View>
+                    }
                 </ScrollView>
             </View>
         </SafeAreaView>

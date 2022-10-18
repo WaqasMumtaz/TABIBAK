@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, SafeAreaView, FlatList, TouchableOpacity, Alert
 import React, { useState, useEffect, useRef } from 'react';
 import Components from '../../Components';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import Global from '../../Global';
 import { useTranslation } from 'react-i18next'
+import { useNavigation } from '@react-navigation/native';
 import { updateUser } from '../../Redux/reducersActions/userReducer';
 import { changeLanguage } from '../../Redux/reducersActions/changeLanguage';
 

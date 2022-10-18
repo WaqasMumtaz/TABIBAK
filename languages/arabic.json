@@ -47,7 +47,8 @@
         "category_5":"طبيب قلب",
         "profile_view":"عرض الملف الشخصي",
         "make_appointment":"حدد موعدا",
-        "create_appointment":"إنشاء موعد جديد"
-        
+        "create_appointment":"إنشاء موعد جديد",
+        "appointments":"تعيينات",
+        "booking":"الحجز"
     }
 }

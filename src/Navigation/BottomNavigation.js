@@ -33,10 +33,16 @@ const BottomNavigation = () => {
           <FontAwesomeIcon size={size} color={color} name='home'/>
        )}}
       />
-      <Tab.Screen name={t('list')} component={Screens.List} 
+      <Tab.Screen name={t('appointments')} component={Screens.Appointments} 
       options={{
         tabBarIcon: ({ color, size , focused }) => (
-          <FontAwesomeIcon size={size} color={color} name='list'/>
+          <FontAwesomeIcon size={size} color={color} name='calendar'/>
+       )}}
+      />
+      <Tab.Screen name={t('booking')} component={Screens.Booking} 
+      options={{
+        tabBarIcon: ({ color, size , focused }) => (
+          <FontAwesomeIcon size={size} color={color} name='check'/>
        )}}
       />
       <Tab.Screen name={t('more')} component={Screens.More} 

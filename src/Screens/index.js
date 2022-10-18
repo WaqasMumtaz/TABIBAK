@@ -1,5 +1,6 @@
 import Home from "./Home";
-import List from "./List";
+import Appointments from "./Appointments";
+import Booking from "./Booking";
 import More from "./More";
 import DetailsPage from "./Details";
 import Auth from "./Auth";
@@ -11,7 +12,7 @@ import AppointmentForm from "./AppointmentForm";
 
 export default {
     Home,
-    List,
+    Appointments,
     More,
     DetailsPage,
     Auth,
@@ -19,5 +20,6 @@ export default {
     FamilyMembers,
     DoctorsTile,
     DoctorProfile,
-    AppointmentForm
+    AppointmentForm,
+    Booking
 }
