@@ -49,6 +49,18 @@
         "make_appointment":"حدد موعدا",
         "create_appointment":"إنشاء موعد جديد",
         "appointments":"تعيينات",
-        "booking":"الحجز"
+        "booking":"الحجز",
+        "doctor_name":"اسم الطبيب",
+        "date":"تاريخ",
+        "time":"زمن",
+        "status":"حالة",
+        "prescription":"روشتة",
+        "reports":"التقارير",
+        "view_pres":"مشاهدة الوصفة الطبية",
+        "view_reports":"عرض التقارير",
+        "cancelled":"ألغيت",
+        "completed":"منجز",
+        "all":"الجميع",
+        "appointment":"ميعاد"
     }
 }

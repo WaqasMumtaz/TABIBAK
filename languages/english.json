@@ -49,7 +49,18 @@
         "make_appointment":"Make Appointment",
         "create_appointment":"Create New Appointment",
         "appointments":"Appointments",
-        "booking":"Booking"
-
+        "booking":"Booking",
+        "doctor_name":"Doctor Name",
+        "date":"Date",
+        "time":"Time",
+        "status":"Status",
+        "prescription":"Prescription",
+        "reports":"Reports",
+        "view_pres":"View Prescription",
+        "view_reports":"View Reports",
+        "cancelled":"Cancelled",
+        "completed":"Completed",
+        "all":"All",
+        "appointment":"Appointment"
     }
 }
