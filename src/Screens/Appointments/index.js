@@ -19,12 +19,28 @@ const Appointments = () => {
     const [appointments, setAppointments] = useState(null);
     const [modal, setModal] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState({})
+    const [medicineData, setMedicineData] = useState({
+        medicine_name: [],
+        medicine_type: [],
+        medicine_bps: [],
+        medicine_dose: [],
+        medicine_day: [],
+        medicine_comment: []
+    })
 
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
+
+    const medicine_arr = [t('medicine_name'), t('type'), t('mg_mi'), t('dose'), t('day'), t('comments')]
 
     const [authObj, setAuthObj] = useState({
         search: ''
     })
+
+    const childContainer = {
+        flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row',
+        alignItems: 'center',
+        marginVertical: 5
+    }
 
     const headings = [
         'Doctor Name',
@@ -38,6 +54,70 @@ const Appointments = () => {
     function handleModal(params) {
         console.log('Selected perscription .>>', params);
         setModal(true);
+        console.log('prescriptions')
+        let names;
+        let types;
+        let mbs;
+        let does;
+        let days;
+        let comments;
+
+        for (const iterator of params.prescription) {
+            names = JSON.parse(iterator.medicine_name)
+            types = JSON.parse(iterator.medicine_type)
+            mbs = JSON.parse(iterator.medicine_quantity)
+            does = JSON.parse(iterator.medicine_dose)
+            days = JSON.parse(iterator.medicine_day)
+            comments = JSON.parse(iterator.medicine_comment)
+        }
+
+        console.log('Medical Report >.', names, types, mbs, does, days, comments);
+        let arr1 = Object.keys(names);
+        let arr2 = Object.keys(types);
+        let arr3 = Object.keys(mbs);
+        let arr4 = Object.keys(does);
+        let arr5 = Object.keys(days);
+        let arr6 = Object.keys(comments);
+        let newArr1 = [];
+        let newArr2 = [];
+        let newArr3 = [];
+        let newArr4 = [];
+        let newArr5 = [];
+        let newArr6 = [];
+        for (const iterator of arr1) {
+            newArr1.push(names[iterator])
+        }
+        for (const iterator of arr2) {
+            newArr2.push(types[iterator])
+        }
+        for (const iterator of arr3) {
+            newArr3.push(mbs[iterator])
+        }
+        for (const iterator of arr4) {
+            newArr4.push(does[iterator])
+        }
+        for (const iterator of arr5) {
+            newArr5.push(days[iterator])
+        }
+        for (const iterator of arr6) {
+            newArr6.push(comments[iterator])
+        }
+
+        console.log('New Arr1 >>>>', newArr1);
+        console.log('New Arr2 >>>>', newArr2);
+        console.log('New Arr3 >>>>', newArr3);
+        console.log('New Arr4 >>>>', newArr4);
+        console.log('New Arr >>>>', newArr5);
+        console.log('New Arr >>>>', newArr6);
+
+        setMedicineData({
+            medicine_name: newArr1,
+            medicine_type: newArr2,
+            medicine_bps: newArr3,
+            medicine_dose: newArr4,
+            medicine_day: newArr5,
+            medicine_comment: newArr6
+        })
         setSelectedAppointment(params);
     }
 
@@ -63,12 +143,30 @@ const Appointments = () => {
         }
     }
 
+    function printStringifyData(obj) {
+        console.log('Obje passed .>>>', obj);
+        let arr = Object.keys(obj);
+        arr.map((v, i) => {
+            console.log('print >>>', obj[v])
+            return (
+                <View key={i}>
+                    <Text style={{}}>{obj[v]}</Text>
+                </View>
+            )
+        })
+        // for (var key in obj) {
+        //     //if (obj.hasOwnProperty(key)) {
+        //         return (
+        //             // <View>
+        //                 <Text style={{}}>{obj[key]}</Text>
+        //             // </View>
+        //         )
+        //         // console.log(key + " -> " + obj[key]);
+        //    // }
+        // }
+    }
+
     const renderItem = ({ item }) => {
-        const childContainer = {
-            flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row',
-            alignItems: 'center',
-            marginVertical: 5
-        }
         return (
             <View style={styles.card}>
                 <View style={{ ...childContainer }}>
@@ -133,6 +231,79 @@ const Appointments = () => {
         )
     }
 
+    const renderPrescription2 = (item, i) => {
+        return (
+            <View key={i}>
+                {printStringifyData(JSON.parse(item?.medicine_name))}
+                {/* {printStringifyData(JSON.parse(item?.medicine_type))}
+                {printStringifyData(JSON.parse(item?.medicine_quantity))}
+                {printStringifyData(JSON.parse(item?.medicine_dose))}
+                {printStringifyData(JSON.parse(item?.medicine_day))}
+                {printStringifyData(JSON.parse(item?.medicine_comment))} */}
+
+            </View>
+        )
+    }
+
+    const renderPrescription = (item, i) => {
+        //let  = JSON.parse(item?.medicine_name);
+        return (
+            <View key={i}>
+                <View style={{ ...childContainer }} >
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('medicine_name')}</Text>
+                    </View>
+                    {printStringifyData(JSON.parse(item?.medicine_name))}
+                    {/* <View>
+                        <Text style={{}}>{medicine_names}</Text>
+                    </View> */}
+                </View>
+                <View style={{ ...childContainer }}>
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('type')}</Text>
+                    </View>
+                    {printStringifyData(JSON.parse(item?.medicine_type))}
+                    {/* <View>
+                        <Text style={{}}>{JSON.stringify(item?.medicine_type)}</Text>
+                    </View> */}
+                </View>
+                <View style={{ ...childContainer }}>
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('mg_mi')}</Text>
+                    </View>
+                    <View>
+                        <Text style={{}}>{JSON.stringify(item?.medicine_quantity)}</Text>
+
+                    </View>
+                </View>
+                <View style={{ ...childContainer }}>
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('dose')}</Text>
+                    </View>
+                    <View>
+                        <Text style={{}}>{JSON.stringify(item?.medicine_dose)}</Text>
+                    </View>
+                </View>
+                <View style={{ ...childContainer }}>
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('day')}</Text>
+                    </View>
+                    <View>
+                        <Text style={{}}>{JSON.stringify(item?.medicine_day)}</Text>
+                    </View>
+                </View>
+                <View style={{ ...childContainer }}>
+                    <View style={styles.row1}>
+                        <Text style={styles.titleHead}>{t('comments')}</Text>
+                    </View>
+                    <View>
+                        <Text style={{}}>{JSON.stringify(item?.medicine_comment)}</Text>
+                    </View>
+                </View>
+            </View>
+        )
+    }
+
     async function fetchAppointments(params) {
         try {
             let params = {
@@ -150,7 +321,10 @@ const Appointments = () => {
             }
             else {
                 // alert(req.data.length)
-                setAppointments(req.data)
+                setAppointments(req.data);
+                let prescriptions = req.data.prescription;
+
+
             }
 
 
@@ -218,14 +392,121 @@ const Appointments = () => {
                                 </View>
                             </View>
                             {/* Second Row  */}
-                            <View style={{ padding: 12, backgroundColor: Global.main_color, marginTop: 18, borderRadius:10}}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row'}}>
+                            <View style={{ padding: 12, backgroundColor: Global.main_color, marginTop: 18, borderRadius: 10 }}>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
                                     <Text style={{ color: Global.white, fontWeight: '700' }}>{`${t('appointment')} ${t('date')} :`} {moment(selectedAppointment.appdate).format("MMM Do YYYY")}, {moment(selectedAppointment.appdate, "YYYY-MM-DD HH:mm:ss").format('dddd').substring(0, 3)}</Text>
                                 </View>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row'}}>
-                                    <Text style={{ color: Global.white, fontWeight: '700', marginTop:3}}>{`Time : ${moment(selectedAppointment?.slot?.start_time, 'hh:mm a').format('hh:mm a')}`}</Text>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ color: Global.white, fontWeight: '700', marginTop: 3 }}>{`Time : ${moment(selectedAppointment?.slot?.start_time, 'hh:mm a').format('hh:mm a')} - ${moment(selectedAppointment?.slot?.end_time, 'hh:mm a').format('hh:mm a')}`}</Text>
                                 </View>
                             </View>
+                            {/* Third Row  */}
+                            <View style={{ marginTop: 18 }}>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text>{t('medicine')}:</Text>
+                                </View>
+
+                                <View style={[styles.card, { height: 180 }]}>
+                                    <ScrollView>
+                                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                                            {medicine_arr.map((v, i) => {
+                                                return (
+                                                    <View key={i}>
+                                                        <View style={{ flexDirection: 'row' }} >
+                                                            <Text style={{ marginLeft: i != 0 ? 12 : 0, color: Global.main_color, fontWeight: 'bold' }}>{v}</Text>
+                                                        </View>
+                                                    </View>
+                                                )
+                                            })}
+                                            <View style={{marginTop:10, flexDirection: 'row', alignItems: 'center', justifyContent:'center' }}>
+                                                <View>
+                                                    {medicineData.medicine_name.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+                                                </View>
+                                                <View>
+                                                    {medicineData.medicine_type.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+
+                                                </View>
+                                                <View>
+                                                    {medicineData.medicine_bps.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+                                                </View>
+                                                <View>
+                                                    {medicineData.medicine_dose.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+
+                                                </View>
+                                                <View>
+                                                    {medicineData.medicine_day.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+
+                                                </View>
+                                                <View>
+                                                    {medicineData.medicine_comment.map((item, i) => {
+                                                        return (
+                                                            <View key={i}>
+                                                                <Text>{item}</Text>
+                                                            </View>
+                                                        )
+                                                    })}
+
+                                                </View>
+
+                                            </View>
+                                        </ScrollView>
+
+                                        {/* </View> */}
+                                        {/* {selectedAppointment?.prescription?.map((item, i) => {
+                                            let names = JSON.parse(item?.medicine_name);
+                                            // let arrys = Object.keys(names);
+                                            // arrys.map((v,i)=> {
+                                            return (
+                                                <View key={i}>
+                                                    <View>
+                                                        <Text>{names[1]}</Text>
+                                                    </View>
+                                                    <View>
+                                                        <Text>{names[2]}</Text>
+                                                    </View>
+                                                </View>
+                                            )
+                                            //  })
+                                        })} */}
+
+
+                                        {/* {selectedAppointment?.prescription?.map(item => printStringifyData(JSON.parse(item?.medicine_name)))} */}
+                                        {/* {selectedAppointment?.prescription?.map((item, i) => renderPrescription2(item, i))} */}
+                                    </ScrollView>
+                                    {/* {selectedAppointment?.prescription?.map((item, i) => renderPrescription(item, i))} */}
+                                </View>
+                            </View>
+
                         </View>
                     </ScrollView>
                     {/* </View> */}

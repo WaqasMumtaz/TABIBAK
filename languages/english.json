@@ -61,6 +61,14 @@
         "cancelled":"Cancelled",
         "completed":"Completed",
         "all":"All",
-        "appointment":"Appointment"
+        "appointment":"Appointment",
+        "medicine":"Medicine",
+        "medicine_name":"Medicine Name",
+        "type":"Type",
+        "mg_mi":"Mg/MI",
+        "dose":"Dose",
+        "day":"Day",
+        "comments":"Comments"
+
     }
 }

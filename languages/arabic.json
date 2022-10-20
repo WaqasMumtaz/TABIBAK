@@ -61,6 +61,12 @@
         "cancelled":"ألغيت",
         "completed":"منجز",
         "all":"الجميع",
-        "appointment":"ميعاد"
+        "appointment":"ميعاد",
+        "medicine":"طب",
+        "type":"يكتب",
+        "mg_mi":"ملغ / مي",
+        "dose":"جرعة",
+        "day":"يوم",
+        "comments":"تعليقات"
     }
 }
