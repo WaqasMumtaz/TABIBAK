@@ -19,18 +19,19 @@ const DoctorCard = ({ data, handleDoctor, selectedDoctor, i }) => {
             <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        <Text style={[styles.textStyle, { fontSize: 18 }]}>{data.name}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 18 }]}>{data?.user?.name}</Text>
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, { fontSize: 15, color: Global.dark_gray }]}>{data.category}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 15, color: Global.dark_gray }]}>{data?.category?.name}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 15,marginTop:4, color: Global.dark_gray }]}>{data?.specialist}</Text>
                     </View>
                 </View>
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Text>Select Doctor</Text>
                     <RadioButton
-                        value={data.id === selectedDoctor.id ? selectedDoctor.name : ''}
-                        status={data.id === selectedDoctor.id ? 'checked' : 'unchecked'}
-                        onPress={() => handleDoctor(data)}
+                        value={data?.user?.id === selectedDoctor.id ? selectedDoctor.name : ''}
+                        status={data?.user?.id === selectedDoctor.id ? 'checked' : 'unchecked'}
+                        onPress={() => handleDoctor(data?.user, data?.specialist)}
                         color={Global.main_color}
                     />
                 </View>

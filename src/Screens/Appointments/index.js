@@ -18,7 +18,7 @@ const Appointments = () => {
     const isRTL = i18n.dir();
     const [appointments, setAppointments] = useState(null);
     const [modal, setModal] = useState(false);
-    const [selectedAppointment, setSelectedAppointment] = useState({})
+    const [selectedAppointment, setSelectedAppointment] = useState(null)
     const [medicineData, setMedicineData] = useState({
         medicine_name: [],
         medicine_type: [],
@@ -29,8 +29,69 @@ const Appointments = () => {
     })
 
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    // console.log('Login user data >>>>', userData);
 
-    const medicine_arr = [t('medicine_name'), t('type'), t('mg_mi'), t('dose'), t('day'), t('comments')]
+    const medicine_arr = [
+        {
+            id: 1,
+            title: t('medicine_name'),
+            detail: medicineData.medicine_name
+        },
+        {
+            id: 2,
+            title: t('type'),
+            detail: medicineData.medicine_type
+        },
+        {
+            id: 3,
+            title: t('mg_mi'),
+            detail: medicineData.medicine_bps
+        },
+        {
+            id: 4,
+            title: t('dose'),
+            detail: medicineData.medicine_dose
+        },
+        {
+            id: 5,
+            title: t('day'),
+            detail: medicineData.medicine_day
+        },
+        {
+            id: 6,
+            title: t('comments'),
+            detail: medicineData.medicine_comment
+
+        }
+
+    ]
+    const patientInfo = [
+        {
+            id: 1,
+            title: t('name'),
+            info: userData?.name
+        },
+        {
+            id: 2,
+            title: t('age'),
+            info: ''
+        },
+        {
+            id: 3,
+            title: t('gender'),
+            info: userData?.gender
+        },
+        {
+            id: 4,
+            title: t('patient_type'),
+            info: selectedAppointment ? selectedAppointment?.type : ''
+        },
+        {
+            id: 5,
+            title: t('blood_pressure'),
+            info: ''
+        }
+    ]
 
     const [authObj, setAuthObj] = useState({
         search: ''
@@ -53,7 +114,6 @@ const Appointments = () => {
 
     function handleModal(params) {
         console.log('Selected perscription .>>', params);
-        setModal(true);
         console.log('prescriptions')
         let names;
         let types;
@@ -119,6 +179,8 @@ const Appointments = () => {
             medicine_comment: newArr6
         })
         setSelectedAppointment(params);
+        setModal(true);
+
     }
 
     function closeModal() {
@@ -141,29 +203,6 @@ const Appointments = () => {
         else if (title === 'Delete') {
             alert('Your process is pending...')
         }
-    }
-
-    function printStringifyData(obj) {
-        console.log('Obje passed .>>>', obj);
-        let arr = Object.keys(obj);
-        arr.map((v, i) => {
-            console.log('print >>>', obj[v])
-            return (
-                <View key={i}>
-                    <Text style={{}}>{obj[v]}</Text>
-                </View>
-            )
-        })
-        // for (var key in obj) {
-        //     //if (obj.hasOwnProperty(key)) {
-        //         return (
-        //             // <View>
-        //                 <Text style={{}}>{obj[key]}</Text>
-        //             // </View>
-        //         )
-        //         // console.log(key + " -> " + obj[key]);
-        //    // }
-        // }
     }
 
     const renderItem = ({ item }) => {
@@ -231,73 +270,93 @@ const Appointments = () => {
         )
     }
 
-    const renderPrescription2 = (item, i) => {
+    const medicineDataRender = (item, i) => {
+        // console.log('Detail of items >>>', item.detail)
         return (
-            <View key={i}>
-                {printStringifyData(JSON.parse(item?.medicine_name))}
-                {/* {printStringifyData(JSON.parse(item?.medicine_type))}
-                {printStringifyData(JSON.parse(item?.medicine_quantity))}
-                {printStringifyData(JSON.parse(item?.medicine_dose))}
-                {printStringifyData(JSON.parse(item?.medicine_day))}
-                {printStringifyData(JSON.parse(item?.medicine_comment))} */}
+            <View key={i} style={{ marginLeft: i != 0 ? 15 : 0 }}>
+                <View style={{}} >
+                    <Text style={{ fontSize: 15, color: Global.main_color, fontWeight: 'bold' }}>{item.title}</Text>
+                </View>
+                <View style={{ marginTop: 8, justifyContent: 'center', alignItems: 'center' }}>
+                    {/* <Text>hello</Text> */}
+                    {/* <View> */}
+                    {item?.detail?.map((v, j) => {
+                        return (
+                            <View key={j} style={{ marginTop: j != 0 ? 7 : 0 }}>
+                                <Text>{v}</Text>
+                            </View>
+                        )
+                    })}
+                    {/* </View>  */}
+                    {/* <View>
+                        {medicineData.medicine_type.map((item, i) => {
+                            return (
+                                <View key={i}>
+                                    <Text>{item}</Text>
+                                </View>
+                            )
+                        })}
 
+                    </View>
+                    <View>
+                        {medicineData.medicine_bps.map((item, i) => {
+                            return (
+                                <View key={i}>
+                                    <Text>{item}</Text>
+                                </View>
+                            )
+                        })}
+                    </View>
+                    <View>
+                        {medicineData.medicine_dose.map((item, i) => {
+                            return (
+                                <View key={i}>
+                                    <Text>{item}</Text>
+                                </View>
+                            )
+                        })}
+
+                    </View>
+                    <View>
+                        {medicineData.medicine_day.map((item, i) => {
+                            return (
+                                <View key={i}>
+                                    <Text>{item}</Text>
+                                </View>
+                            )
+                        })}
+
+                    </View>
+                    <View>
+                        {medicineData.medicine_comment.map((item, i) => {
+                            return (
+                                <View key={i}>
+                                    <Text>{item}</Text>
+                                </View>
+                            )
+                        })}
+
+                    </View> */}
+                </View>
             </View>
         )
     }
 
-    const renderPrescription = (item, i) => {
-        //let  = JSON.parse(item?.medicine_name);
+    const patientInfoDataRender = (items, i) => {
         return (
-            <View key={i}>
-                <View style={{ ...childContainer }} >
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('medicine_name')}</Text>
+            <View key={i} style={{ marginTop: i != 0 ? 8 : 0 }}>
+                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }} >
+                    <View style={{ flex: 1, }}>
+                        <Text style={{ fontSize: 15, color: Global.main_color, fontWeight: 'bold' }}>{items.title}</Text>
                     </View>
-                    {printStringifyData(JSON.parse(item?.medicine_name))}
-                    {/* <View>
-                        <Text style={{}}>{medicine_names}</Text>
-                    </View> */}
-                </View>
-                <View style={{ ...childContainer }}>
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('type')}</Text>
-                    </View>
-                    {printStringifyData(JSON.parse(item?.medicine_type))}
-                    {/* <View>
-                        <Text style={{}}>{JSON.stringify(item?.medicine_type)}</Text>
-                    </View> */}
-                </View>
-                <View style={{ ...childContainer }}>
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('mg_mi')}</Text>
-                    </View>
-                    <View>
-                        <Text style={{}}>{JSON.stringify(item?.medicine_quantity)}</Text>
-
-                    </View>
-                </View>
-                <View style={{ ...childContainer }}>
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('dose')}</Text>
-                    </View>
-                    <View>
-                        <Text style={{}}>{JSON.stringify(item?.medicine_dose)}</Text>
-                    </View>
-                </View>
-                <View style={{ ...childContainer }}>
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('day')}</Text>
-                    </View>
-                    <View>
-                        <Text style={{}}>{JSON.stringify(item?.medicine_day)}</Text>
-                    </View>
-                </View>
-                <View style={{ ...childContainer }}>
-                    <View style={styles.row1}>
-                        <Text style={styles.titleHead}>{t('comments')}</Text>
-                    </View>
-                    <View>
-                        <Text style={{}}>{JSON.stringify(item?.medicine_comment)}</Text>
+                    <View >
+                        {i == 1 ?
+                            <Text style={{}}>{selectedAppointment?.prescription[0].patient_age}</Text>
+                            : i == 4 ?
+                                <Text style={{}}>{selectedAppointment?.prescription[0].patient_bp}</Text>
+                                :
+                                <Text style={{}}>{items.info}</Text>
+                        }
                     </View>
                 </View>
             </View>
@@ -356,24 +415,25 @@ const Appointments = () => {
                     //     {categories.map(item => renderItem(item))}
                     // </View>
                 }
+            {selectedAppointment != null && 
                 <Components.ModalScreen
                     modalVisible={modal}
                     handleModal={closeModal}
                 >
                     {/* <View style={{height: windowHeight - 100, backgroundColor: 'red' }}> */}
-                    <ScrollView>
-                        <View style={{ flex: 1, margin: 8 }}>
-                            <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                <View style={{ flex: 1 }}>
-                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                        <Text style={{ fontWeight: 'bold' }}>{t('all')} {t('prescription')}</Text>
-                                        <Text style={{ fontWeight: 'bold', color: Global.main_color }}>/ {t('view_pres')}</Text>
-                                    </View>
+                    <View style={{ flex: 1, margin: 8 }}>
+                        <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                            <View style={{ flex: 1 }}>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontWeight: 'bold' }}>{t('all')} {t('prescription')}</Text>
+                                    <Text style={{ fontWeight: 'bold', color: Global.main_color }}>/ {t('view_pres')}</Text>
                                 </View>
-                                <TouchableOpacity onPress={() => closeModal()}>
-                                    <IonicIcon name="close-circle" color={Global.main_color} size={28} />
-                                </TouchableOpacity>
                             </View>
+                            <TouchableOpacity onPress={() => closeModal()}>
+                                <IonicIcon name="close-circle" color={Global.main_color} size={28} />
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView nestedScrollEnabled={true}>
                             {/* Second Row  */}
                             <View style={{ marginTop: 18, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
                                 <View style={styles.row2child}>
@@ -403,114 +463,58 @@ const Appointments = () => {
                             {/* Third Row  */}
                             <View style={{ marginTop: 18 }}>
                                 <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text>{t('medicine')}:</Text>
+                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('medicine')}:</Text>
                                 </View>
-
                                 <View style={[styles.card, { height: 180 }]}>
-                                    <ScrollView>
-                                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                            {medicine_arr.map((v, i) => {
-                                                return (
-                                                    <View key={i}>
-                                                        <View style={{ flexDirection: 'row' }} >
-                                                            <Text style={{ marginLeft: i != 0 ? 12 : 0, color: Global.main_color, fontWeight: 'bold' }}>{v}</Text>
-                                                        </View>
-                                                    </View>
-                                                )
-                                            })}
-                                            <View style={{marginTop:10, flexDirection: 'row', alignItems: 'center', justifyContent:'center' }}>
-                                                <View>
-                                                    {medicineData.medicine_name.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-                                                </View>
-                                                <View>
-                                                    {medicineData.medicine_type.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-
-                                                </View>
-                                                <View>
-                                                    {medicineData.medicine_bps.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-                                                </View>
-                                                <View>
-                                                    {medicineData.medicine_dose.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-
-                                                </View>
-                                                <View>
-                                                    {medicineData.medicine_day.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-
-                                                </View>
-                                                <View>
-                                                    {medicineData.medicine_comment.map((item, i) => {
-                                                        return (
-                                                            <View key={i}>
-                                                                <Text>{item}</Text>
-                                                            </View>
-                                                        )
-                                                    })}
-
-                                                </View>
-
-                                            </View>
+                                    <ScrollView
+                                        nestedScrollEnabled={true}
+                                    >
+                                        <ScrollView
+                                            nestedScrollEnabled={true}
+                                            horizontal={true}
+                                            showsHorizontalScrollIndicator={false}>
+                                            {medicine_arr.map((v, i) => medicineDataRender(v, i))}
                                         </ScrollView>
 
-                                        {/* </View> */}
-                                        {/* {selectedAppointment?.prescription?.map((item, i) => {
-                                            let names = JSON.parse(item?.medicine_name);
-                                            // let arrys = Object.keys(names);
-                                            // arrys.map((v,i)=> {
-                                            return (
-                                                <View key={i}>
-                                                    <View>
-                                                        <Text>{names[1]}</Text>
-                                                    </View>
-                                                    <View>
-                                                        <Text>{names[2]}</Text>
-                                                    </View>
-                                                </View>
-                                            )
-                                            //  })
-                                        })} */}
-
-
-                                        {/* {selectedAppointment?.prescription?.map(item => printStringifyData(JSON.parse(item?.medicine_name)))} */}
-                                        {/* {selectedAppointment?.prescription?.map((item, i) => renderPrescription2(item, i))} */}
                                     </ScrollView>
-                                    {/* {selectedAppointment?.prescription?.map((item, i) => renderPrescription(item, i))} */}
                                 </View>
                             </View>
+                            {/* Fourth Row  */}
+                            <View style={{ marginTop: 18 }}>
+                                <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('patient_info')}:</Text>
+                                </View>
+                                <View style={[styles.card, { height: 180 }]}>
+                                    <ScrollView nestedScrollEnabled={true}>
+                                        {patientInfo.map((v, i) => patientInfoDataRender(v, i))}
 
-                        </View>
-                    </ScrollView>
+                                    </ScrollView>
+                                </View>
+                            </View>
+                            {/* Fifth Row  */}
+                            <View style={{ marginTop: 18 }}>
+                                <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('test')}:</Text>
+                                </View>
+
+                            </View>
+                            <View style={[styles.card]}>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{t('advice')}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                        <IonicIcon name="checkmark" color={Global.dark_gray} size={20} />
+                                        <Text>{selectedAppointment?.prescription[0]?.advice}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </View>
                     {/* </View> */}
                 </Components.ModalScreen>
+           }
+            
             </View>
         </SafeAreaView>
     )

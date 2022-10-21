@@ -45,6 +45,7 @@
         "category_3":"العلاج الطبيعي والتأهيل",
         "category_4":"استشارة الطبيب عبر الإنترنت",
         "category_5":"طبيب قلب",
+        "category":"فئة",
         "profile_view":"عرض الملف الشخصي",
         "make_appointment":"حدد موعدا",
         "create_appointment":"إنشاء موعد جديد",
@@ -67,6 +68,22 @@
         "mg_mi":"ملغ / مي",
         "dose":"جرعة",
         "day":"يوم",
-        "comments":"تعليقات"
+        "comments":"تعليقات",
+        "patient_info":"معلومات المريض",
+        "test": "اختبار",
+        "advice":"نصيحة",
+        "name":"اسم",
+        "age":"سن",
+        "gender":"جنس",
+        "patient_type":"نوع المريض",
+        "blood_pressure":"ضغط الدم",
+        "brief_comment":"موجز مشاكلك",
+        "select_payment":"اختار طريقة الدفع",
+        "placement_head": "تحقق من المعلومات ضع التعليق",
+        "bank_name_err":"اسم البنك مطلوب",
+        "account_name_err":"اسم الحساب المصرفي مطلوب",
+        "account_number_err":"رقم الحساب مطلوب",
+        "deposited_by_err":"الإيداع من قبل مطلوب",
+        "deposited_slip_err": "مطلوب قسيمة الإيداع"
     }
 }

@@ -10,7 +10,9 @@ import moment from 'moment';
 import bankImg from '../../Assets/bank.png';
 import spotImg from '../../Assets/cod.jpg';
 import ImagePicker from 'react-native-image-crop-picker';
-
+import HttpUtilsFile from '../../Services/HttpUtils';
+import { useNavigation } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux'
 
 
 const AppointmentForm = ({ route }) => {
@@ -18,6 +20,7 @@ const AppointmentForm = ({ route }) => {
     const isRTL = i18n.dir();
     const { doctor_name, doctor_id } = route.params;
     const [appointments, setAppointments] = useState(null);
+    const [categories, setCategories] = useState(null);
     const [appointmentData, setAppointmentData] = useState({
         create: false,
         selected_date: '',
@@ -32,10 +35,13 @@ const AppointmentForm = ({ route }) => {
         deposited_by: '',
         deposit_slip: ''
     })
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    const [doctors, setDoctors] = useState(null);
+
     const [openTimeSlots, setOpenTimeSlots] = useState(false);
     const [timeSlots, setTimeSlots] = useState([
-        { label: 'Apple', value: 'apple' },
-        { label: 'Banana', value: 'banana' }
+        // { label: 'Apple', value: 'apple' },
+        // { label: 'Banana', value: 'banana' }
     ]);
     const [openFollowUp1, setOpenFollowUp1] = useState(false);
     const [followUp1, setFollowUp1] = useState([
@@ -48,7 +54,10 @@ const AppointmentForm = ({ route }) => {
         { label: 'F2', value: 'f2' }
     ]);
 
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState({
+        id: 0,
+        name: ''
+    });
     const [selectedDoctor, setSelectedDoctor] = useState({
         id: '',
         name: ''
@@ -63,6 +72,7 @@ const AppointmentForm = ({ route }) => {
     }
 
     function handleDoctor(params) {
+        console.log('Selected Doctor >>>>', params);
         setSelectedDoctor({
             id: params.id,
             name: params.name
@@ -159,24 +169,24 @@ const AppointmentForm = ({ route }) => {
     const DOCTORS = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
         name: "Adam",
-        category: selectedCategory
+        category: selectedCategory.name
     }, {
         id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
         name: "John Don",
-        category: selectedCategory
+        category: selectedCategory.name
     }, {
         id: "58694a0f-3da1-471f-bd96-145571e29d72",
         name: "Saim Duck",
-        category: selectedCategory
+        category: selectedCategory.name
     }, {
         id: "68694a0f-3da1-431f-bd56-142371e29d72",
         name: "Ben Stroke",
-        category: selectedCategory
+        category: selectedCategory.name
 
     }, {
         id: "28694a0f-3da1-471f-bd96-142456e29d72",
         name: "Zampa",
-        category: selectedCategory
+        category: selectedCategory.name
     }
     ]
 
@@ -186,14 +196,114 @@ const AppointmentForm = ({ route }) => {
             key={item.id}
         >
             <RadioButton
-                value={selectedCategory}
-                status={item.category === selectedCategory ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedCategory(item.category)}
+                value={selectedCategory.name}
+                status={item.name === selectedCategory.name ? 'checked' : 'unchecked'}
+                onPress={() => setSelectedCategory({ id: item.id, name: item.name })}
                 color={Global.main_color}
             />
-            <Text >{item.category}</Text>
+            <Text >{item.name}</Text>
         </View>
     )
+
+    async function fetchTimeSlot(params) {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('getdoctorslot?' + query);
+            if (req.data.length == 0) {
+                setTimeSlots([])
+            }
+            else {
+                let slots = [];
+                for (const iterator of req?.data) {
+                    let obj = {
+                        label: `${moment(iterator.start_time, 'hh:mm A').format('hh:mm A')} - ${moment(iterator.end_time, 'hh:mm A').format('hh:mm A')}`,
+                        value: `${iterator.start_time} - ${iterator.end_time}`,
+                        id: iterator.id
+                    }
+                    slots.push(obj)
+                }
+                setTimeSlots(slots);
+
+            }
+        } catch (error) {
+
+        }
+    }
+
+    async function fetchCategories() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('getcategory?' + query);
+            //  console.log('Req of Categories >>', req);
+            if (req.data.length == 0) {
+                setCategories([])
+            }
+            else {
+                let arr = [...req.data];
+                arr.push({ id: 6, name: 'Family Tree' })
+                setCategories(arr)
+            }
+
+        } catch (error) {
+            console.log('Error >>>', error);
+        }
+    }
+
+    async function fetchDoctors(params) {
+        let timesSlots = [...timeSlots];
+        let indx = timesSlots.findIndex(x => x.value === appointmentData.time_slot);
+        if (indx != -1) {
+            // alert(timesSlots[indx].id);
+            let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
+            let time_id = timesSlots[indx].id;
+            let obj = {
+                appdate: appDate,
+                slot_id: time_id,
+                category_id: selectedCategory.id
+            }
+            console.log('Doctor API data >>>', obj);
+            try {
+                let req = await HttpUtilsFile.post('getdoctorlist', obj, userData?.api_token);
+                console.log('Req of Doctors >>', req);
+                if (req.data.length == 0) {
+                    setDoctors([])
+                }
+                else {
+                    setDoctors(req.data);
+                }
+
+            } catch (error) {
+                console.log('Error .>>>', error);
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (selectedCategory.id) {
+            fetchDoctors();
+        }
+    }, [selectedCategory.id])
+
+    useEffect(() => {
+        fetchTimeSlot();
+        fetchCategories();
+    }, [])
+
+    // console.log('Selected Doctor .>>>', selectedDoctor);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -235,20 +345,30 @@ const AppointmentForm = ({ route }) => {
                         </View>
                         {appointmentData.time_slot !== '' && (
                             <>
-                               <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row'}}>
-                                  <Text style={{ color: Global.main_color, fontWeight: 'bold'}}>{t('category')}</Text>
-                               </View>
-                                <View style={{ margin: 10, flexDirection: 'row', flexWrap: 'wrap' }}>
-                                    {CATEGORIES.map(item => renderItem(item))}
+                                <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ color: Global.main_color, fontWeight: 'bold' }}>{t('category')}</Text>
+                                </View>
+                                <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                    {categories.map(item => renderItem(item))}
                                 </View>
                             </>
                         )}
-                        {selectedCategory !== '' && (
+                        {selectedCategory.name !== '' && (
                             <>
                                 <View style={{ margin: 10 }}>
                                     <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>Choose Doctor</Text>
                                     <ScrollView horizontal={true} >
-                                        {DOCTORS.map((item, i) => (<Components.DoctorCard data={item} handleDoctor={handleDoctor} selectedDoctor={selectedDoctor} key={i} />))}
+                                        {doctors == null ?
+                                            <Components.Spinner />
+                                            :
+                                            doctors?.length == 0 ?
+                                                <Components.NoRecord />
+                                                :
+                                                <>
+                                                    {doctors?.map((item, i) => (<Components.DoctorCard data={item} handleDoctor={handleDoctor} selectedDoctor={selectedDoctor} key={i} />))}
+                                                </>
+
+                                        }
                                     </ScrollView>
                                 </View>
                                 <View style={{ margin: 10 }}>
@@ -282,18 +402,20 @@ const AppointmentForm = ({ route }) => {
                                         listMode="MODAL"
                                     />
                                 </View>
-                                <View style={{ margin: 10 }}>
+                                {/* <View style={{ margin: 10 }}>
                                     <Components.MyButton
                                         title='View Prescription'
                                         styleBtn={{ backgroundColor: Global.inputs_bg }}
                                         titleStyle={{ fontWeight: '500', color: Global.main_color }}
                                     />
-                                </View>
+                                </View> */}
                             </>
                         )}
-                        {(selectedCategory && selectedDoctor.name) && (
+                        {(selectedCategory.name && selectedDoctor.name) && (
                             <View style={{ margin: 10 }}>
-                                <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>Check Information Place Comment</Text>
+                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>{t('placement_head')}</Text>
+                                </View>
                                 <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
                                     <Text>{`${selectedDoctor.name} Appointment`}</Text>
                                     <Text style={{ color: Global.main_color }}>{`(30 min)`}</Text>
@@ -314,15 +436,15 @@ const AppointmentForm = ({ route }) => {
                                                     {v.id == 1 && (<Text>{moment(appointmentData.selected_date).format("DD/MM/YYYY")}</Text>)}
                                                     {v.id == 2 && (<Text>{appointmentData.time_slot}</Text>)}
                                                     {v.id == 3 && (<Text>{moment(appointmentData.selected_date, "YYYY-MM-DD HH:mm:ss").format('dddd')}</Text>)}
-                                                    {v.id == 4 && (<Text>{selectedCategory}</Text>)}
+                                                    {v.id == 4 && (<Text>{selectedCategory.name}</Text>)}
                                                 </View>
                                             </View>
                                         ]
 
                                     })}
                                 </View>
-                                <View style={{ marginVertical: 10 }}>
-                                    <Text>Brief Your Problems</Text>
+                                <View style={{ marginVertical: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text>{t('brief_comment')}</Text>
                                 </View>
                                 <Components.InputField
                                     placeholder="Comment"
@@ -331,8 +453,8 @@ const AppointmentForm = ({ route }) => {
                                     value={appointmentData.comment}
                                     multiple={true}
                                 />
-                                <View style={{ marginTop: 10 }}>
-                                    <Text style={{ fontWeight: '600', color: Global.main_color }}>Select Payment Method</Text>
+                                <View style={{ marginTop: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                    <Text style={{ fontWeight: '600', color: Global.main_color }}>{t('select_payment')}</Text>
                                 </View>
                                 <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
                                     <TouchableOpacity
@@ -354,7 +476,7 @@ const AppointmentForm = ({ route }) => {
                                         />
                                     </TouchableOpacity>
                                 </View>
-                                {appointmentData.payment && (
+                                {appointmentData.payment == 'bank' && (
                                     <View style={{ marginTop: 10 }}>
                                         <Components.InputField
                                             placeholder="Bank Name"
@@ -392,7 +514,7 @@ const AppointmentForm = ({ route }) => {
                                                 <TouchableOpacity
                                                     style={{ margin: 10 }}
                                                 >
-                                                    <Text style={{ color: 'red', textDecorationLine:'underline'}}>Remove File</Text>
+                                                    <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Remove File</Text>
                                                 </TouchableOpacity>
                                             </View>
                                             :
@@ -409,11 +531,15 @@ const AppointmentForm = ({ route }) => {
                                                 </View>
                                             </>
                                         }
-                                    <View style={{margin:10}}/>
-                                    <Components.MyButton
-                                        title='Create'
+
+                                    </View>
+                                )}
+                                {(appointmentData.payment == 'bank' || appointmentData.payment == 'spot') && (
+                                    <View style={{ margin: 10 }}>
+                                        <Components.MyButton
+                                            title='Create'
                                         // titleStyle={{ fontWeight: '500', color: Global.main_color }}
-                                    />
+                                        />
                                     </View>
                                 )}
                             </View>
@@ -469,12 +595,13 @@ const styles = StyleSheet.create({
     selectedBtnPayment: {
         borderWidth: 2,
         height: 70,
-        width: 160,
+        width: '46%',
         borderColor: Global.main_color
     },
     paymentBtnStyle: {
         height: 70,
-        width: 160,
+        width: '46%',
+        margin: 10,
     },
     chooseFileBtn: {
         borderWidth: 1,

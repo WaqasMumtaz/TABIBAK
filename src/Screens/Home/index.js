@@ -57,7 +57,7 @@ const Home = () => {
         console.log('Data clicked >>>>', data);
         navigation.navigate("DoctorsTile", {
             category_id: data.id,
-            category_name: data.category
+            category_name: data.name
         })
     }
 

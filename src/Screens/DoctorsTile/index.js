@@ -10,6 +10,8 @@ import case5 from '../../Assets/case_5.jpeg'
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector , useDispatch} from 'react-redux'
+import HttpUtilsFile from '../../Services/HttpUtils';
 
 const DoctorsTile = ({ route }) => {
     const navigation = useNavigation();
@@ -22,6 +24,8 @@ const DoctorsTile = ({ route }) => {
         id:'',
         category:''
     })
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
+
 
     const DATA = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
@@ -116,6 +120,35 @@ const DoctorsTile = ({ route }) => {
         }
     }
 
+    async function fetchDoctors() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.post('getdoctorlist?' + query);
+              console.log('Req of Doctors >>', req);
+            // if (req.data.length == 0) {
+            //     setCategories([])
+            // }
+            // else {
+            //     let arr = [...req.data];
+            //     arr.push({ id: 6, name: 'Family Tree' })
+            //     setCategories(arr)
+            // }
+
+        } catch (error) {
+          console.log('Error >>>', error);
+        }
+    }
+
+    useEffect(() => {
+        fetchDoctors();
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>

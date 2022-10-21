@@ -45,6 +45,7 @@
         "category_3":"Physiotherapy & Rehabilization",
         "category_4":"Online Doctor Consultation",
         "category_5":"Cardiologist",
+        "category":"Category",
         "profile_view":"Profile View",
         "make_appointment":"Make Appointment",
         "create_appointment":"Create New Appointment",
@@ -68,7 +69,23 @@
         "mg_mi":"Mg/MI",
         "dose":"Dose",
         "day":"Day",
-        "comments":"Comments"
+        "comments":"Comments",
+        "patient_info":"Patient Info",
+        "test": "Test",
+        "advice":"Advice",
+        "name":"Name",
+        "age":"Age",
+        "gender":"Gender",
+        "patient_type":"Patient Type",
+        "blood_pressure":"Blood Pressure",
+        "brief_comment":"Brief Your Problems",
+        "select_payment":"Select Payment Method",
+        "placement_head": "Check Information Place Comment",
+        "bank_name_err":"Bank name is required",
+        "account_name_err":"Bank account name is required",
+        "account_number_err":"Account number is required",
+        "deposited_by_err":"Deposited by is required",
+        "deposited_slip_err": "Deposited slip is required"
 
     }
 }
