@@ -25,7 +25,7 @@ const DoctorsTile = ({ route }) => {
         category:''
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
-
+    const [doctorsList , setDoctorsList] = useState(null);
 
     const DATA = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",

@@ -84,6 +84,10 @@
         "account_name_err":"اسم الحساب المصرفي مطلوب",
         "account_number_err":"رقم الحساب مطلوب",
         "deposited_by_err":"الإيداع من قبل مطلوب",
-        "deposited_slip_err": "مطلوب قسيمة الإيداع"
+        "deposited_slip_err": "مطلوب قسيمة الإيداع",
+        "role":"دور",
+        "download":"تحميل",
+        "report":"تقرير"
+
     }
 }

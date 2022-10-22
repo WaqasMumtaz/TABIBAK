@@ -85,7 +85,9 @@
         "account_name_err":"Bank account name is required",
         "account_number_err":"Account number is required",
         "deposited_by_err":"Deposited by is required",
-        "deposited_slip_err": "Deposited slip is required"
-
+        "deposited_slip_err": "Deposited slip is required",
+        "role":"Role",
+        "download":"Download",
+        "report":"Report"
     }
 }

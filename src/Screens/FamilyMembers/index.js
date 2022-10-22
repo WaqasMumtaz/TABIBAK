@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import Global from '../../Global';
 import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
 import { alertDialog ,showAlert} from '../../../Functions';
-
+import HttpUtilsFile from '../../Services/HttpUtils';
+import { useSelector } from 'react-redux';
 
 const FamilyMembers = () => {
     let phoneInput = useRef(null);
@@ -15,8 +16,9 @@ const FamilyMembers = () => {
     const [modal, setModal] = useState(false);
     const [loader, setLoader] = useState(false);
 
-    const { t, i18n } = useTranslation();
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
 
+    const { t, i18n } = useTranslation();
 
     const [authObj, setAuthObj] = useState({
         first_name: '',
@@ -142,7 +144,7 @@ const FamilyMembers = () => {
 
     }
 
-    function handleSave() {
+    async function handleSave() {
         // console.log('User Data ****>>>>>', authObj)
         let { email, password, first_name, last_name, phone, family_key } = authObj;
         let errors = {};
@@ -187,6 +189,23 @@ const FamilyMembers = () => {
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
             setLoader(true)
+            try {
+                let obj = {
+                    name:`${first_name} ${last_name}`,
+                    email:email,
+                    phone:phone,
+                    password:password
+                }
+                console.log('Added Member Obj ***>>>>', obj);
+                let req = await HttpUtilsFile.post('addfamily', obj, userData?.api_token);
+                console.log('Added Member Respons >>>>', req);
+                setLoader(false);
+
+                
+            } catch (error) {
+                console.log('Error >>>>', error);
+                setLoader(false);
+            }
             // setTimeout(()=>{
             //     setLoader(false);
             //     dispatch(updateUser(authObj));
@@ -242,6 +261,7 @@ const FamilyMembers = () => {
                 modalVisible={modal}
                 title={t('add_member')}
                 handleModal={handleModal}
+                transparent={false}
             >
                 <ScrollView keyboardShouldPersistTaps='always'>
                     <View style={{ flex: 1, marginHorizontal: 20 }}>

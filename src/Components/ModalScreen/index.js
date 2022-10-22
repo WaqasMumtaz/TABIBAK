@@ -7,11 +7,11 @@ import Global from '../../Global';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const ModalScreen = ({ children, modalVisible, title, handleModal }) => {
+const ModalScreen = ({ children, modalVisible, title, handleModal, transparent }) => {
   return (
     <Modal
       animationType="slide"
-      transparent={true}
+      transparent={transparent}
       visible={modalVisible}
     // onRequestClose={() => {
     //   setModalVisible(!modalVisible);

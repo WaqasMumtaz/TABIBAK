@@ -18,7 +18,7 @@ import { useSelector, useDispatch } from 'react-redux'
 const AppointmentForm = ({ route }) => {
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();
-    const { doctor_name, doctor_id } = route.params;
+    // const { doctor_name, doctor_id } = route.params;
     const [appointments, setAppointments] = useState(null);
     const [categories, setCategories] = useState(null);
     const [appointmentData, setAppointmentData] = useState({
@@ -35,8 +35,17 @@ const AppointmentForm = ({ route }) => {
         deposited_by: '',
         deposit_slip: ''
     })
+    const [errorObj, setErrorObj] = useState({
+        bank_name: '',
+        bank_account_name: '',
+        bank_account_number: '',
+        deposited_by: '',
+        deposit_slip: ''
+    })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [doctors, setDoctors] = useState(null);
+
+    const [createAppLoader, setCreateAppLoader] = useState(false);
 
     const [openTimeSlots, setOpenTimeSlots] = useState(false);
     const [timeSlots, setTimeSlots] = useState([
@@ -60,7 +69,8 @@ const AppointmentForm = ({ route }) => {
     });
     const [selectedDoctor, setSelectedDoctor] = useState({
         id: '',
-        name: ''
+        name: '',
+        specialist: ''
     });
 
 
@@ -71,11 +81,12 @@ const AppointmentForm = ({ route }) => {
         })
     }
 
-    function handleDoctor(params) {
+    function handleDoctor(params, specialist) {
         console.log('Selected Doctor >>>>', params);
         setSelectedDoctor({
             id: params.id,
-            name: params.name
+            name: params.name,
+            specialist
         });
     }
 
@@ -263,6 +274,79 @@ const AppointmentForm = ({ route }) => {
         }
     }
 
+    async function handleCreateAppointment() {
+        const {
+            selected_date,
+            time_slot,
+            follow,
+            selected_follow_up,
+            comment,
+            payment,
+            bank_name,
+            bank_account_name,
+            bank_account_number,
+            deposited_by,
+            deposit_slip
+        } = appointmentData;
+
+        let errors = {};
+        if (payment == 'bank') {
+            if (bank_name == '') {
+                errors.bank_name = t('bank_name_err')
+            }
+            if (bank_account_name == '') {
+                errors.bank_account_name = t('account_name_err')
+            }
+            if (bank_account_number == '') {
+                errors.bank_account_number = t('account_number_err')
+            }
+            if (deposited_by == '') {
+                errors.deposited_by = t('deposited_by_err')
+            }
+            if (deposit_slip == '') {
+                errors.deposit_slip = t('deposited_slip_err')
+            }
+        }
+
+        setErrorObj(errors);
+        if (Object.keys(errors).length === 0) {
+            setCreateAppLoader(true);
+            try {
+                let timesSlots = [...timeSlots];
+                let indx = timesSlots.findIndex(x => x.value === time_slot);
+                if (indx != -1) {
+                    alert(timesSlots[indx].id);
+                    //return
+                    let appDate = moment(selected_date).format('YYYY-MM-DD');
+                    let time_id = timesSlots[indx].id;
+                    let obj = {
+                        appdate: appDate,
+                        apptime: time_slot,
+                        slot_id: time_id,
+                        DoctorsService: selectedDoctor.specialist,
+                        selectdoctory: selectedDoctor.id,
+                        payment_method: payment,
+                        comment: deposited_by,
+                        followup: follow,
+                        followup_id: 1,
+                        bank_deposite_slip: deposit_slip,
+                    }
+                    console.log('Data of appointment >>>>', obj);
+                    let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
+                    console.log('Response of create appointment >>>>>', req);
+                    setCreateAppLoader(false);
+                    
+                }
+
+            } catch (error) {
+                setCreateAppLoader(false);
+                console.log('Error of create appointment', error);
+            }
+        }
+
+
+    }
+
     async function fetchDoctors(params) {
         let timesSlots = [...timeSlots];
         let indx = timesSlots.findIndex(x => x.value === appointmentData.time_slot);
@@ -309,9 +393,8 @@ const AppointmentForm = ({ route }) => {
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={t('make_appointment')} backIcon={true} />
             {/* <Text>This is Appointment Form</Text> */}
-            {(appointmentData.create == false && appointments == null) ?
+            {/* {(appointmentData.create == false && appointments == null) ?
                 <View style={styles.noDataStyle}>
-                    {/* <IonicIcons name="calendar-number-outline" color={Global.orange_clr} size={40}/> */}
                     <FontAwesomeIcon name="calendar" color={Global.orange_clr} size={150} />
                     <View style={{ margin: 20 }} />
                     <Components.MyButton
@@ -319,7 +402,7 @@ const AppointmentForm = ({ route }) => {
                         onClick={createAppointment}
                     />
                 </View>
-                :
+                : */}
                 <ScrollView contentContainerStyle={styles.contentContainer}>
                     <View style={styles.formContainer}>
                         <View style={{ margin: 10 }}>
@@ -484,6 +567,11 @@ const AppointmentForm = ({ route }) => {
                                             handleChange={(name, value) => handleChange(name, value)}
                                             value={appointmentData.bank_name}
                                         />
+                                        {errorObj.bank_name ? (
+                                            <Text style={styles.error}>{errorObj.bank_name}</Text>
+                                        ) : (
+                                            null
+                                        )}
                                         <View style={{ margin: 10 }} />
                                         <Components.InputField
                                             placeholder="Bank Account Name"
@@ -491,6 +579,11 @@ const AppointmentForm = ({ route }) => {
                                             handleChange={(name, value) => handleChange(name, value)}
                                             value={appointmentData.bank_account_name}
                                         />
+                                        {errorObj.bank_account_name ? (
+                                            <Text style={styles.error}>{errorObj.bank_account_name}</Text>
+                                        ) : (
+                                            null
+                                        )}
                                         <View style={{ margin: 10 }} />
                                         <Components.InputField
                                             placeholder="Bank Account Number"
@@ -498,6 +591,11 @@ const AppointmentForm = ({ route }) => {
                                             handleChange={(name, value) => handleChange(name, value)}
                                             value={appointmentData.bank_account_number}
                                         />
+                                        {errorObj.bank_account_number ? (
+                                            <Text style={styles.error}>{errorObj.bank_account_number}</Text>
+                                        ) : (
+                                            null
+                                        )}
                                         <View style={{ margin: 10 }} />
                                         <Components.InputField
                                             placeholder="Deposited by"
@@ -505,6 +603,11 @@ const AppointmentForm = ({ route }) => {
                                             handleChange={(name, value) => handleChange(name, value)}
                                             value={appointmentData.deposited_by}
                                         />
+                                        {errorObj.deposited_by ? (
+                                            <Text style={styles.error}>{errorObj.deposited_by}</Text>
+                                        ) : (
+                                            null
+                                        )}
                                         {appointmentData.deposit_slip ?
                                             <View style={{ marginTop: 15, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: "center" }}>
                                                 <Components.ImagePlaceholder
@@ -513,6 +616,7 @@ const AppointmentForm = ({ route }) => {
                                                 />
                                                 <TouchableOpacity
                                                     style={{ margin: 10 }}
+                                                    onPress={()=> setAppointmentData({...appointmentData, deposit_slip:''})}
                                                 >
                                                     <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Remove File</Text>
                                                 </TouchableOpacity>
@@ -529,6 +633,11 @@ const AppointmentForm = ({ route }) => {
                                                         <Text style={{ fontWeight: 'bold' }}>Choose File</Text>
                                                     </TouchableOpacity>
                                                 </View>
+                                                {errorObj.deposit_slip ? (
+                                                    <Text style={styles.error}>{errorObj.deposit_slip}</Text>
+                                                ) : (
+                                                    null
+                                                )}
                                             </>
                                         }
 
@@ -538,6 +647,8 @@ const AppointmentForm = ({ route }) => {
                                     <View style={{ margin: 10 }}>
                                         <Components.MyButton
                                             title='Create'
+                                            onClick={handleCreateAppointment}
+                                            loader={createAppLoader}
                                         // titleStyle={{ fontWeight: '500', color: Global.main_color }}
                                         />
                                     </View>
@@ -547,7 +658,7 @@ const AppointmentForm = ({ route }) => {
                         )}
                     </View>
                 </ScrollView>
-            }
+            {/* } */}
         </SafeAreaView>
     )
 }
@@ -610,7 +721,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10
-
-    }
+    },
+    error: {
+        textAlign: 'center',
+        color: 'red',
+    },
 
 })

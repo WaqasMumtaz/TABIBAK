@@ -27,6 +27,10 @@ const Appointments = () => {
         medicine_day: [],
         medicine_comment: []
     })
+    const [reportVisible, setReportVisible] = useState({
+        modal: false,
+        app_id: null
+    })
 
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     // console.log('Login user data >>>>', userData);
@@ -113,7 +117,7 @@ const Appointments = () => {
     ];
 
     function handleModal(params) {
-        console.log('Selected perscription .>>', params);
+        console.log('Selected perscription .>>', params.prescription);
         console.log('prescriptions')
         let names;
         let types;
@@ -121,65 +125,67 @@ const Appointments = () => {
         let does;
         let days;
         let comments;
-
-        for (const iterator of params.prescription) {
-            names = JSON.parse(iterator.medicine_name)
-            types = JSON.parse(iterator.medicine_type)
-            mbs = JSON.parse(iterator.medicine_quantity)
-            does = JSON.parse(iterator.medicine_dose)
-            days = JSON.parse(iterator.medicine_day)
-            comments = JSON.parse(iterator.medicine_comment)
+        
+        if(params?.prescription?.length > 0){
+            for (const iterator of params.prescription) {
+                names = JSON.parse(iterator.medicine_name)
+                types = JSON.parse(iterator.medicine_type)
+                mbs = JSON.parse(iterator.medicine_quantity)
+                does = JSON.parse(iterator.medicine_dose)
+                days = JSON.parse(iterator.medicine_day)
+                comments = JSON.parse(iterator.medicine_comment)
+            }
+            console.log('Medical Report >.', names, types, mbs, does, days, comments);
+            let arr1 = Object.keys(names);
+            let arr2 = Object.keys(types);
+            let arr3 = Object.keys(mbs);
+            let arr4 = Object.keys(does);
+            let arr5 = Object.keys(days);
+            let arr6 = Object.keys(comments);
+            let newArr1 = [];
+            let newArr2 = [];
+            let newArr3 = [];
+            let newArr4 = [];
+            let newArr5 = [];
+            let newArr6 = [];
+            for (const iterator of arr1) {
+                newArr1.push(names[iterator])
+            }
+            for (const iterator of arr2) {
+                newArr2.push(types[iterator])
+            }
+            for (const iterator of arr3) {
+                newArr3.push(mbs[iterator])
+            }
+            for (const iterator of arr4) {
+                newArr4.push(does[iterator])
+            }
+            for (const iterator of arr5) {
+                newArr5.push(days[iterator])
+            }
+            for (const iterator of arr6) {
+                newArr6.push(comments[iterator])
+            }
+    
+            // console.log('New Arr1 >>>>', newArr1);
+            // console.log('New Arr2 >>>>', newArr2);
+            // console.log('New Arr3 >>>>', newArr3);
+            // console.log('New Arr4 >>>>', newArr4);
+            // console.log('New Arr >>>>', newArr5);
+            // console.log('New Arr >>>>', newArr6);
+    
+            setMedicineData({
+                medicine_name: newArr1,
+                medicine_type: newArr2,
+                medicine_bps: newArr3,
+                medicine_dose: newArr4,
+                medicine_day: newArr5,
+                medicine_comment: newArr6
+            })
+            setSelectedAppointment(params);
+            setModal(true);
         }
 
-        console.log('Medical Report >.', names, types, mbs, does, days, comments);
-        let arr1 = Object.keys(names);
-        let arr2 = Object.keys(types);
-        let arr3 = Object.keys(mbs);
-        let arr4 = Object.keys(does);
-        let arr5 = Object.keys(days);
-        let arr6 = Object.keys(comments);
-        let newArr1 = [];
-        let newArr2 = [];
-        let newArr3 = [];
-        let newArr4 = [];
-        let newArr5 = [];
-        let newArr6 = [];
-        for (const iterator of arr1) {
-            newArr1.push(names[iterator])
-        }
-        for (const iterator of arr2) {
-            newArr2.push(types[iterator])
-        }
-        for (const iterator of arr3) {
-            newArr3.push(mbs[iterator])
-        }
-        for (const iterator of arr4) {
-            newArr4.push(does[iterator])
-        }
-        for (const iterator of arr5) {
-            newArr5.push(days[iterator])
-        }
-        for (const iterator of arr6) {
-            newArr6.push(comments[iterator])
-        }
-
-        console.log('New Arr1 >>>>', newArr1);
-        console.log('New Arr2 >>>>', newArr2);
-        console.log('New Arr3 >>>>', newArr3);
-        console.log('New Arr4 >>>>', newArr4);
-        console.log('New Arr >>>>', newArr5);
-        console.log('New Arr >>>>', newArr6);
-
-        setMedicineData({
-            medicine_name: newArr1,
-            medicine_type: newArr2,
-            medicine_bps: newArr3,
-            medicine_dose: newArr4,
-            medicine_day: newArr5,
-            medicine_comment: newArr6
-        })
-        setSelectedAppointment(params);
-        setModal(true);
 
     }
 
@@ -203,6 +209,14 @@ const Appointments = () => {
         else if (title === 'Delete') {
             alert('Your process is pending...')
         }
+    }
+
+    function viewReports(params) {
+        //console.log('Params >>>', params);
+        setReportVisible({
+            modal: true,
+            app_id: params.id
+        })
     }
 
     const renderItem = ({ item }) => {
@@ -247,8 +261,9 @@ const Appointments = () => {
                     </View>
                     <View>
                         <TouchableOpacity
-                            style={styles.prescriptionBtn}
+                            style={item.prescription.length == 0 ? styles.prescriptionBtnDisabled : styles.prescriptionBtn}
                             onPress={() => handleModal(item)}
+                            disabled={item.prescription.length == 0 ? true : false}
                         >
                             <Text style={{ color: Global.main_color }}>{t('view_pres')}</Text>
                         </TouchableOpacity>
@@ -260,7 +275,10 @@ const Appointments = () => {
                         <Text style={styles.titleHead}>{t('reports')}</Text>
                     </View>
                     <View>
-                        <TouchableOpacity style={[styles.prescriptionBtn, { backgroundColor: Global.main_color }]}>
+                        <TouchableOpacity
+                            style={[styles.prescriptionBtn, { backgroundColor: Global.main_color }]}
+                            onPress={() => viewReports(item)}
+                        >
                             <Text style={{ color: Global.white }}>{t('view_reports')}</Text>
                         </TouchableOpacity>
 
@@ -269,6 +287,7 @@ const Appointments = () => {
             </View>
         )
     }
+
 
     const medicineDataRender = (item, i) => {
         // console.log('Detail of items >>>', item.detail)
@@ -392,6 +411,22 @@ const Appointments = () => {
         }
     }
 
+    async function handleDownload(params) {
+        alert('Process pending...')
+    }
+
+    async function handleDownloadReport() {
+        alert('Process pending...')
+
+    }
+
+    function closeReportModal(params) {
+        setReportVisible({
+            modal: false,
+            app_id: null
+        })
+    }
+
     useEffect(() => {
         fetchAppointments();
     }, [])
@@ -415,106 +450,158 @@ const Appointments = () => {
                     //     {categories.map(item => renderItem(item))}
                     // </View>
                 }
-            {selectedAppointment != null && 
+                {selectedAppointment != null &&
+                    <Components.ModalScreen
+                        modalVisible={modal}
+                        handleModal={closeModal}
+                        transparent={true}
+                    >
+                        {/* <View style={{height: windowHeight - 100, backgroundColor: 'red' }}> */}
+                        <View style={{ flex: 1, margin: 8, }}>
+                            <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                <View style={{ flex: 1 }}>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontWeight: 'bold' }}>{t('all')} {t('prescription')}</Text>
+                                        <Text style={{ fontWeight: 'bold', color: Global.main_color }}>/ {t('view_pres')}</Text>
+                                    </View>
+                                </View>
+                                <TouchableOpacity onPress={() => closeModal()}>
+                                    <IonicIcon name="close-circle" color={Global.main_color} size={28} />
+                                </TouchableOpacity>
+                            </View>
+                            <ScrollView nestedScrollEnabled={true}>
+                                {/* Second Row  */}
+                                <View style={{ marginTop: 18, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                                    <View style={styles.row2child}>
+                                        <Text style={{ fontSize: 14, fontWeight: 'bold' }}>{selectedAppointment?.doctor?.user?.name}</Text>
+                                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctor?.specialist} Specialist</Text>
+                                        <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctorsService}</Text>
+                                    </View>
+                                    <View style={styles.row2child}>
+                                        <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Chamber</Text>
+                                        <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctor?.chamber ? `${selectedAppointment?.doctor?.chamber}` : ''}</Text>
+                                    </View>
+                                    <View style={styles.row2child}>
+                                        <Text style={{ fontSize: 14, fontWeight: 'bold' }}>{`Off Day : ${selectedAppointment?.doctor?.offday}`}</Text>
+                                        <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{`${selectedAppointment?.doctor?.starttime} am - ${selectedAppointment?.doctor?.endtime} pm`}</Text>
+                                        <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{`${selectedAppointment?.doctor?.starttime2} pm - ${selectedAppointment?.doctor?.endtime2} am`}</Text>
+                                    </View>
+                                </View>
+                                {/* Second Row  */}
+                                <View style={{ padding: 12, backgroundColor: Global.main_color, marginTop: 18, borderRadius: 10 }}>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                        <Text style={{ color: Global.white, fontWeight: '700' }}>{`${t('appointment')} ${t('date')} :`} {moment(selectedAppointment.appdate).format("MMM Do YYYY")}, {moment(selectedAppointment.appdate, "YYYY-MM-DD HH:mm:ss").format('dddd').substring(0, 3)}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                        <Text style={{ color: Global.white, fontWeight: '700', marginTop: 3 }}>{`Time : ${moment(selectedAppointment?.slot?.start_time, 'hh:mm a').format('hh:mm a')} - ${moment(selectedAppointment?.slot?.end_time, 'hh:mm a').format('hh:mm a')}`}</Text>
+                                    </View>
+                                </View>
+                                {/* Third Row  */}
+                                <View style={{ marginTop: 18 }}>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('medicine')}:</Text>
+                                    </View>
+                                    <View style={[styles.card, { height: 180 }]}>
+                                        <ScrollView
+                                            nestedScrollEnabled={true}
+                                        >
+                                            <ScrollView
+                                                nestedScrollEnabled={true}
+                                                horizontal={true}
+                                                showsHorizontalScrollIndicator={false}>
+                                                {medicine_arr.map((v, i) => medicineDataRender(v, i))}
+                                            </ScrollView>
+
+                                        </ScrollView>
+                                    </View>
+                                </View>
+                                {/* Fourth Row  */}
+                                <View style={{ marginTop: 18 }}>
+                                    <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('patient_info')}:</Text>
+                                    </View>
+                                    <View style={[styles.card, { height: 180 }]}>
+                                        <ScrollView nestedScrollEnabled={true}>
+                                            {patientInfo.map((v, i) => patientInfoDataRender(v, i))}
+
+                                        </ScrollView>
+                                    </View>
+                                </View>
+                                {/* Fifth Row  */}
+                                <View style={{ marginTop: 18 }}>
+                                    <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('test')}:</Text>
+                                    </View>
+
+                                </View>
+                                <View style={[styles.card]}>
+                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{t('advice')}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                            <IonicIcon name="checkmark" color={Global.dark_gray} size={20} />
+                                            <Text>{selectedAppointment?.prescription[0]?.advice}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                                {/* Download btn */}
+
+                                {/* <View style={{flex:1}}>
+                                <Components.MyButton
+                                title='Download'
+                                />
+                            </View> */}
+                            </ScrollView>
+                        </View>
+                        <View style={{ flex: 0.2 }}>
+                            <Components.FABComponent
+                                visible={true}
+                                // iconDetail={{ name: 'add', color: 'white' }}
+                                title={t('download')}
+                                color={Global.main_color}
+                                placement={isRTL == 'rtl' ? 'left' : 'right'}
+                                size='large'
+                                onPress={handleDownload}
+                                _style={{ borderRadius: 7 }}
+                            />
+                        </View>
+                        {/* </View> */}
+                    </Components.ModalScreen>
+                }
+
                 <Components.ModalScreen
-                    modalVisible={modal}
-                    handleModal={closeModal}
+                    modalVisible={reportVisible.modal}
+                    handleModal={closeReportModal}
+                    transparent={true}
                 >
-                    {/* <View style={{height: windowHeight - 100, backgroundColor: 'red' }}> */}
                     <View style={{ flex: 1, margin: 8 }}>
                         <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                             <View style={{ flex: 1 }}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                    <Text style={{ fontWeight: 'bold' }}>{t('all')} {t('prescription')}</Text>
-                                    <Text style={{ fontWeight: 'bold', color: Global.main_color }}>/ {t('view_pres')}</Text>
-                                </View>
+                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: Global.main_color }}>{t('report')}</Text>
                             </View>
-                            <TouchableOpacity onPress={() => closeModal()}>
+                            <TouchableOpacity onPress={() => closeReportModal()}>
                                 <IonicIcon name="close-circle" color={Global.main_color} size={28} />
                             </TouchableOpacity>
                         </View>
-                        <ScrollView nestedScrollEnabled={true}>
-                            {/* Second Row  */}
-                            <View style={{ marginTop: 18, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
-                                <View style={styles.row2child}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>{selectedAppointment?.doctor?.user?.name}</Text>
-                                    <Text style={{ fontSize: 12, fontWeight: 'bold', color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctor?.specialist} Specialist</Text>
-                                    <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctorsService}</Text>
-                                </View>
-                                <View style={styles.row2child}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Chamber</Text>
-                                    <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{selectedAppointment?.doctor?.chamber ? `${selectedAppointment?.doctor?.chamber}` : ''}</Text>
-                                </View>
-                                <View style={styles.row2child}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>{`Off Day : ${selectedAppointment?.doctor?.offday}`}</Text>
-                                    <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{`${selectedAppointment?.doctor?.starttime} am - ${selectedAppointment?.doctor?.endtime} pm`}</Text>
-                                    <Text style={{ fontSize: 12, color: Global.dark_gray, marginTop: 5 }}>{`${selectedAppointment?.doctor?.starttime2} pm - ${selectedAppointment?.doctor?.endtime2} am`}</Text>
-                                </View>
-                            </View>
-                            {/* Second Row  */}
-                            <View style={{ padding: 12, backgroundColor: Global.main_color, marginTop: 18, borderRadius: 10 }}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ color: Global.white, fontWeight: '700' }}>{`${t('appointment')} ${t('date')} :`} {moment(selectedAppointment.appdate).format("MMM Do YYYY")}, {moment(selectedAppointment.appdate, "YYYY-MM-DD HH:mm:ss").format('dddd').substring(0, 3)}</Text>
-                                </View>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ color: Global.white, fontWeight: '700', marginTop: 3 }}>{`Time : ${moment(selectedAppointment?.slot?.start_time, 'hh:mm a').format('hh:mm a')} - ${moment(selectedAppointment?.slot?.end_time, 'hh:mm a').format('hh:mm a')}`}</Text>
-                                </View>
-                            </View>
-                            {/* Third Row  */}
-                            <View style={{ marginTop: 18 }}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('medicine')}:</Text>
-                                </View>
-                                <View style={[styles.card, { height: 180 }]}>
-                                    <ScrollView
-                                        nestedScrollEnabled={true}
-                                    >
-                                        <ScrollView
-                                            nestedScrollEnabled={true}
-                                            horizontal={true}
-                                            showsHorizontalScrollIndicator={false}>
-                                            {medicine_arr.map((v, i) => medicineDataRender(v, i))}
-                                        </ScrollView>
-
-                                    </ScrollView>
-                                </View>
-                            </View>
-                            {/* Fourth Row  */}
-                            <View style={{ marginTop: 18 }}>
-                                <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('patient_info')}:</Text>
-                                </View>
-                                <View style={[styles.card, { height: 180 }]}>
-                                    <ScrollView nestedScrollEnabled={true}>
-                                        {patientInfo.map((v, i) => patientInfoDataRender(v, i))}
-
-                                    </ScrollView>
-                                </View>
-                            </View>
-                            {/* Fifth Row  */}
-                            <View style={{ marginTop: 18 }}>
-                                <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{t('test')}:</Text>
-                                </View>
-
-                            </View>
-                            <View style={[styles.card]}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{t('advice')}</Text>
-                                    </View>
-                                    <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                        <IonicIcon name="checkmark" color={Global.dark_gray} size={20} />
-                                        <Text>{selectedAppointment?.prescription[0]?.advice}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        </ScrollView>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text>Currently Unavailable Reports...</Text>
+                        </View>
                     </View>
-                    {/* </View> */}
+                    <View style={{ flex: 0.2 }}>
+                        <Components.FABComponent
+                            visible={true}
+                            // iconDetail={{ name: 'add', color: 'white' }}
+                            title={t('download')}
+                            color={Global.main_color}
+                            placement={isRTL == 'rtl' ? 'left' : 'right'}
+                            size='large'
+                            onPress={handleDownloadReport}
+                            _style={{ borderRadius: 7 }}
+                        />
+                    </View>
                 </Components.ModalScreen>
-           }
-            
+
             </View>
         </SafeAreaView>
     )
@@ -540,6 +627,15 @@ const styles = StyleSheet.create({
         borderColor: Global.inputs_bg,
     },
     prescriptionBtn: {
+        paddingHorizontal: 10,
+        padding: 6,
+        backgroundColor: Global.white,
+        // margin: 5,
+        width: 140,
+        alignItems: 'center'
+    },
+    prescriptionBtnDisabled:{
+        opacity:0.3,
         paddingHorizontal: 10,
         padding: 6,
         backgroundColor: Global.white,

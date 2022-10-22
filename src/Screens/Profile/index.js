@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image } from 'react-native'
 import Global from '../../Global'
 import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
@@ -10,6 +10,8 @@ import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import ActionSheet from 'react-native-actionsheet';
 import ImagePicker from 'react-native-image-crop-picker';
+import HttpUtilsFile from '../../Services/HttpUtils';
+import { useSelector } from 'react-redux';
 
 //const isRTL = Global.isRTL();
 
@@ -18,7 +20,9 @@ const Profile = () => {
     const isRTL = useRTL();
     let actionSheet = useRef();
     const navigation = useNavigation()
-    console.log('Custom Function RTL ***>>>>>', isRTL);
+    // console.log('Custom Function RTL ***>>>>>', isRTL);
+    const { userData } = useSelector(state => state.persistedReducer.userReducer);
+
     let phoneInput = useRef(null);
     const [loader, setLoader] = useState(false);
 
@@ -40,7 +44,8 @@ const Profile = () => {
         password: '',
         family_key: '',
         photo: null,
-        edit: false
+        edit: false,
+        role: ''
     })
 
     const [errorObj, setErrorObj] = useState({
@@ -63,8 +68,8 @@ const Profile = () => {
             family_key: '',
             edit: false
         })
-         setErrorObj({
-             ...errorObj,
+        setErrorObj({
+            ...errorObj,
             first_name: '',
             last_name: '',
             email: '',
@@ -201,6 +206,42 @@ const Profile = () => {
     }
 
     console.log('Edit user >>>', authObj.edit)
+    async function getUserDetails() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+
+            let req = await HttpUtilsFile.get('user_details?' + query);
+            if (req.message === 'Data fetch Successful') {
+                setAuthObj({
+                    ...authObj,
+                    first_name: req?.data?.fname,
+                    last_name: req?.data?.lname,
+                    phone:req?.data?.image,
+                    role: req?.data?.role,
+                    phone: req?.data?.phone,
+                    email: req?.data?.email,
+                    family_key: req?.data?.family_name
+                })
+            }
+
+        } catch (error) {
+
+        }
+    }
+
+    useEffect(() => {
+        getUserDetails();
+        return () => {
+            handleClear()
+        }
+    }, [])
+
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAwareScrollView
@@ -240,6 +281,12 @@ const Profile = () => {
 
                         </TouchableOpacity>
                     </View>
+                    {authObj.role && (
+                        <View style={{flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent:'center', alignItems:'center', marginTop:10}}>
+                          <Text style={{fontSize:15, fontWeight:'bold', color:Global.main_color}}>{`${t('role')} :`}</Text>
+                          <Text style={{marginHorizontal:7}}>{`${authObj.role}`}</Text>
+                        </View>
+                    )}
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                         <Components.InputField
                             placeholder="First Name"

@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native';
 import { updateUser } from '../../Redux/reducersActions/userReducer';
 import { changeLanguage } from '../../Redux/reducersActions/changeLanguage';
-
 import ActionSheet from 'react-native-actionsheet';
+import HttpUtilsFile from '../../Services/HttpUtils';
 
 
 const More = () => {
@@ -17,6 +17,8 @@ const More = () => {
   let actionSheet = useRef();
   const dispatch = useDispatch();
   const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+  const { userData } = useSelector(state => state.persistedReducer.userReducer);
+
   const { t, i18n } = useTranslation();
 
   const isRTL = i18n.dir();
@@ -42,8 +44,8 @@ const More = () => {
 
   }, {
     id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title:t('member'),
-    icon:'person-add'
+    title: t('member'),
+    icon: 'person-add'
     // title: t('licence'),
     // icon: "logo-usd",
 
@@ -65,6 +67,25 @@ const More = () => {
   }
   ]
 
+  async function logout(params) {
+    try {
+      let params = {
+        api_token: userData?.api_token
+      };
+
+      let query = Object.keys(params)
+        .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&');
+      // console.log('Query >>>', query)
+      let req = await HttpUtilsFile.get('logout?' + query);
+      console.log('Logout response .>>>>>', req);
+      dispatch(updateUser(null))
+
+    } catch (error) {
+      console.log('Error logout >>>>>', error);
+    }
+  }
+
   function handleNavigate(title) {
     if (title === t('logout')) {
       Alert.alert(
@@ -76,17 +97,17 @@ const More = () => {
             onPress: () => console.log("Cancel Pressed"),
             style: "cancel"
           },
-          { text: `${t('yes')}`, onPress: () => dispatch(updateUser(null)) }
+          { text: `${t('yes')}`, onPress: () => logout()}
         ]
       );
     }
     else if (title === t('lang')) {
       openSheet()
     }
-    else if (title === t('profile')){
+    else if (title === t('profile')) {
       navigation.navigate('Profile');
     }
-    else if(title === t('member')) {
+    else if (title === t('member')) {
       navigation.navigate('Family Members');
     }
 
@@ -111,14 +132,14 @@ const More = () => {
 
   const renderItems = ({ item }) => (
     <TouchableOpacity
-      style={[styles.cardList, {flexDirection: isRTL === 'rtl' ? 'row-reverse' : 'row'}]}
+      style={[styles.cardList, { flexDirection: isRTL === 'rtl' ? 'row-reverse' : 'row' }]}
       onPress={() => handleNavigate(item.title)}
     >
       <View style={{ marginLeft: 10 }}>
-        <IonicIcon name={item.icon} color={Global.main_color} size={30} />
+        <IonicIcon name={item.icon} color={Global.main_color} size={27} />
       </View>
       <View style={{ marginLeft: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.title}</Text>
+        <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{item.title}</Text>
       </View>
     </TouchableOpacity>
   )
@@ -157,14 +178,14 @@ export default More
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'white'
+    backgroundColor: 'white'
   },
   cardList: {
     // flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Global.inputs_bg,
     padding: 10,
-    height: 70,
-    marginTop:15
+    height: 60,
+    marginTop: 12
   }
 })
