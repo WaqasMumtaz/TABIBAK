@@ -20,12 +20,11 @@ const MembersList = ({ data, userOperation, listStyle, isRTL }) => {
         return (
             <View style={{ ...listContainer, ...listStyle }}>
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize:17, fontWeight:'bold' }}>{`${item.first_name} ${item.last_name}`}</Text>
+                    <Text style={{ fontSize:17, fontWeight:'bold' }}>{`${item.name}`}</Text>
                 </View>
-                <View style={styles.options}>
+                {/* <View style={styles.options}>
                     <TouchableOpacity onPress={() => userOperation('edit', item)}>
                         <FontIcon name="pencil-alt" color={Global.main_color} size={18} />
-                        {/* <Text style={[styles.btnText, { textDecorationLine: 'underline' }]}>Edit</Text> */}
                     </TouchableOpacity>
                     <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => userOperation('delete', item)}>
                         <Icon name="trash-outline" color={Global.main_color} size={20} />
@@ -33,7 +32,7 @@ const MembersList = ({ data, userOperation, listStyle, isRTL }) => {
                     <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => userOperation('view', item)}>
                         <Icon name="open-outline" color={Global.main_color} size={20} />
                     </TouchableOpacity>
-                </View>
+                </View> */}
 
             </View>
         )
@@ -45,12 +44,12 @@ const MembersList = ({ data, userOperation, listStyle, isRTL }) => {
             {data == null ?
                 <Components.Spinner />
                 :
-                data.length == 0 ?
+                data?.length == 0 ?
                     <Components.NoRecord />
                     :
                     <FlatList
                         data={data}
-                        keyExtractor={(item) => `item_${item.value}`}
+                        keyExtractor={(item) => `item_${item.id}`}
                         ItemSeparatorComponent={() => (<View style={styles.borderLine}></View>)}
                         renderItem={renderItems}
                     // ListEmptyComponent={() => (

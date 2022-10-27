@@ -10,8 +10,9 @@ import case5 from '../../Assets/case_5.jpeg'
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector , useDispatch} from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import HttpUtilsFile from '../../Services/HttpUtils';
+import moment from 'moment';
 
 const DoctorsTile = ({ route }) => {
     const navigation = useNavigation();
@@ -20,12 +21,15 @@ const DoctorsTile = ({ route }) => {
     const { category_id, category_name } = route.params;
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState({
-        name:'',
-        id:'',
+        name: '',
+        bio:'',
+        category_id: '',
+        fees:'',
+        role:'',
         category:''
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
-    const [doctorsList , setDoctorsList] = useState(null);
+    const [doctorsList, setDoctorsList] = useState(null);
 
     const DATA = [{
         id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
@@ -75,74 +79,84 @@ const DoctorsTile = ({ route }) => {
             <View>
                 <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={[styles.textStyle, { fontSize: 18 }]} numberOfLines={1} ellipsizeMode='tail'>{data.name}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 18 }]} numberOfLines={1} ellipsizeMode='tail'>{data.user.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={()=> handleModal(data)}>
+                    <TouchableOpacity onPress={() => handleModal(data)}>
                         <IonicIcon name="ellipsis-vertical" size={28} color={Global.dark_gray} />
                     </TouchableOpacity>
                 </View>
                 {/* <Text style={[styles.textStyle, {fontSize:14}]}>{data.subTitle}</Text> */}
-                <Text style={[styles.textStyle, { fontSize: 12 }]}>{data.timeStamp}</Text>
+                {/* <Text style={[styles.textStyle, { fontSize: 12 }]}>{data.timeStamp}</Text> */}
+
             </View>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 {/* <Image source={data.avatarUrl} style={styles.imageStyle}/> */}
                 <IonicIcon name="person" size={80} color={Global.dark_gray} />
             </View>
+            <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
+                <Text>{`${moment(data.starttime, 'hh:mm A').format('hh:mm A')}`}</Text>
+                <Text>-</Text>
+                <Text >{`${moment(data.endtime, 'hh:mm A').format('hh:mm A')}`}</Text>
+            </View>
         </View>
     );
 
     function handleModal(doctor) {
+        console.log('Doctor >>>>', doctor);
         setSelectedDoctor({
-            name:doctor.name,
-            id:doctor.id,
-            category:doctor.subTitle
+            name: doctor?.user?.name,
+            bio: doctor?.user?.bio,
+            category_id: doctor?.category?.id,
+            fees:doctor?.fees,
+            role:doctor?.user?.role,
+            category: doctor?.category?.name,
+
         })
-        setModalVisible(modalVisible => !modalVisible);
+         setModalVisible(modalVisible => !modalVisible);
     }
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const {name , id, category} = selectedDoctor;
-        if(params === t('profile_view')){
+        const { name, bio , category_id, fees , role ,category} = selectedDoctor;
+        if (params === t('profile_view')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
-                name:name,
-                id:id,
-                category:category
+                name: name,
+                bio: bio,
+                category_id: category_id,
+                fees,
+                role,
+                category
             });
         }
-        else if(params === t('make_appointment')){
+        else if (params === t('make_appointment')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('Appointment', {
-                doctor_name:name,
-                doctor_id:id
+                name: name,
+                bio: bio,
+                category_id: category_id,
+                fees,
+                role,
+                category
             });
         }
     }
 
     async function fetchDoctors() {
         try {
-            let params = {
-                api_token: userData?.api_token
-            };
+            let obj = {
+                category_id: category_id
+            }
+            console.log('Category Obj >>>', obj)
 
-            let query = Object.keys(params)
-                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-                .join('&');
-            // console.log('Query >>>', query)
-            let req = await HttpUtilsFile.post('getdoctorlist?' + query);
-              console.log('Req of Doctors >>', req);
-            // if (req.data.length == 0) {
-            //     setCategories([])
-            // }
-            // else {
-            //     let arr = [...req.data];
-            //     arr.push({ id: 6, name: 'Family Tree' })
-            //     setCategories(arr)
-            // }
+            let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
+            console.log('Req of Doctors >>', req);
+            if (req.data.length > 0) {
+                setDoctorsList(req.data);
+            }
 
         } catch (error) {
-          console.log('Error >>>', error);
+            console.log('Error >>>', error);
         }
     }
 
@@ -154,18 +168,25 @@ const DoctorsTile = ({ route }) => {
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={category_name} backIcon={true} />
             <View style={{ flex: 1, margin: 10 }}>
-                <FlatList
-                    // contentContainerStyle={{alignItems:'center'}}
-                    data={DATA}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    numColumns={2}
-                />
+                {doctorsList == null ?
+                    <Components.Spinner />
+                    : doctorsList.length == 0 ?
+                        <Components.NoRecord />
+                        :
+                        <FlatList
+                            // contentContainerStyle={{alignItems:'center'}}
+                            data={doctorsList}
+                            renderItem={renderItem}
+                            keyExtractor={item => item.id}
+                            numColumns={2}
+                        />
+
+                }
                 <Components.AlertModal
                     modalVisible={modalVisible}
                     setModalVisible={handleModal}
                     title={t('alert')}
-                    data={[{name:t('profile_view')}, {name:t('make_appointment')}]}
+                    data={[{ name: t('profile_view') }, { name: t('make_appointment') }]}
                     handleClick={handleClick}
                 />
             </View>

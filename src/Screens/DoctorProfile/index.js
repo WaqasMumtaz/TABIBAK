@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const DoctorProfile = ({ route }) => {
-    const { name ,id , category} = route.params;
+    const { name ,bio , category_id, fees, role, category} = route.params;
     const navigation = useNavigation();
 
     function openImage() {
@@ -16,8 +16,7 @@ const DoctorProfile = ({ route }) => {
 
     function handleNavigate(){
         navigation.navigate('Appointment', {
-            doctor_name:name,
-            doctor_id:id
+            doctor_name:name
         });
     }
 
@@ -34,7 +33,7 @@ const DoctorProfile = ({ route }) => {
                         <TemplateComponents.BodyText title={category} _style={{ marginVertical: 10 }} />
                     </View>
                     <View>
-                        <TemplateComponents.HeadingText title='Fee: $50' _style={{ color: Global.main_color }} />
+                        <TemplateComponents.HeadingText title={`Fees : $${fees}`} _style={{ color: Global.main_color }} />
                     </View>
                 </View>
                 <View style={{ paddingVertical: 10 }}>
@@ -45,7 +44,7 @@ const DoctorProfile = ({ route }) => {
                 </View>
                 <View style={{ paddingVertical: 10 }}>
                     <TemplateComponents.BodyText
-                        title={`It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using Content here, content here, making it look like readable English. Many desktop publishing packages and web page editors.`}
+                        title={bio}
                         _style={{ lineHeight: 25 }}
                     />
                 </View>

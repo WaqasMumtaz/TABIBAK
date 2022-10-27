@@ -87,9 +87,9 @@ const Profile = () => {
         });
     }
 
-    function handleSave() {
+    async function handleSave() {
         // console.log('User Data ****>>>>>', authObj)
-        let { email, password, first_name, last_name, phone, family_key } = authObj;
+        const { email, password, first_name, last_name, phone, family_key } = authObj;
         let errors = {};
         // console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
         //   return
@@ -100,38 +100,59 @@ const Profile = () => {
         if (!hasValidLength(password)) {
             errors.password = "Your password must have 8 or more characters"
         }
-        if (!hasMixed(password)) {
-            errors.password = "Your password must have upper & lowercase letters"
+        // if (!hasMixed(password)) {
+        //     errors.password = "Your password must have upper & lowercase letters"
+
+        // }
+        // if (!hasNumber(password)) {
+        //     errors.password = "Your password must have at least one number"
+
+        // }
+        // if (!hasSpecial(password)) {
+        //     errors.password = "Your password must have at least one special character"
+        // }
+
+        if (first_name == '') {
+            errors.first_name = 'First Name is required';
 
         }
-        if (!hasNumber(password)) {
-            errors.password = "Your password must have at least one number"
+        if (last_name == '') {
+            errors.last_name = 'Last Name is required';
 
         }
-        if (!hasSpecial(password)) {
-            errors.password = "Your password must have at least one special character"
-        }
+         //console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
+        // if (phoneInput.current?.isValidNumber(phone) == false) {
+        //     errors.phone = 'Phone number is not valid';
 
-        if (first_name == '' || !/^[a-zA-Z]+$/.test(first_name)) {
-            errors.first_name = 'First Name is required and may only contain letters';
-
-        }
-        if (last_name == '' || !/^[a-zA-Z]+$/.test(last_name)) {
-            errors.last_name = 'Last Name is required and may only contain letters';
-
-        }
-        console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
-        if (phoneInput.current?.isValidNumber(phone) == false) {
-            errors.phone = 'Phone number is not valid';
-
-        }
+        // }
+        console.log('Errors >>>', errors);
         setErrorObj(errors);
-        if (Object.keys(errors).length === 0) {
-            setLoader(true)
-            // setTimeout(()=>{
-            //     setLoader(false);
-            //     dispatch(updateUser(authObj));
-            // },2000)
+        if (Object.keys(errors).length == 0) {
+        //    alert(1)
+            setLoader(true);
+            let obj = {
+                name:`${first_name} ${last_name}`,
+                email:email,
+                phone:phone,
+                password:password,
+            }
+            try {
+                console.log('Edit Member Obj ***>>>>', obj);
+                let req = await HttpUtilsFile.post('user-update', obj, userData?.api_token);
+                console.log('Edit Member Respons >>>>', req);
+                setLoader(false);
+                if(req.message === 'Patient Registered'){
+                    alert('Update user successfully');
+                    setAuthObj({ ...authObj, edit: false });
+                    //getUserDetails();
+                }else {
+                    alert(req.message);
+                }
+
+            } catch (error) {
+                console.log('update user error >>>', error);
+                setLoader(false);
+            }
         }
     }
 
@@ -306,7 +327,7 @@ const Profile = () => {
                         />
                         {errorObj.last_name ? <Text style={styles.error}>{t('last_name')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
-                        {authObj.edit ? (
+                        {/* {authObj.edit ? (
                             <>
                                 <Components.PhoneNumberInput
                                     name='phone'
@@ -317,16 +338,16 @@ const Profile = () => {
                                 {errorObj.phone ? <Text style={styles.error}>{t('phone_validation')}</Text> : null}
                             </>
                         ) :
-                            (
+                            ( */}
                                 <Components.InputField
                                     placeholder="Phone"
                                     name={'phone'}
-                                    //handleChange={(name, value) => handleChange(name, value)}
+                                    handleChange={(name, value) => handleChange(name, value)}
                                     value={authObj.phone}
                                     editable={authObj.edit}
                                 />
-                            )
-                        }
+                            {/* )
+                        } */}
 
                         <View style={{ marginBottom: 15 }} />
                         <Components.InputField
@@ -339,13 +360,34 @@ const Profile = () => {
                         />
                         {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
-                        <Components.InputField
+                        {/* <Components.InputField
                             placeholder="Family key (Optional)"
                             name={'family_key'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.family_key}
                             editable={authObj.edit}
-                        />
+                        /> */}
+                        {authObj.edit && (
+                            <>
+                              <Components.InputField
+                                    placeholder="Password"
+                                    secureTextEntry={!authObj.showPass}
+                                    name={'password'}
+                                    handleChange={(name, value) => handleChange(name, value)}
+                                    value={authObj.password}
+                                    onPress={() =>
+                                        setAuthObj({
+                                            ...authObj,
+                                            showPass: !authObj.showPass,
+                                        })}
+                                />
+                                {errorObj.password ? (
+                                    <Text style={styles.error}>{t('password_validation')}</Text>
+                                ) : (
+                                    null
+                                )}
+                            </>
+                        )}
                         {authObj.edit && (
                             <View style={{ margin: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                                 <View style={{ margin: 10 }}>

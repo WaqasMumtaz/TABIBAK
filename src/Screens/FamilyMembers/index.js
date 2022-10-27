@@ -69,9 +69,9 @@ const FamilyMembers = () => {
         else if (params === 'view') {
             setAuthObj({
                 ...authObj,
-                first_name:data.first_name,
-                last_name:data.last_name,
-                fullName:data.label,
+                // first_name:data.first_name,
+                // last_name:data.last_name,
+                fullName:data.name,
                 form_type:'view'
             })
             setModal(modal => !modal);
@@ -94,33 +94,54 @@ const FamilyMembers = () => {
     }
 
     async function fetchFamilyMembers(params) {
-        let data = [];
-        const res = [{
-            value: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-            first_name: 'Ahmed',
-            last_name:'Ali'
+        // let data = [];
+        // const res = [{
+        //     value: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
+        //     first_name: 'Ahmed',
+        //     last_name:'Ali'
 
-        }, {
-            value: "58694a0f-3da1-471f-bd96-145571e29d72",
-            first_name: 'Zain',
-            last_name:'Abbas'
+        // }, {
+        //     value: "58694a0f-3da1-471f-bd96-145571e29d72",
+        //     first_name: 'Zain',
+        //     last_name:'Abbas'
 
-        }, {
-            value: "68694a0f-3da1-431f-bd56-142371e29d72",
-            first_name: 'Qureshi',
-            last_name:'Qais'
-        }, {
-            value: "28694a0f-3da1-471f-bd96-142456e29d72",
-            first_name: 'Naeem',
-            last_name:'Badar'
-        },
-        {
-            value: "28694a0f-3da1-471f-bd96-142456e29d73",
-            first_name: 'Nabi',
-            last_name:'Noor'
+        // }, {
+        //     value: "68694a0f-3da1-431f-bd56-142371e29d72",
+        //     first_name: 'Qureshi',
+        //     last_name:'Qais'
+        // }, {
+        //     value: "28694a0f-3da1-471f-bd96-142456e29d72",
+        //     first_name: 'Naeem',
+        //     last_name:'Badar'
+        // },
+        // {
+        //     value: "28694a0f-3da1-471f-bd96-142456e29d73",
+        //     first_name: 'Nabi',
+        //     last_name:'Noor'
+        // }
+        // ]
+        // setDATA(res);
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('getfamilymembers?' + query);
+            console.log('Family members res >>>>', req);
+            if(req.data.length > 0){
+                setDATA(req.data);
+            }else {
+                setDATA([]);
+            }
+            
+            
+        } catch (error) {
+            console.log('Fetching family members error >>>', error)
         }
-        ]
-        setDATA(res);
 
         // if (isRTL === 'rtl') {
         //     for (const iterator of res) {
@@ -139,7 +160,7 @@ const FamilyMembers = () => {
         //     setDATA(data);
         // }
        // else {
-            setDATA(res);
+           // setDATA(res);
         //}
 
     }
@@ -200,7 +221,15 @@ const FamilyMembers = () => {
                 let req = await HttpUtilsFile.post('addfamily', obj, userData?.api_token);
                 console.log('Added Member Respons >>>>', req);
                 setLoader(false);
-
+                if(req.message === 'Patient Registered'){
+                    alert(req.message);
+                    handleClear();
+                    handleModal();
+                    fetchFamilyMembers();
+                }
+                else {
+                    alert(req.message);
+                }
                 
             } catch (error) {
                 console.log('Error >>>>', error);

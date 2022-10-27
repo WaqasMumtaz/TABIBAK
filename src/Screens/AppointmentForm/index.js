@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import Components from '../../Components';
 import { useTranslation } from 'react-i18next';
-import IonicIcons from 'react-native-vector-icons/Ionicons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5';
 import Global from '../../Global';
 import { RadioButton } from 'react-native-paper';
 import moment from 'moment';
@@ -11,7 +9,6 @@ import bankImg from '../../Assets/bank.png';
 import spotImg from '../../Assets/cod.jpg';
 import ImagePicker from 'react-native-image-crop-picker';
 import HttpUtilsFile from '../../Services/HttpUtils';
-import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux'
 
 
@@ -59,8 +56,8 @@ const AppointmentForm = ({ route }) => {
     ]);
     const [openFollowUp2, setOpenFollowUp2] = useState(false);
     const [followUp2, setFollowUp2] = useState([
-        { label: 'F1', value: 'f1' },
-        { label: 'F2', value: 'f2' }
+        // { label: 'F1', value: 'f1' },
+        // { label: 'F2', value: 'f2' }
     ]);
 
     const [selectedCategory, setSelectedCategory] = useState({
@@ -310,31 +307,31 @@ const AppointmentForm = ({ route }) => {
 
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
-            setCreateAppLoader(true);
+            // setCreateAppLoader(true);
             try {
                 let timesSlots = [...timeSlots];
                 let indx = timesSlots.findIndex(x => x.value === time_slot);
                 if (indx != -1) {
-                    alert(timesSlots[indx].id);
+                    //alert(timesSlots[indx].id);
                     //return
                     let appDate = moment(selected_date).format('YYYY-MM-DD');
                     let time_id = timesSlots[indx].id;
                     let obj = {
                         appdate: appDate,
-                        apptime: time_slot,
+                        apptime: 21,
                         slot_id: time_id,
                         DoctorsService: selectedDoctor.specialist,
                         selectdoctory: selectedDoctor.id,
                         payment_method: payment,
-                        comment: deposited_by,
+                        comment: comment,
                         followup: follow,
-                        followup_id: 1,
+                        followup_id: selected_follow_up,
                         bank_deposite_slip: deposit_slip,
                     }
                     console.log('Data of appointment >>>>', obj);
-                    let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
-                    console.log('Response of create appointment >>>>>', req);
-                    setCreateAppLoader(false);
+                     let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
+                     console.log('Response of create appointment >>>>>', req);
+                    // setCreateAppLoader(false);
                     
                 }
 
@@ -345,6 +342,38 @@ const AppointmentForm = ({ route }) => {
         }
 
 
+    }
+
+    async function getFollowUps(){
+        try {
+            // let params = {
+            //     api_token: userData?.api_token
+            // };
+
+            // let query = Object.keys(params)
+            //     .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+            //     .join('&');
+            let obj = {
+                doctor_id:selectedDoctor.id
+            }
+              console.log('Obj follow >>>', obj)
+            let req = await HttpUtilsFile.post('followup-appointment', obj , userData?.api_token);
+            console.log('Req response of follow ups >>>', req);
+            if(req.message == 'Followup  List'){
+                let arr = [];
+                req.data.map(items => {
+                    let obj = {
+                        label:items,
+                        value:items
+                    }
+                    arr.push(obj)
+                })
+                setFollowUp2(arr);
+            }
+            
+        } catch (error) {
+            console.log('Error of follow ups api >>>', error);
+        }
     }
 
     async function fetchDoctors(params) {
@@ -382,9 +411,17 @@ const AppointmentForm = ({ route }) => {
         }
     }, [selectedCategory.id])
 
+    useEffect(()=> {
+        if(selectedDoctor.id){
+            getFollowUps();
+        }
+
+    },[selectedDoctor.id])
+
     useEffect(() => {
         fetchTimeSlot();
         fetchCategories();
+        
     }, [])
 
     // console.log('Selected Doctor .>>>', selectedDoctor);
