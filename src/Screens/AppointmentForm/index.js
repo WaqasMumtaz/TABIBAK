@@ -10,11 +10,13 @@ import spotImg from '../../Assets/cod.jpg';
 import ImagePicker from 'react-native-image-crop-picker';
 import HttpUtilsFile from '../../Services/HttpUtils';
 import { useSelector, useDispatch } from 'react-redux'
+import { updateAppointments  } from '../../Redux/reducersActions/updateAppointments';
 
 
 const AppointmentForm = ({ route }) => {
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();
+    const dispatch = useDispatch();
     // const { doctor_name, doctor_id } = route.params;
     const [appointments, setAppointments] = useState(null);
     const [categories, setCategories] = useState(null);
@@ -316,23 +318,48 @@ const AppointmentForm = ({ route }) => {
                     //return
                     let appDate = moment(selected_date).format('YYYY-MM-DD');
                     let time_id = timesSlots[indx].id;
-                    let obj = {
-                        appdate: appDate,
-                        apptime: 21,
-                        slot_id: time_id,
-                        DoctorsService: selectedDoctor.specialist,
-                        selectdoctory: selectedDoctor.id,
-                        payment_method: payment,
-                        comment: comment,
-                        followup: follow,
-                        followup_id: selected_follow_up,
-                        bank_deposite_slip: deposit_slip,
-                    }
-                    console.log('Data of appointment >>>>', obj);
-                     let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
-                     console.log('Response of create appointment >>>>>', req);
+                    const formObj = new FormData();
+                    formObj.append('appdate', appDate)
+                    formObj.append('apptime', time_slot)
+                    formObj.append('slot_id', time_id)
+                    formObj.append('DoctorsService', selectedDoctor.specialist)
+                    formObj.append('selectdoctory', selectedDoctor.id);
+                    formObj.append('payment_method', payment);
+                    formObj.append('comment', comment);
+                    formObj.append('followup', follow);
+                    formObj.append('followup_id', selected_follow_up);
+                    formObj.append('bank_deposite_slip', deposit_slip);
+
+                    // let obj = {
+                    //     appdate: appDate,
+                    //     apptime: time_slot,
+                    //     slot_id: time_id,
+                    //     DoctorsService: selectedDoctor.specialist,
+                    //     selectdoctory: selectedDoctor.id,
+                    //     payment_method: payment,
+                    //     comment: comment,
+                    //     followup: follow,
+                    //     followup_id: selected_follow_up,
+                    //     bank_deposite_slip: deposit_slip,
+                    // }
+                    console.log('Data of appointment >>>>', formObj);
+                    dispatch(updateAppointments(true));
+                    //let req = await HttpUtilsFile.post('create-appointment', formObj, userData?.api_token);
+                    console.log('Link >>>', Global.BASE_URL + '/create-appointment')
+                    fetch(Global.BASE_URL + '/create-appointment', {
+                        method: 'post',
+                        headers: new Headers({
+                            Authorization: 'Bearer ' + userData?.api_token,
+                            //'Content-Type': 'multipart/form-data',
+                            // "Content-Type": "application/json",
+                        }),
+                        body: formObj
+                    })
+                    .then(data => {
+                       console.log('Api Respons >>>>', data);
+                      })
+                    //let resJson = await req.json();
                     // setCreateAppLoader(false);
-                    
                 }
 
             } catch (error) {
@@ -344,7 +371,7 @@ const AppointmentForm = ({ route }) => {
 
     }
 
-    async function getFollowUps(){
+    async function getFollowUps() {
         try {
             // let params = {
             //     api_token: userData?.api_token
@@ -354,23 +381,23 @@ const AppointmentForm = ({ route }) => {
             //     .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
             //     .join('&');
             let obj = {
-                doctor_id:selectedDoctor.id
+                doctor_id: selectedDoctor.id
             }
-              console.log('Obj follow >>>', obj)
-            let req = await HttpUtilsFile.post('followup-appointment', obj , userData?.api_token);
+            console.log('Obj follow >>>', obj)
+            let req = await HttpUtilsFile.post('followup-appointment', obj, userData?.api_token);
             console.log('Req response of follow ups >>>', req);
-            if(req.message == 'Followup  List'){
+            if (req.message == 'Followup  List') {
                 let arr = [];
                 req.data.map(items => {
                     let obj = {
-                        label:items,
-                        value:items
+                        label: items,
+                        value: items
                     }
                     arr.push(obj)
                 })
                 setFollowUp2(arr);
             }
-            
+
         } catch (error) {
             console.log('Error of follow ups api >>>', error);
         }
@@ -411,17 +438,17 @@ const AppointmentForm = ({ route }) => {
         }
     }, [selectedCategory.id])
 
-    useEffect(()=> {
-        if(selectedDoctor.id){
+    useEffect(() => {
+        if (selectedDoctor.id) {
             getFollowUps();
         }
 
-    },[selectedDoctor.id])
+    }, [selectedDoctor.id])
 
     useEffect(() => {
         fetchTimeSlot();
         fetchCategories();
-        
+
     }, [])
 
     // console.log('Selected Doctor .>>>', selectedDoctor);
@@ -440,261 +467,261 @@ const AppointmentForm = ({ route }) => {
                     />
                 </View>
                 : */}
-                <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <View style={styles.formContainer}>
-                        <View style={{ margin: 10 }}>
-                            <Components.DatePicker
-                                mode='date'
-                                name={appointmentData.selected_date == '' ? 'dd/mm/yyyy' : moment(appointmentData.selected_date).format("DD/MM/YYYY")}
-                                onChange={handleChangeDate}
-                            />
-                        </View>
-                        <View style={{ margin: 10 }}>
-                            <Components.DropDown
-                                placeholder="Select time slot"
-                                list={timeSlots}
-                                onChange={(value) => handleChange('time_slot', value())}
-                                value={appointmentData.time_slot}
-                                dropDownMaxHeight={150}
-                                open={openTimeSlots}
-                                style={styles.dropdown_inner_style}
-                                setOpen={() => setOpenTimeSlots(openTimeSlots => !openTimeSlots)}
-                                listMode="MODAL"
-                                disabled={appointmentData.selected_date == '' ? true : false}
-                            />
-                        </View>
-                        {appointmentData.time_slot !== '' && (
-                            <>
-                                <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ color: Global.main_color, fontWeight: 'bold' }}>{t('category')}</Text>
-                                </View>
-                                <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
-                                    {categories.map(item => renderItem(item))}
-                                </View>
-                            </>
-                        )}
-                        {selectedCategory.name !== '' && (
-                            <>
-                                <View style={{ margin: 10 }}>
-                                    <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>Choose Doctor</Text>
-                                    <ScrollView horizontal={true} >
-                                        {doctors == null ?
-                                            <Components.Spinner />
+            <ScrollView contentContainerStyle={styles.contentContainer}>
+                <View style={styles.formContainer}>
+                    <View style={{ margin: 10 }}>
+                        <Components.DatePicker
+                            mode='date'
+                            name={appointmentData.selected_date == '' ? 'dd/mm/yyyy' : moment(appointmentData.selected_date).format("DD/MM/YYYY")}
+                            onChange={handleChangeDate}
+                        />
+                    </View>
+                    <View style={{ margin: 10 }}>
+                        <Components.DropDown
+                            placeholder="Select time slot"
+                            list={timeSlots}
+                            onChange={(value) => handleChange('time_slot', value())}
+                            value={appointmentData.time_slot}
+                            dropDownMaxHeight={150}
+                            open={openTimeSlots}
+                            style={styles.dropdown_inner_style}
+                            setOpen={() => setOpenTimeSlots(openTimeSlots => !openTimeSlots)}
+                            listMode="MODAL"
+                            disabled={appointmentData.selected_date == '' ? true : false}
+                        />
+                    </View>
+                    {appointmentData.time_slot !== '' && (
+                        <>
+                            <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text style={{ color: Global.main_color, fontWeight: 'bold' }}>{t('category')}</Text>
+                            </View>
+                            <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                {categories.map(item => renderItem(item))}
+                            </View>
+                        </>
+                    )}
+                    {selectedCategory.name !== '' && (
+                        <>
+                            <View style={{ margin: 10 }}>
+                                <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>Choose Doctor</Text>
+                                <ScrollView horizontal={true} >
+                                    {doctors == null ?
+                                        <Components.Spinner />
+                                        :
+                                        doctors?.length == 0 ?
+                                            <Components.NoRecord />
                                             :
-                                            doctors?.length == 0 ?
-                                                <Components.NoRecord />
-                                                :
-                                                <>
-                                                    {doctors?.map((item, i) => (<Components.DoctorCard data={item} handleDoctor={handleDoctor} selectedDoctor={selectedDoctor} key={i} />))}
-                                                </>
+                                            <>
+                                                {doctors?.map((item, i) => (<Components.DoctorCard data={item} handleDoctor={handleDoctor} selectedDoctor={selectedDoctor} key={i} />))}
+                                            </>
 
-                                        }
-                                    </ScrollView>
-                                </View>
-                                <View style={{ margin: 10 }}>
-                                    <Text style={{ color: Global.dark_gray, fontWeight: '600', marginVertical: 5 }}>Date, time and service required</Text>
-                                    <Components.DropDown
-                                        placeholder="Follow Up"
-                                        list={followUp1}
-                                        onChange={(value) => handleChange('follow', value())}
-                                        value={appointmentData.follow}
-                                        dropDownMaxHeight={150}
-                                        open={openFollowUp1}
-                                        style={styles.dropdown_inner_style}
-                                        setOpen={() => setOpenFollowUp1(openFollowUp1 => !openFollowUp1)}
-                                        listMode="MODAL"
-                                    />
-                                </View>
-                            </>
-                        )}
-                        {appointmentData.follow == 'yes' && (
-                            <>
-                                <View style={{ margin: 10 }}>
-                                    <Components.DropDown
-                                        placeholder="Select Follow Up"
-                                        list={followUp2}
-                                        onChange={(value) => handleChange('selected_follow_up', value())}
-                                        value={appointmentData.selected_follow_up}
-                                        dropDownMaxHeight={150}
-                                        open={openFollowUp2}
-                                        style={styles.dropdown_inner_style}
-                                        setOpen={() => setOpenFollowUp2(openFollowUp2 => !openFollowUp2)}
-                                        listMode="MODAL"
-                                    />
-                                </View>
-                                {/* <View style={{ margin: 10 }}>
+                                    }
+                                </ScrollView>
+                            </View>
+                            <View style={{ margin: 10 }}>
+                                <Text style={{ color: Global.dark_gray, fontWeight: '600', marginVertical: 5 }}>Date, time and service required</Text>
+                                <Components.DropDown
+                                    placeholder="Follow Up"
+                                    list={followUp1}
+                                    onChange={(value) => handleChange('follow', value())}
+                                    value={appointmentData.follow}
+                                    dropDownMaxHeight={150}
+                                    open={openFollowUp1}
+                                    style={styles.dropdown_inner_style}
+                                    setOpen={() => setOpenFollowUp1(openFollowUp1 => !openFollowUp1)}
+                                    listMode="MODAL"
+                                />
+                            </View>
+                        </>
+                    )}
+                    {appointmentData.follow == 'yes' && (
+                        <>
+                            <View style={{ margin: 10 }}>
+                                <Components.DropDown
+                                    placeholder="Select Follow Up"
+                                    list={followUp2}
+                                    onChange={(value) => handleChange('selected_follow_up', value())}
+                                    value={appointmentData.selected_follow_up}
+                                    dropDownMaxHeight={150}
+                                    open={openFollowUp2}
+                                    style={styles.dropdown_inner_style}
+                                    setOpen={() => setOpenFollowUp2(openFollowUp2 => !openFollowUp2)}
+                                    listMode="MODAL"
+                                />
+                            </View>
+                            {/* <View style={{ margin: 10 }}>
                                     <Components.MyButton
                                         title='View Prescription'
                                         styleBtn={{ backgroundColor: Global.inputs_bg }}
                                         titleStyle={{ fontWeight: '500', color: Global.main_color }}
                                     />
                                 </View> */}
-                            </>
-                        )}
-                        {(selectedCategory.name && selectedDoctor.name) && (
-                            <View style={{ margin: 10 }}>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>{t('placement_head')}</Text>
-                                </View>
-                                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text>{`${selectedDoctor.name} Appointment`}</Text>
-                                    <Text style={{ color: Global.main_color }}>{`(30 min)`}</Text>
-                                </View>
-                                <View style={styles.cardContainer}>
-                                    {PLACEMENTS.map((v, i) => {
-                                        return [
-                                            i != 0 && (
-                                                <View style={{ borderWidth: 0.5, borderColor: Global.dark_gray }} key={v.id} />
-                                            ),
-                                            <View style={{ backgroundColor: Global.inputs_bg, height: '25%', justifyContent: 'center', padding: 5 }} key={i}>
-                                                <View
-                                                    style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}
-                                                >
-                                                    <View style={{ flex: 1 }}>
-                                                        <Text style={{ fontWeight: 'bold' }}>{v.title}</Text>
-                                                    </View>
-                                                    {v.id == 1 && (<Text>{moment(appointmentData.selected_date).format("DD/MM/YYYY")}</Text>)}
-                                                    {v.id == 2 && (<Text>{appointmentData.time_slot}</Text>)}
-                                                    {v.id == 3 && (<Text>{moment(appointmentData.selected_date, "YYYY-MM-DD HH:mm:ss").format('dddd')}</Text>)}
-                                                    {v.id == 4 && (<Text>{selectedCategory.name}</Text>)}
+                        </>
+                    )}
+                    {(selectedCategory.name && selectedDoctor.name) && (
+                        <View style={{ margin: 10 }}>
+                            <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>{t('placement_head')}</Text>
+                            </View>
+                            <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text>{`${selectedDoctor.name} Appointment`}</Text>
+                                <Text style={{ color: Global.main_color }}>{`(30 min)`}</Text>
+                            </View>
+                            <View style={styles.cardContainer}>
+                                {PLACEMENTS.map((v, i) => {
+                                    return [
+                                        i != 0 && (
+                                            <View style={{ borderWidth: 0.5, borderColor: Global.dark_gray }} key={v.id} />
+                                        ),
+                                        <View style={{ backgroundColor: Global.inputs_bg, height: '25%', justifyContent: 'center', padding: 5 }} key={i}>
+                                            <View
+                                                style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}
+                                            >
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={{ fontWeight: 'bold' }}>{v.title}</Text>
                                                 </View>
+                                                {v.id == 1 && (<Text>{moment(appointmentData.selected_date).format("DD/MM/YYYY")}</Text>)}
+                                                {v.id == 2 && (<Text>{appointmentData.time_slot}</Text>)}
+                                                {v.id == 3 && (<Text>{moment(appointmentData.selected_date, "YYYY-MM-DD HH:mm:ss").format('dddd')}</Text>)}
+                                                {v.id == 4 && (<Text>{selectedCategory.name}</Text>)}
                                             </View>
-                                        ]
+                                        </View>
+                                    ]
 
-                                    })}
-                                </View>
-                                <View style={{ marginVertical: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text>{t('brief_comment')}</Text>
-                                </View>
-                                <Components.InputField
-                                    placeholder="Comment"
-                                    name={'comment'}
-                                    handleChange={(name, value) => handleChange(name, value)}
-                                    value={appointmentData.comment}
-                                    multiple={true}
-                                />
-                                <View style={{ marginTop: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                    <Text style={{ fontWeight: '600', color: Global.main_color }}>{t('select_payment')}</Text>
-                                </View>
-                                <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                    <TouchableOpacity
-                                        onPress={() => handleChange('payment', 'bank')}
-                                        style={appointmentData.payment == 'bank' ? styles.selectedBtnPayment : styles.paymentBtnStyle}
-                                    >
-                                        <Components.ImagePlaceholder
-                                            src={bankImg}
-                                            _style={styles.imgStyle1}
-                                        />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => handleChange('payment', 'spot')}
-                                        style={appointmentData.payment == 'spot' ? styles.selectedBtnPayment : styles.paymentBtnStyle}
-                                    >
-                                        <Components.ImagePlaceholder
-                                            src={spotImg}
-                                            _style={styles.imgStyle1}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                                {appointmentData.payment == 'bank' && (
-                                    <View style={{ marginTop: 10 }}>
-                                        <Components.InputField
-                                            placeholder="Bank Name"
-                                            name={'bank_name'}
-                                            handleChange={(name, value) => handleChange(name, value)}
-                                            value={appointmentData.bank_name}
-                                        />
-                                        {errorObj.bank_name ? (
-                                            <Text style={styles.error}>{errorObj.bank_name}</Text>
-                                        ) : (
-                                            null
-                                        )}
-                                        <View style={{ margin: 10 }} />
-                                        <Components.InputField
-                                            placeholder="Bank Account Name"
-                                            name={'bank_account_name'}
-                                            handleChange={(name, value) => handleChange(name, value)}
-                                            value={appointmentData.bank_account_name}
-                                        />
-                                        {errorObj.bank_account_name ? (
-                                            <Text style={styles.error}>{errorObj.bank_account_name}</Text>
-                                        ) : (
-                                            null
-                                        )}
-                                        <View style={{ margin: 10 }} />
-                                        <Components.InputField
-                                            placeholder="Bank Account Number"
-                                            name={'bank_account_number'}
-                                            handleChange={(name, value) => handleChange(name, value)}
-                                            value={appointmentData.bank_account_number}
-                                        />
-                                        {errorObj.bank_account_number ? (
-                                            <Text style={styles.error}>{errorObj.bank_account_number}</Text>
-                                        ) : (
-                                            null
-                                        )}
-                                        <View style={{ margin: 10 }} />
-                                        <Components.InputField
-                                            placeholder="Deposited by"
-                                            name={'deposited_by'}
-                                            handleChange={(name, value) => handleChange(name, value)}
-                                            value={appointmentData.deposited_by}
-                                        />
-                                        {errorObj.deposited_by ? (
-                                            <Text style={styles.error}>{errorObj.deposited_by}</Text>
-                                        ) : (
-                                            null
-                                        )}
-                                        {appointmentData.deposit_slip ?
-                                            <View style={{ marginTop: 15, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: "center" }}>
-                                                <Components.ImagePlaceholder
-                                                    uri={appointmentData.deposit_slip}
-                                                    _style={{ height: 80, width: 80 }}
-                                                />
+                                })}
+                            </View>
+                            <View style={{ marginVertical: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text>{t('brief_comment')}</Text>
+                            </View>
+                            <Components.InputField
+                                placeholder="Comment"
+                                name={'comment'}
+                                handleChange={(name, value) => handleChange(name, value)}
+                                value={appointmentData.comment}
+                                multiple={true}
+                            />
+                            <View style={{ marginTop: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text style={{ fontWeight: '600', color: Global.main_color }}>{t('select_payment')}</Text>
+                            </View>
+                            <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                                <TouchableOpacity
+                                    onPress={() => handleChange('payment', 'bank')}
+                                    style={appointmentData.payment == 'bank' ? styles.selectedBtnPayment : styles.paymentBtnStyle}
+                                >
+                                    <Components.ImagePlaceholder
+                                        src={bankImg}
+                                        _style={styles.imgStyle1}
+                                    />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => handleChange('payment', 'spot')}
+                                    style={appointmentData.payment == 'spot' ? styles.selectedBtnPayment : styles.paymentBtnStyle}
+                                >
+                                    <Components.ImagePlaceholder
+                                        src={spotImg}
+                                        _style={styles.imgStyle1}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            {appointmentData.payment == 'bank' && (
+                                <View style={{ marginTop: 10 }}>
+                                    <Components.InputField
+                                        placeholder="Bank Name"
+                                        name={'bank_name'}
+                                        handleChange={(name, value) => handleChange(name, value)}
+                                        value={appointmentData.bank_name}
+                                    />
+                                    {errorObj.bank_name ? (
+                                        <Text style={styles.error}>{errorObj.bank_name}</Text>
+                                    ) : (
+                                        null
+                                    )}
+                                    <View style={{ margin: 10 }} />
+                                    <Components.InputField
+                                        placeholder="Bank Account Name"
+                                        name={'bank_account_name'}
+                                        handleChange={(name, value) => handleChange(name, value)}
+                                        value={appointmentData.bank_account_name}
+                                    />
+                                    {errorObj.bank_account_name ? (
+                                        <Text style={styles.error}>{errorObj.bank_account_name}</Text>
+                                    ) : (
+                                        null
+                                    )}
+                                    <View style={{ margin: 10 }} />
+                                    <Components.InputField
+                                        placeholder="Bank Account Number"
+                                        name={'bank_account_number'}
+                                        handleChange={(name, value) => handleChange(name, value)}
+                                        value={appointmentData.bank_account_number}
+                                    />
+                                    {errorObj.bank_account_number ? (
+                                        <Text style={styles.error}>{errorObj.bank_account_number}</Text>
+                                    ) : (
+                                        null
+                                    )}
+                                    <View style={{ margin: 10 }} />
+                                    <Components.InputField
+                                        placeholder="Deposited by"
+                                        name={'deposited_by'}
+                                        handleChange={(name, value) => handleChange(name, value)}
+                                        value={appointmentData.deposited_by}
+                                    />
+                                    {errorObj.deposited_by ? (
+                                        <Text style={styles.error}>{errorObj.deposited_by}</Text>
+                                    ) : (
+                                        null
+                                    )}
+                                    {appointmentData.deposit_slip ?
+                                        <View style={{ marginTop: 15, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: "center" }}>
+                                            <Components.ImagePlaceholder
+                                                uri={appointmentData.deposit_slip}
+                                                _style={{ height: 80, width: 80 }}
+                                            />
+                                            <TouchableOpacity
+                                                style={{ margin: 10 }}
+                                                onPress={() => setAppointmentData({ ...appointmentData, deposit_slip: '' })}
+                                            >
+                                                <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Remove File</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        :
+                                        <>
+                                            <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+                                                <Text style={{ margin: 10 }}>Deposited Slip</Text>
+
                                                 <TouchableOpacity
-                                                    style={{ margin: 10 }}
-                                                    onPress={()=> setAppointmentData({...appointmentData, deposit_slip:''})}
+                                                    style={styles.chooseFileBtn}
+                                                    onPress={() => addDepositedSlip()}
                                                 >
-                                                    <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Remove File</Text>
+                                                    <Text style={{ fontWeight: 'bold' }}>Choose File</Text>
                                                 </TouchableOpacity>
                                             </View>
-                                            :
-                                            <>
-                                                <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                                    <Text style={{ margin: 10 }}>Deposited Slip</Text>
+                                            {errorObj.deposit_slip ? (
+                                                <Text style={styles.error}>{errorObj.deposit_slip}</Text>
+                                            ) : (
+                                                null
+                                            )}
+                                        </>
+                                    }
 
-                                                    <TouchableOpacity
-                                                        style={styles.chooseFileBtn}
-                                                        onPress={() => addDepositedSlip()}
-                                                    >
-                                                        <Text style={{ fontWeight: 'bold' }}>Choose File</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                                {errorObj.deposit_slip ? (
-                                                    <Text style={styles.error}>{errorObj.deposit_slip}</Text>
-                                                ) : (
-                                                    null
-                                                )}
-                                            </>
-                                        }
+                                </View>
+                            )}
+                            {(appointmentData.payment == 'bank' || appointmentData.payment == 'spot') && (
+                                <View style={{ margin: 10 }}>
+                                    <Components.MyButton
+                                        title='Create'
+                                        onClick={handleCreateAppointment}
+                                        loader={createAppLoader}
+                                    // titleStyle={{ fontWeight: '500', color: Global.main_color }}
+                                    />
+                                </View>
+                            )}
+                        </View>
 
-                                    </View>
-                                )}
-                                {(appointmentData.payment == 'bank' || appointmentData.payment == 'spot') && (
-                                    <View style={{ margin: 10 }}>
-                                        <Components.MyButton
-                                            title='Create'
-                                            onClick={handleCreateAppointment}
-                                            loader={createAppLoader}
-                                        // titleStyle={{ fontWeight: '500', color: Global.main_color }}
-                                        />
-                                    </View>
-                                )}
-                            </View>
-
-                        )}
-                    </View>
-                </ScrollView>
+                    )}
+                </View>
+            </ScrollView>
             {/* } */}
         </SafeAreaView>
     )

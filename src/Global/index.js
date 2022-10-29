@@ -2,6 +2,8 @@
 //import { useRTL } from "../../Functions"
 //const isRTL = useRTL()
 
+const BASE_URL = 'https://getboxxie.com/doctorportal/public/api';
+
 export default {
     main_color:'#0e71b4',
     lightGray: '#676767',
@@ -14,5 +16,6 @@ export default {
     buttons_bg:'#0e71b4',
     email_validation: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/,
     dark_gray:'#a9a9a9',
-    orange_clr:'#FFA500'
+    orange_clr:'#FFA500',
+    BASE_URL
 }

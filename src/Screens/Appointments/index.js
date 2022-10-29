@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, ScrollView, View, SafeAreaView, FlatList, useWindowDimensions, TouchableOpacity, Dimensions } from 'react-native'
+import { StyleSheet,PermissionsAndroid,Platform, Text, ScrollView, View, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global';
 import { useTranslation } from 'react-i18next'
@@ -8,6 +8,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import HttpUtilsFile from '../../Services/HttpUtils'
 import moment from 'moment';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import { downloadFile, showAlert } from '../../../Functions';
+import { updateAppointments } from '../../Redux/reducersActions/updateAppointments';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -16,6 +19,7 @@ const Appointments = () => {
     const navigation = useNavigation();
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();
+    const dispatch = useDispatch();
     const [appointments, setAppointments] = useState(null);
     const [modal, setModal] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null)
@@ -31,9 +35,10 @@ const Appointments = () => {
         modal: false,
         app_id: null
     })
-
+    const { get_appointments } = useSelector(state => state.persistedReducer.updateAppointments);
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
-    // console.log('Login user data >>>>', userData);
+    console.log('Redux get_appointments >>>>', get_appointments);
+    const [pdfLoader , setPdfLoader] = useState(false);
 
     const medicine_arr = [
         {
@@ -125,8 +130,8 @@ const Appointments = () => {
         let does;
         let days;
         let comments;
-        
-        if(params?.prescription?.length > 0){
+
+        if (params?.prescription?.length > 0) {
             for (const iterator of params.prescription) {
                 names = JSON.parse(iterator.medicine_name)
                 types = JSON.parse(iterator.medicine_type)
@@ -166,14 +171,14 @@ const Appointments = () => {
             for (const iterator of arr6) {
                 newArr6.push(comments[iterator])
             }
-    
+
             // console.log('New Arr1 >>>>', newArr1);
             // console.log('New Arr2 >>>>', newArr2);
             // console.log('New Arr3 >>>>', newArr3);
             // console.log('New Arr4 >>>>', newArr4);
             // console.log('New Arr >>>>', newArr5);
             // console.log('New Arr >>>>', newArr6);
-    
+
             setMedicineData({
                 medicine_name: newArr1,
                 medicine_type: newArr2,
@@ -270,7 +275,7 @@ const Appointments = () => {
 
                     </View>
                 </View>
-                <View style={{ ...childContainer }}>
+                {/* <View style={{ ...childContainer }}>
                     <View style={styles.row1}>
                         <Text style={styles.titleHead}>{t('reports')}</Text>
                     </View>
@@ -283,7 +288,7 @@ const Appointments = () => {
                         </TouchableOpacity>
 
                     </View>
-                </View>
+                </View> */}
             </View>
         )
     }
@@ -411,8 +416,75 @@ const Appointments = () => {
         }
     }
 
-    async function handleDownload(params) {
-        alert('Process pending...')
+    const checkPermission = async () => {
+
+        if (Platform.OS === 'ios') {
+            handleDownload();
+        } else {
+          try {
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              {
+                title: 'Storage Permission Required',
+                message:
+                  'Application needs access to your storage to download File',
+              }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              // Start downloading
+              handleDownload();
+              console.log('Storage Permission Granted.');
+            } else {
+              // If permission denied then show alert
+              Alert.alert('Error','Storage Permission Not Granted');
+            }
+          } catch (err) {
+            // To handle permission related exception
+            console.log("++++"+err);
+          }
+        }
+      };
+
+    function closeLoaderPDF() {
+        setPdfLoader(false)
+    }
+
+    async function handleDownload() {
+        // alert('Process pending...');
+        try {
+            let params = {
+                id: selectedAppointment?.id
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+             console.log('Query >>>', query)
+            setPdfLoader(true);
+            let req = await HttpUtilsFile.get('preciption_download?' + query, userData?.api_token);
+            console.log('Response of download file >>>>', req);
+            if(req.message === 'Preciption download url'){
+                downloadFile(req.data, closeLoaderPDF);
+            }
+            else {
+                setPdfLoader(false);
+                alert('Something went wrong, try later');
+            }
+        } catch (error) {
+            setPdfLoader(false);
+            console.log('Download Error >>>', error);
+        }
+        // Get today's date to add the time suffix in filename
+        // let date = new Date();
+        // // File URL which we want to download
+        // let FILE_URL = fileUrl;
+        // // Function to get extention of the file url
+        // let file_ext = getFileExtention(FILE_URL);
+
+        // file_ext = '.' + file_ext[0];
+
+        // config: To get response by passing the downloading related options
+        // fs: Root directory path to download
     }
 
     async function handleDownloadReport() {
@@ -426,6 +498,25 @@ const Appointments = () => {
             app_id: null
         })
     }
+
+    useFocusEffect(
+        React.useCallback(() => {
+            console.log('<<<<< Screen is focused >>>')
+            return () => {
+                console.log('Unmount Of Appointments');
+                if (get_appointments == true) {
+                    dispatch(updateAppointments(false))
+                }
+            }
+        }, [])
+    );
+
+    useEffect(() => {
+        if (get_appointments == true) {
+            fetchAppointments();
+        }
+
+    }, [get_appointments])
 
     useEffect(() => {
         fetchAppointments();
@@ -556,13 +647,14 @@ const Appointments = () => {
                         </View>
                         <View style={{ flex: 0.2 }}>
                             <Components.FABComponent
+                                loading={pdfLoader}
                                 visible={true}
                                 // iconDetail={{ name: 'add', color: 'white' }}
                                 title={t('download')}
                                 color={Global.main_color}
                                 placement={isRTL == 'rtl' ? 'left' : 'right'}
                                 size='large'
-                                onPress={handleDownload}
+                                onPress={checkPermission}
                                 _style={{ borderRadius: 7 }}
                             />
                         </View>
@@ -634,8 +726,8 @@ const styles = StyleSheet.create({
         width: 140,
         alignItems: 'center'
     },
-    prescriptionBtnDisabled:{
-        opacity:0.3,
+    prescriptionBtnDisabled: {
+        opacity: 0.3,
         paddingHorizontal: 10,
         padding: 6,
         backgroundColor: Global.white,
