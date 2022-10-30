@@ -88,6 +88,14 @@
         "deposited_slip_err": "Deposited slip is required",
         "role":"Role",
         "download":"Download",
-        "report":"Report"
+        "report":"Report",
+        "file_downloaded":"File Downloaded Successfully.",
+        "tabibak":"TABIBAK",
+        "storag_perm":"Storage Permission Required",
+        "perm_msg":"Application needs access to your storage to download File",
+        "error":"Error",
+        "file_error":"Storage Permission Not Granted",
+        "updated_user":"Update user successfully",
+        "appointment_created":"Appointment has been created"
     }
 }

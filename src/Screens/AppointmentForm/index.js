@@ -10,7 +10,8 @@ import spotImg from '../../Assets/cod.jpg';
 import ImagePicker from 'react-native-image-crop-picker';
 import HttpUtilsFile from '../../Services/HttpUtils';
 import { useSelector, useDispatch } from 'react-redux'
-import { updateAppointments  } from '../../Redux/reducersActions/updateAppointments';
+import { updateAppointments } from '../../Redux/reducersActions/updateAppointments';
+import { showAlert } from '../../../Functions';
 
 
 const AppointmentForm = ({ route }) => {
@@ -32,7 +33,8 @@ const AppointmentForm = ({ route }) => {
         bank_account_name: '',
         bank_account_number: '',
         deposited_by: '',
-        deposit_slip: ''
+        deposit_slip: '',
+        img_obj:{}
     })
     const [errorObj, setErrorObj] = useState({
         bank_name: '',
@@ -129,7 +131,8 @@ const AppointmentForm = ({ route }) => {
             //if (resJson.status === 'Success') {
             setAppointmentData({
                 ...appointmentData,
-                deposit_slip: image.path
+                deposit_slip: image.path,
+                img_obj:image
             })
 
             //}
@@ -285,23 +288,24 @@ const AppointmentForm = ({ route }) => {
             bank_account_name,
             bank_account_number,
             deposited_by,
-            deposit_slip
+            deposit_slip,
+            img_obj
         } = appointmentData;
 
         let errors = {};
         if (payment == 'bank') {
-            if (bank_name == '') {
-                errors.bank_name = t('bank_name_err')
-            }
-            if (bank_account_name == '') {
-                errors.bank_account_name = t('account_name_err')
-            }
-            if (bank_account_number == '') {
-                errors.bank_account_number = t('account_number_err')
-            }
-            if (deposited_by == '') {
-                errors.deposited_by = t('deposited_by_err')
-            }
+            // if (bank_name == '') {
+            //     errors.bank_name = t('bank_name_err')
+            // }
+            // if (bank_account_name == '') {
+            //     errors.bank_account_name = t('account_name_err')
+            // }
+            // if (bank_account_number == '') {
+            //     errors.bank_account_number = t('account_number_err')
+            // }
+            // if (deposited_by == '') {
+            //     errors.deposited_by = t('deposited_by_err')
+            // }
             if (deposit_slip == '') {
                 errors.deposit_slip = t('deposited_slip_err')
             }
@@ -309,8 +313,8 @@ const AppointmentForm = ({ route }) => {
 
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
-            // setCreateAppLoader(true);
             try {
+                setCreateAppLoader(true);
                 let timesSlots = [...timeSlots];
                 let indx = timesSlots.findIndex(x => x.value === time_slot);
                 if (indx != -1) {
@@ -320,7 +324,7 @@ const AppointmentForm = ({ route }) => {
                     let time_id = timesSlots[indx].id;
                     const formObj = new FormData();
                     formObj.append('appdate', appDate)
-                    formObj.append('apptime', time_slot)
+                    formObj.append('apptime', time_id)
                     formObj.append('slot_id', time_id)
                     formObj.append('DoctorsService', selectedDoctor.specialist)
                     formObj.append('selectdoctory', selectedDoctor.id);
@@ -328,36 +332,79 @@ const AppointmentForm = ({ route }) => {
                     formObj.append('comment', comment);
                     formObj.append('followup', follow);
                     formObj.append('followup_id', selected_follow_up);
-                    formObj.append('bank_deposite_slip', deposit_slip);
+                    //formObj.append('bank_deposite_slip', img_obj);
+                    if(payment === 'bank'){
+                        formObj.append('bank_deposite_slip', {
+                            uri: deposit_slip,
+                            type: img_obj.mime,
+                            name: 'photo'
+                        }
+                        );
+                    }
 
-                    // let obj = {
-                    //     appdate: appDate,
-                    //     apptime: time_slot,
-                    //     slot_id: time_id,
-                    //     DoctorsService: selectedDoctor.specialist,
-                    //     selectdoctory: selectedDoctor.id,
-                    //     payment_method: payment,
-                    //     comment: comment,
-                    //     followup: follow,
-                    //     followup_id: selected_follow_up,
-                    //     bank_deposite_slip: deposit_slip,
-                    // }
+                    let obj = {
+                        appdate: appDate,
+                        apptime: time_slot,
+                        slot_id: time_id,
+                        DoctorsService: selectedDoctor.specialist,
+                        selectdoctory: selectedDoctor.id,
+                        payment_method: payment,
+                        comment: comment,
+                        followup: follow,
+                        followup_id: selected_follow_up,
+                    }
                     console.log('Data of appointment >>>>', formObj);
-                    dispatch(updateAppointments(true));
-                    //let req = await HttpUtilsFile.post('create-appointment', formObj, userData?.api_token);
-                    console.log('Link >>>', Global.BASE_URL + '/create-appointment')
-                    fetch(Global.BASE_URL + '/create-appointment', {
-                        method: 'post',
+                    // let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
+                    console.log('Link >>>', Global.BASE_URL + '/create-appointment');
+                    // console.log('Image form data >>>>', imgData._parts)
+                    let imageReq = await fetch(Global.BASE_URL + '/create-appointment', {
+                        method: 'Post',
                         headers: new Headers({
                             Authorization: 'Bearer ' + userData?.api_token,
-                            //'Content-Type': 'multipart/form-data',
                             // "Content-Type": "application/json",
                         }),
-                        body: formObj
-                    })
-                    .then(data => {
-                       console.log('Api Respons >>>>', data);
-                      })
+                        body: formObj,
+                    });
+    
+                    let resJson = await imageReq.json();
+                    console.log('Create Appointment Respons >>>>', resJson);
+                    if(resJson.message === 'Appointment Created'){
+                        showAlert(t('tabibak'), t('appointment_created'), t('ok'))
+                    dispatch(updateAppointments(true));
+
+                    }
+
+                    // let res = await fetch(
+                    //     Global.BASE_URL + '/create-appointment',
+                    //     {
+                    //         method: 'post',
+                    //         body: JSON.stringify(obj),
+                    //         headers: {
+                    //             Authorization: 'Bearer ' + userData?.api_token,
+                    //             'Content-Type': 'application/json',
+                    //             'Accept': 'application/json',
+                    //              //'Content-Type': 'multipart/form-data',
+                    //             //'Accept': 'multipart/form-data',
+                    //             // 'Accept': 'multipart/form-data'
+                    //         },
+                    //     }
+                    // );
+                    // let responseJson = await res.json();
+                   // console.log('Create Appointment Respons >>>>', responseJson);
+                    setCreateAppLoader(false)
+                    // fetch(Global.BASE_URL + '/create-appointment', {
+                    //     method: 'POST',
+                    //     headers: new Headers({
+                    //         Authorization: 'Bearer ' + userData?.api_token,
+                    //         "Content-Type": payment == 'bank' ? "multipart/form-data" : "application/json"
+                    //     }),
+                    //     body: formObj
+                    // })
+                    // //.then((res) => res.json())
+                    // .then(data => {
+                    //    console.log('Api Respons >>>>', data.json());
+                    //    setCreateAppLoader(false)
+                    //   })
                     //let resJson = await req.json();
                     // setCreateAppLoader(false);
                 }
@@ -496,7 +543,7 @@ const AppointmentForm = ({ route }) => {
                                 <Text style={{ color: Global.main_color, fontWeight: 'bold' }}>{t('category')}</Text>
                             </View>
                             <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
-                                {categories.map(item => renderItem(item))}
+                                {categories?.map(item => renderItem(item))}
                             </View>
                         </>
                     )}
@@ -530,6 +577,7 @@ const AppointmentForm = ({ route }) => {
                                     style={styles.dropdown_inner_style}
                                     setOpen={() => setOpenFollowUp1(openFollowUp1 => !openFollowUp1)}
                                     listMode="MODAL"
+                                    disabled={doctors == null || doctors?.length == 0 ? true : false}
                                 />
                             </View>
                         </>
@@ -625,7 +673,7 @@ const AppointmentForm = ({ route }) => {
                             </View>
                             {appointmentData.payment == 'bank' && (
                                 <View style={{ marginTop: 10 }}>
-                                    <Components.InputField
+                                    {/* <Components.InputField
                                         placeholder="Bank Name"
                                         name={'bank_name'}
                                         handleChange={(name, value) => handleChange(name, value)}
@@ -671,7 +719,7 @@ const AppointmentForm = ({ route }) => {
                                         <Text style={styles.error}>{errorObj.deposited_by}</Text>
                                     ) : (
                                         null
-                                    )}
+                                    )} */}
                                     {appointmentData.deposit_slip ?
                                         <View style={{ marginTop: 15, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: "center" }}>
                                             <Components.ImagePlaceholder

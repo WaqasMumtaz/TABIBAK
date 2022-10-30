@@ -22,11 +22,11 @@ const DoctorsTile = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState({
         name: '',
-        bio:'',
+        bio: '',
         category_id: '',
-        fees:'',
-        role:'',
-        category:''
+        fees: '',
+        role: '',
+        category: ''
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [doctorsList, setDoctorsList] = useState(null);
@@ -107,17 +107,17 @@ const DoctorsTile = ({ route }) => {
             name: doctor?.user?.name,
             bio: doctor?.user?.bio,
             category_id: doctor?.category?.id,
-            fees:doctor?.fees,
-            role:doctor?.user?.role,
+            fees: doctor?.fees,
+            role: doctor?.user?.role,
             category: doctor?.category?.name,
 
         })
-         setModalVisible(modalVisible => !modalVisible);
+        setModalVisible(modalVisible => !modalVisible);
     }
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const { name, bio , category_id, fees , role ,category} = selectedDoctor;
+        const { name, bio, category_id, fees, role, category } = selectedDoctor;
         if (params === t('profile_view')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
@@ -167,12 +167,14 @@ const DoctorsTile = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={category_name} backIcon={true} />
-            <View style={{ flex: 1, margin: 10 }}>
-                {doctorsList == null ?
+            {doctorsList == null ?
+                // <View style={{ flex: 1, backgroundColor: 'red' }}>
                     <Components.Spinner />
-                    : doctorsList.length == 0 ?
-                        <Components.NoRecord />
-                        :
+                // </View>
+                : doctorsList.length == 0 ?
+                    <Components.NoRecord />
+                    :
+                    <View style={{ flex: 1, margin: 10 }}>
                         <FlatList
                             // contentContainerStyle={{alignItems:'center'}}
                             data={doctorsList}
@@ -181,7 +183,9 @@ const DoctorsTile = ({ route }) => {
                             numColumns={2}
                         />
 
-                }
+                    </View>
+            }
+            {modalVisible && (
                 <Components.AlertModal
                     modalVisible={modalVisible}
                     setModalVisible={handleModal}
@@ -189,7 +193,7 @@ const DoctorsTile = ({ route }) => {
                     data={[{ name: t('profile_view') }, { name: t('make_appointment') }]}
                     handleClick={handleClick}
                 />
-            </View>
+            )}
         </SafeAreaView>
     )
 }

@@ -425,9 +425,9 @@ const Appointments = () => {
             const granted = await PermissionsAndroid.request(
               PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
               {
-                title: 'Storage Permission Required',
+                title: t('storag_perm'),
                 message:
-                  'Application needs access to your storage to download File',
+                  t('perm_msg'),
               }
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
@@ -436,7 +436,7 @@ const Appointments = () => {
               console.log('Storage Permission Granted.');
             } else {
               // If permission denied then show alert
-              Alert.alert('Error','Storage Permission Not Granted');
+              showAlert(t('error'), t('file_error'), t('ok'))
             }
           } catch (err) {
             // To handle permission related exception
@@ -446,7 +446,8 @@ const Appointments = () => {
       };
 
     function closeLoaderPDF() {
-        setPdfLoader(false)
+        setPdfLoader(false);
+        showAlert(t('tabibak'), t('file_downloaded'), t('ok'))
     }
 
     async function handleDownload() {

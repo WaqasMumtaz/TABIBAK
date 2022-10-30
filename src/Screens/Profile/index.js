@@ -142,7 +142,7 @@ const Profile = () => {
                 console.log('Edit Member Respons >>>>', req);
                 setLoader(false);
                 if(req.message === 'Patient Registered'){
-                    alert('Update user successfully');
+                    alert(t('updated_user'));
                     setAuthObj({ ...authObj, edit: false });
                     //getUserDetails();
                 }else {

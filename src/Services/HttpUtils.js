@@ -42,8 +42,8 @@ const hitEndpoint = (method, endpoint, token, body) => {
     let url = [BASE_URL, endpoint].join('/')
     
     //console.log(method, endpoint, token, body)
-     console.log('Check HeadersFor >>>>', headers);
-     console.log('URL >>>', url);
+    //  console.log('Check HeadersFor >>>>', headers);
+    //  console.log('URL >>>', url);
    // return;
     return fetch(url, { method, credentials, headers, body }).then((response) => {
         return handleErrors(response)

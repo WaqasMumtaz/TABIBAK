@@ -97,7 +97,7 @@ const Home = () => {
                 .join('&');
             // console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
-            //  console.log('Req of Categories >>', req);
+              console.log('Req of Categories >>', req);
             if (req.data.length == 0) {
                 setCategories([])
             }

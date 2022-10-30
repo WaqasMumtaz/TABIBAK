@@ -81,8 +81,8 @@ function downloadFile(fileUrl, callback) {
     .then(res => {
       // Alert after successful downloading
       console.log('res -> ', JSON.stringify(res));
-      callback();
-      alert('File Downloaded Successfully.');
+      if(callback) callback();
+      //alert('File Downloaded Successfully.');
       // return true;
     });
 }
