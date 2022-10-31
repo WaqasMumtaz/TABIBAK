@@ -275,7 +275,7 @@ const Appointments = () => {
 
                     </View>
                 </View>
-                {/* <View style={{ ...childContainer }}>
+                <View style={{ ...childContainer }}>
                     <View style={styles.row1}>
                         <Text style={styles.titleHead}>{t('reports')}</Text>
                     </View>
@@ -288,7 +288,7 @@ const Appointments = () => {
                         </TouchableOpacity>
 
                     </View>
-                </View> */}
+                </View>
             </View>
         )
     }

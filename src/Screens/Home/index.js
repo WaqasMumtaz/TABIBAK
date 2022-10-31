@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, FlatList, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, FlatList, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global'
 import { useTranslation } from 'react-i18next'
@@ -14,9 +14,9 @@ import family from '../../Assets/family.png';
 import nurse from '../../Assets/nurse.png';
 
 
-
 const Home = () => {
     const navigation = useNavigation();
+    const { height, width } = useWindowDimensions();
     const { t } = useTranslation();
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [categories, setCategories] = useState(null);
@@ -61,26 +61,26 @@ const Home = () => {
         })
     }
 
+    console.log('Total Screen Width >>>', Math.ceil(width / 3))
 
-
-    const renderItem = (item) => (
+    const renderItem = ({ item }) => (
         // <Components.MyCard data={item} key={item.id} />
         <TouchableOpacity
-            key={item.id}
-            style={styles.card}
-            elevation={3}
+            // key={item.id}
+            style={[styles.card, { width: '28%' }]}
+            // elevation={17}
             onPress={() => handleNavigate(item)}
         >
             {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
-            <View>
+            <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ marginVertical: 5 }}>
                     <Components.ImagePlaceholder
                         src={item.id == 1 ? doctor : item.id == 2 ? nurse : item.id == 3 ? therapy : item.id == 4 ? online_doctor : item.id == 5 ? cardio : family}
-                        _style={{ height: 60, width: 60 }}
+                        _style={{ height: 35, width: 35 }}
                     />
                 </View>
-                <View>
-                    <Text style={[styles.textStyle, { fontSize: 18 }]}>{item.name}</Text>
+                <View style={{}}>
+                    <Text style={[styles.textStyle, { fontSize: 11 }]}>{item.name}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -97,7 +97,7 @@ const Home = () => {
                 .join('&');
             // console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
-              console.log('Req of Categories >>', req);
+            console.log('Req of Categories >>', req);
             if (req.data.length == 0) {
                 setCategories([])
             }
@@ -108,7 +108,7 @@ const Home = () => {
             }
 
         } catch (error) {
-          console.log('Error >>>', error);
+            console.log('Error >>>', error);
         }
     }
 
@@ -119,18 +119,24 @@ const Home = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Components.TopBar title={t('home')} home={true} />
-            <View style={{ flex: 1}}>
-                <ScrollView contentContainerStyle={styles.contentContainer}>
-                    {categories == null ?
-                        <Components.Spinner />
-                        : categories?.length == 0 ?
-                            <Components.NoRecord />
-                            :
-                            <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
-                                {categories.map(item => renderItem(item))}
-                            </View>
-                    }
-                </ScrollView>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', margin: 8 }}>
+                {/* <ScrollView contentContainerStyle={styles.contentContainer}> */}
+                {categories == null ?
+                    <Components.Spinner />
+                    : categories?.length == 0 ?
+                        <Components.NoRecord />
+                        :
+                        // <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
+                        //  {categories.map(item => renderItem(item))}
+                        <FlatList
+                            data={categories}
+                            renderItem={renderItem}
+                            keyExtractor={item => `item_id${item.id}`}
+                            numColumns={3}
+                        />
+                    // </View>
+                }
+                {/* </ScrollView> */}
             </View>
         </SafeAreaView>
     )
@@ -149,25 +155,32 @@ const styles = StyleSheet.create({
     },
     card: {
         margin: 8,
-        width: '41%',
-        height: 200,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
+        // width: 150,
+        height: 145,
+        borderRadius: 15,
+        margin: 10,
+        // justifyContent: 'center',
+        // alignItems: 'center',
         padding: 10,
-        backgroundColor: Global.inputs_bg,
-        shadowColor: "#000000",
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
+        //backgroundColor: Global.inputs_bg,
+        //  borderWidth:3,
+        // borderColor:Global.gray_clr,
+        backgroundColor: Global.white,
+        shadowColor: "#000",
         shadowOffset: {
-            height: 1,
-            width: 1
-        }
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6
     },
     textStyle: {
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
         textAlign: 'center',
-        lineHeight: 28,
-        color: Global.main_color
+        // fontSize:8,
+        // lineHeight: 20,
+        color: Global.main_color,
+        margin: 8
     }
 })

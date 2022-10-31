@@ -106,6 +106,7 @@ const SignUp = ({ handleState }) => {
                 console.log('Else User Data >>>>', data);
                 if(req.message === 'Patient Registered'){
                     clearForm();
+                    handleState(1);
                 }
 
             }

@@ -18,7 +18,7 @@ const PhoneNumberInput = ({
             defaultValue={value}
             // disabled={disabled}
             // disableArrowIcon={disabled}
-            defaultCode="DM"
+            defaultCode="OM"
             layout="first"
             onChangeText={(text) => {
                 handleChange(name,text);
@@ -60,5 +60,7 @@ const styles = StyleSheet.create({
         flex:1,
         height:55,
         backgroundColor:Global.inputs_bg
+        //backgroundColor:'red'
+
     }
 })
