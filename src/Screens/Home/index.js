@@ -102,9 +102,9 @@ const Home = () => {
                 setCategories([])
             }
             else {
-                let arr = [...req.data];
-                arr.push({ id: 6, name: 'Family Tree' })
-                setCategories(arr)
+                // let arr = [...req.data];
+                // arr.push({ id: 6, name: 'Family Tree' })
+                setCategories(req.data)
             }
 
         } catch (error) {
@@ -118,8 +118,12 @@ const Home = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Components.TopBar title={t('home')} home={true} />
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', margin: 8 }}>
+            <Components.TopBar 
+            // title={t('home')} 
+            home={true} 
+            user_name={userData?.name}
+            />
+            <View style={{ flex: 1 , margin:10, marginTop:'10%'}}>
                 {/* <ScrollView contentContainerStyle={styles.contentContainer}> */}
                 {categories == null ?
                     <Components.Spinner />
@@ -129,6 +133,7 @@ const Home = () => {
                         // <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
                         //  {categories.map(item => renderItem(item))}
                         <FlatList
+                        contentContainerStyle={{alignSelf:'center'}}
                             data={categories}
                             renderItem={renderItem}
                             keyExtractor={item => `item_id${item.id}`}
@@ -154,14 +159,14 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     card: {
-        margin: 8,
+        //margin: 5,
         // width: 150,
-        height: 145,
-        borderRadius: 15,
+        height: 139,
+        borderRadius: 20,
         margin: 10,
         // justifyContent: 'center',
         // alignItems: 'center',
-        padding: 10,
+        padding: 17,
         //backgroundColor: Global.inputs_bg,
         //  borderWidth:3,
         // borderColor:Global.gray_clr,

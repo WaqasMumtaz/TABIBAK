@@ -16,6 +16,8 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const Appointments = () => {
+    const today_date = moment().format('YYYY-MM-DD');
+    console.log('today_date >>>>>', today_date);
     const navigation = useNavigation();
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();
@@ -257,7 +259,29 @@ const Appointments = () => {
                         <Text style={styles.titleHead}>{t('status')}</Text>
                     </View>
                     <View>
-                        <Text style={[styles.statusStyle, { color: item?.status === "2" ? 'green' : 'red' }]}>{item?.status === "2" ? t('completed') : t('cancelled')}</Text>
+                        <Text 
+                        style={[styles.statusStyle, {
+                            color: item?.status === "2" ? 'green' 
+                            : item?.status === "3" ? 'red' 
+                            : item?.status === "1" ? 'green' 
+                            : ((moment(item?.appdate) < today_date) && item?.status === "1" ) ? 'red'
+                            : ((moment(item?.appdate) < today_date) && item?.status === "0" ) ? 'red'
+                            : Global.main_color
+                        }]}
+                        >
+                            {
+                                item?.status === "2" ? t('completed') 
+                                : item?.status === "3" ? t('cancelled')
+                                : item?.status === "1" ? t('approved')
+                                : ((moment(item?.appdate) < today_date) && item?.status === "1" ) ?
+                                t('cancelled')
+                                : ((moment(item?.appdate) < today_date) && item?.status === "0" ) ? 
+                                t('cancelled')
+                                :
+                                t('pending')
+                            }
+                        </Text>
+                        
                     </View>
                 </View>
                 <View style={{ ...childContainer }}>

@@ -5,8 +5,10 @@ import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next'
 import SearchInput from '../SearchInput';
+import IonicIcon from 'react-native-vector-icons/Ionicons';
 
-export default function TopBar({ title, home = false, backBtn, backIcon = false }) {
+
+export default function TopBar({ title, home = false, backBtn, backIcon = false, user_name }) {
   const navigation = useNavigation();
   const [searchValue, setSearchValue] = useState({
     name: ''
@@ -26,7 +28,7 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false 
     <>
       <View style={styles.homeTopBarStyle}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{title}</Text>
+          <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
         </View>
         {/* <View style={styles.containerText}>
         <SearchInput
@@ -38,14 +40,18 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false 
         />
       </View> */}
       </View>
-      {/* <View style={{ height: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-        <View style={{height:'100%', width: '42%', backgroundColor: Global.main_color , borderBottomRightRadius:-20
-      }}/>
-        <View style={styles.profile_container}>
-          <Text>Pic</Text>
+      <View style={{ height: 40, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, height: '100%', backgroundColor: Global.main_color, borderBottomLeftRadius: 20 }} />
+        <View style={{ flex: 1, height: "100%", backgroundColor: Global.main_color, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ zIndex: 0, position: 'absolute' }}>
+            <View style={[styles.profile_container, { bottom: -15 }]}>
+              <IonicIcon name="person" size={40} color={Global.dark_gray} />
+            </View>
+          </View>
+
         </View>
-        <View style={{height:'100%', width: '42%', backgroundColor: Global.main_color }}/>
-      </View> */}
+        <View style={{ flex: 1, height: '100%', backgroundColor: Global.main_color, borderBottomRightRadius: 20 }} />
+      </View>
     </>
 
   ) : backIcon ? (
@@ -170,18 +176,20 @@ const styles = StyleSheet.create({
     //marginLeft:12,
   },
   profile_container: {
-    justifyContent:'center',
-    alignItems:'center',
-    backgroundColor:Global.inputs_bg,
-    height:70,
-    width:70,
-    borderRadius:70/2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    //backgroundColor: Global.inputs_bg,
+    backgroundColor: Global.white,
+    height: 75,
+    width: 75,
+    borderRadius: 75 / 2,
     shadowColor: "#000000",
     shadowOpacity: 0.8,
     shadowRadius: 2,
     shadowOffset: {
       height: 1,
       width: 1
-    }
+    },
+    elevation: 3
   }
 });

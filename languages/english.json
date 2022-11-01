@@ -96,6 +96,9 @@
         "error":"Error",
         "file_error":"Storage Permission Not Granted",
         "updated_user":"Update user successfully",
-        "appointment_created":"Appointment has been created"
+        "appointment_created":"Appointment has been created",
+        "status_zero":"No action taken by doctor",
+        "pending":"Pending",
+        "approved":"Approved"
     }
 }

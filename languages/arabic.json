@@ -95,7 +95,8 @@
         "error":"خطأ",
         "file_error":"لم يتم منح إذن التخزين",
         "updated_user":"تحديث المستخدم بنجاح",
-        "appointment_created":"تم إنشاء الموعد"
-        
+        "appointment_created":"تم إنشاء الموعد",
+        "pending":"قيد الانتظار",
+        "approved":"وافق"
     }
 }
