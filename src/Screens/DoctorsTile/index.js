@@ -19,14 +19,17 @@ const DoctorsTile = ({ route }) => {
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();
     const { category_id, category_name } = route.params;
+    console.log('Route Category ID >>>', category_id);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState({
+        doctor_id:'',
         name: '',
         bio: '',
         category_id: '',
         fees: '',
         role: '',
-        category: ''
+        category: '',
+        specialist:''
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [doctorsList, setDoctorsList] = useState(null);
@@ -74,16 +77,19 @@ const DoctorsTile = ({ route }) => {
     )
 
     const MyCard = ({ data }) => (
-        <View style={styles.card} elevation={3} >
+        <TouchableOpacity
+            style={styles.card}
+            onPress={() => handleModal(data)}
+        >
             {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
             <View>
                 <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.textStyle, { fontSize: 18 }]} numberOfLines={1} ellipsizeMode='tail'>{data.user.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => handleModal(data)}>
+                    {/* <TouchableOpacity onPress={() => handleModal(data)}>
                         <IonicIcon name="ellipsis-vertical" size={28} color={Global.dark_gray} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 {/* <Text style={[styles.textStyle, {fontSize:14}]}>{data.subTitle}</Text> */}
                 {/* <Text style={[styles.textStyle, { fontSize: 12 }]}>{data.timeStamp}</Text> */}
@@ -91,25 +97,28 @@ const DoctorsTile = ({ route }) => {
             </View>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 {/* <Image source={data.avatarUrl} style={styles.imageStyle}/> */}
-                <IonicIcon name="person" size={80} color={Global.dark_gray} />
+                <IonicIcon name="person" size={60} color={Global.dark_gray} />
             </View>
             <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
                 <Text>{`${moment(data.starttime, 'hh:mm A').format('hh:mm A')}`}</Text>
                 <Text>-</Text>
                 <Text >{`${moment(data.endtime, 'hh:mm A').format('hh:mm A')}`}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     function handleModal(doctor) {
-        console.log('Doctor >>>>', doctor);
+        console.log('Doctor Category ID >>>>>>>', doctor?.category?.id);
+        //return;
         setSelectedDoctor({
+            doctor_id:doctor?.user?.id,
             name: doctor?.user?.name,
             bio: doctor?.user?.bio,
             category_id: doctor?.category?.id,
             fees: doctor?.fees,
             role: doctor?.user?.role,
             category: doctor?.category?.name,
+            specialist:doctor?.specialist
 
         })
         setModalVisible(modalVisible => !modalVisible);
@@ -117,27 +126,31 @@ const DoctorsTile = ({ route }) => {
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const { name, bio, category_id, fees, role, category } = selectedDoctor;
+        const { name, bio, category_id, fees, role, category, doctor_id, specialist } = selectedDoctor;
         if (params === t('profile_view')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
-                name: name,
-                bio: bio,
-                category_id: category_id,
+                doctor_id,
+                name,
+                bio,
+                category_id,
                 fees,
                 role,
-                category
+                category,
+                specialist
             });
         }
         else if (params === t('make_appointment')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('Appointment', {
-                name: name,
-                bio: bio,
-                category_id: category_id,
+                doctor_id,
+                name,
+                bio,
+                category_id,
                 fees,
                 role,
-                category
+                category,
+                specialist
             });
         }
     }
@@ -169,7 +182,7 @@ const DoctorsTile = ({ route }) => {
             <Components.TopBar title={category_name} backIcon={true} />
             {doctorsList == null ?
                 // <View style={{ flex: 1, backgroundColor: 'red' }}>
-                    <Components.Spinner />
+                <Components.Spinner />
                 // </View>
                 : doctorsList.length == 0 ?
                     <Components.NoRecord />
@@ -208,16 +221,19 @@ const styles = StyleSheet.create({
     card: {
         margin: 10,
         width: '45%',
-        borderRadius: 10,
+        height:160,
+        borderRadius: 15,
         padding: 10,
         backgroundColor: Global.inputs_bg,
-        shadowColor: "#000000",
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
+        backgroundColor: Global.white,
+        shadowColor: "#000",
         shadowOffset: {
-            height: 1,
-            width: 1
-        }
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6
     },
     textStyle: {
         marginVertical: 5

@@ -18,7 +18,13 @@ const Booking = () => {
     // const { height, width } = useWindowDimensions();
 
     function createAppointment() {
-        navigation.navigate('Appointment');
+        navigation.navigate('Appointment', {
+            doctor_id:undefined,
+            name:undefined,
+            category_id:undefined,
+            category:undefined,
+            specialist:undefined
+        });
     }
 
 

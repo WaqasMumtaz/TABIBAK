@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Global from './../../Global';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5';
+import moment from 'moment';
 
 const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled,visible, mode, ...rest }) => {
   const [pickerMode, setPickerMode] = useState(null);
@@ -44,6 +45,7 @@ const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled
         mode={mode}
         onConfirm={handleConfirm}
         onCancel={hidePicker}
+        minimumDate={moment().add(1,'day').format('dddd')}
       />
     </View>
   );
