@@ -7,6 +7,10 @@ import moment from 'moment';
 
 const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled,visible, mode, ...rest }) => {
   const [pickerMode, setPickerMode] = useState(null);
+ // let tomorrow  = moment().add(1,'days');
+  // var date = moment(tomorrow);
+  // console.log('Tomorrow Date >>', date);
+  // console.log('Today Date >>>>', new Date());
 
   const showDatePicker = () => {
    // alert(mode)
@@ -45,7 +49,7 @@ const DatePicker = ({ onChange, name, getDateType,styleText, styleData, disabled
         mode={mode}
         onConfirm={handleConfirm}
         onCancel={hidePicker}
-        minimumDate={moment().add(1,'day').format('dddd')}
+        minimumDate={new Date()}
       />
     </View>
   );

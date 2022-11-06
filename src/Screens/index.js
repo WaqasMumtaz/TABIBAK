@@ -9,6 +9,7 @@ import FamilyMembers from './FamilyMembers';
 import DoctorsTile from './DoctorsTile';
 import DoctorProfile from "./DoctorProfile";
 import AppointmentForm from "./AppointmentForm";
+import AboutUs from './AboutUs';
 
 export default {
     Home,
@@ -21,5 +22,6 @@ export default {
     DoctorsTile,
     DoctorProfile,
     AppointmentForm,
-    Booking
+    Booking,
+    AboutUs
 }

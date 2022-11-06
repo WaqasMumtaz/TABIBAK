@@ -50,11 +50,12 @@ const More = () => {
     // icon: "logo-usd",
 
   }, 
+  {
+    id: "68694a0f-3da1-431f-bd56-142371e29d72",
+    title: t('about_us'),
+    icon: 'people-circle-outline',
+  },
   // {
-  //   id: "68694a0f-3da1-431f-bd56-142371e29d72",
-  //   title: t('setting'),
-  //   icon: 'settings',
-  // }, {
   //   id: "28694a0f-3da1-471f-bd96-142456e29d72",
   //   title: t('about'),
   //   icon: "information-circle",
@@ -111,6 +112,9 @@ const More = () => {
     }
     else if (title === t('member')) {
       navigation.navigate('Family Members');
+    }
+    else if(title === t('about_us')){
+      navigation.navigate('About');
     }
 
     // navigation.navigate('Detail', { title , detail, point_1, point_2, point_3 });

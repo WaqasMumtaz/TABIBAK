@@ -64,6 +64,7 @@
         "all":"الجميع",
         "appointment":"ميعاد",
         "medicine":"طب",
+        "medicine_name":"اسم الطب",
         "type":"يكتب",
         "mg_mi":"ملغ / مي",
         "dose":"جرعة",
@@ -97,6 +98,23 @@
         "updated_user":"تحديث المستخدم بنجاح",
         "appointment_created":"تم إنشاء الموعد",
         "pending":"قيد الانتظار",
-        "approved":"وافق"
+        "approved":"وافق",
+        "select_doctor":"اختر دكتور",
+        "off_day":"يوم الإجازة",
+        "doctor_off_day":"هذا اليوم هو خارج هذا الطبيب",
+        "about_us":"معلومات عنا",
+        "select_time_slot":"حدد الفترة الزمنية",
+        "date_time_req":"التاريخ والوقت والخدمة المطلوبة",
+        "follow_up":"متابعة",
+        "select_follow":"حدد متابعة",
+        "comment":"تعليق",
+        "remove_file":"إزالة الملف",
+        "deposit_slip":"قسيمة الإيداع",
+        "choose_file":"اختر ملف",
+        "create":"خلق",
+        "appointment_date":"تاريخ الموعد",
+        "appointment_time":"وقت الموعد",
+        "appointment_day":"يوم التعيين",
+        "services":"خدمات"
     }
 }

@@ -99,6 +99,23 @@
         "appointment_created":"Appointment has been created",
         "status_zero":"No action taken by doctor",
         "pending":"Pending",
-        "approved":"Approved"
+        "approved":"Approved",
+        "select_doctor":"Select Doctor",
+        "off_day":"Off Day",
+        "doctor_off_day":"This day is the off of this doctor",
+        "about_us":"About Us",
+        "select_time_slot":"Select time slot",
+        "date_time_req":"Date, time and service required",
+        "follow_up":"Follow Up",
+        "select_follow":"Select Follow Up",
+        "comment":"Comment",
+        "remove_file":"Remove File",
+        "deposit_slip":"Deposited Slip",
+        "choose_file":"Choose File",
+        "create":"Create",
+        "appointment_date":"Appointment Date",
+        "appointment_time":"Appointment Time",
+        "appointment_day":"Appointment Day",
+        "services":"Services"
     }
 }

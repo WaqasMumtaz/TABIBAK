@@ -29,7 +29,9 @@ const DoctorsTile = ({ route }) => {
         fees: '',
         role: '',
         category: '',
-        specialist:''
+        specialist:'',
+        offday:null
+
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [doctorsList, setDoctorsList] = useState(null);
@@ -79,7 +81,7 @@ const DoctorsTile = ({ route }) => {
     const MyCard = ({ data }) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => handleModal(data)}
+            onPress={() => selectDoctor(data)}
         >
             {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
             <View>
@@ -107,9 +109,8 @@ const DoctorsTile = ({ route }) => {
         </TouchableOpacity>
     );
 
-    function handleModal(doctor) {
-        console.log('Doctor Category ID >>>>>>>', doctor?.category?.id);
-        //return;
+    function selectDoctor(doctor) {
+        console.log('Doctor Off day >>>>>>>', doctor.offday);
         setSelectedDoctor({
             doctor_id:doctor?.user?.id,
             name: doctor?.user?.name,
@@ -118,15 +119,21 @@ const DoctorsTile = ({ route }) => {
             fees: doctor?.fees,
             role: doctor?.user?.role,
             category: doctor?.category?.name,
-            specialist:doctor?.specialist
-
+            specialist:doctor?.specialist,
+            offday:doctor?.offday
         })
-        setModalVisible(modalVisible => !modalVisible);
+        setModalVisible(true);
+
+    }
+
+    function handleModal() {
+        //return;
+        setModalVisible(false);
     }
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const { name, bio, category_id, fees, role, category, doctor_id, specialist } = selectedDoctor;
+        const { name, bio, category_id, fees, role, category, doctor_id, specialist, offday } = selectedDoctor;
         if (params === t('profile_view')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
@@ -137,7 +144,8 @@ const DoctorsTile = ({ route }) => {
                 fees,
                 role,
                 category,
-                specialist
+                specialist,
+                offday
             });
         }
         else if (params === t('make_appointment')) {
@@ -150,7 +158,8 @@ const DoctorsTile = ({ route }) => {
                 fees,
                 role,
                 category,
-                specialist
+                specialist,
+                offday
             });
         }
     }

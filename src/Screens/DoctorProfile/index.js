@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const DoctorProfile = ({ route }) => {
-    const {doctor_id, name ,bio , category_id, fees, role,specialist, category} = route.params;
+    const {doctor_id, name ,bio , category_id, fees, role,specialist, category,offday} = route.params;
     const navigation = useNavigation();
 
     function openImage() {
@@ -20,7 +20,8 @@ const DoctorProfile = ({ route }) => {
             name,
             category_id,
             specialist,
-            category
+            category,
+            offday
         });
     }
 

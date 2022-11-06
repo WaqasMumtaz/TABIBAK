@@ -14,7 +14,8 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
     name: ''
   });
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir();
 
   function handleChange(name, value) {
     setSearchValue({
@@ -27,8 +28,13 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
   return home ? (
     <>
       <View style={styles.homeTopBarStyle}>
-        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
+        <View style={{flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems:'center' }}>
+          <View style={{flex:1, marginHorizontal:10, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start'}}>
+             <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
+          </View>
+          <View style={[styles.profile_container]}>
+              <IonicIcon name="person" size={40} color={Global.dark_gray} />
+            </View>
         </View>
         {/* <View style={styles.containerText}>
         <SearchInput
@@ -40,8 +46,15 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
         />
       </View> */}
       </View>
-      <View style={{ height: 40, flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ flex: 1, height: '100%', backgroundColor: Global.main_color, borderBottomLeftRadius: 20 }} />
+      <View style={{
+        height: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        backgroundColor: Global.main_color
+      }} />
+      {/* <View style={{ flex: 1, height: '100%', backgroundColor: Global.main_color, borderBottomLeftRadius: 20 }} />
         <View style={{ flex: 1, height: "100%", backgroundColor: Global.main_color, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ zIndex: 0, position: 'absolute' }}>
             <View style={[styles.profile_container, { bottom: -15 }]}>
@@ -51,7 +64,7 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
 
         </View>
         <View style={{ flex: 1, height: '100%', backgroundColor: Global.main_color, borderBottomRightRadius: 20 }} />
-      </View>
+      </View> */}
     </>
 
   ) : backIcon ? (
@@ -92,11 +105,15 @@ const styles = StyleSheet.create({
   },
   homeTopBarStyle: {
     backgroundColor: Global.main_color,
+    justifyContent:'flex-end',
+    alignItems:'flex-end',
+    //marginTop:20,
     // alignItems:"center",
     // height: '16%',
     //borderBottomRightRadius: 20,
     //borderBottomLeftRadius: 20,
-    padding: 5
+    paddingTop: 15,
+    paddingHorizontal:10
   },
   containerText: {
     position: 'relative',
@@ -180,9 +197,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     //backgroundColor: Global.inputs_bg,
     backgroundColor: Global.white,
-    height: 75,
-    width: 75,
-    borderRadius: 75 / 2,
+    height: 50,
+    width: 50,
+    borderRadius: 50 / 2,
     shadowColor: "#000000",
     shadowOpacity: 0.8,
     shadowRadius: 2,

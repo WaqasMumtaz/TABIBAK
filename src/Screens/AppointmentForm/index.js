@@ -20,7 +20,7 @@ const AppointmentForm = ({ route }) => {
     const isRTL = i18n.dir();
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const { doctor_id, category_id, specialist, name, category } = route.params;
+    const { doctor_id, category_id, specialist, name, category, offday } = route.params;
     console.log('Appointment Route Category ID >>>', category_id);
     const [appointments, setAppointments] = useState(null);
     const [categories, setCategories] = useState(null);
@@ -74,7 +74,8 @@ const AppointmentForm = ({ route }) => {
     const [selectedDoctor, setSelectedDoctor] = useState({
         id: undefined,
         name: '',
-        specialist: ''
+        specialist: '',
+        offday: offday
     });
 
 
@@ -85,12 +86,13 @@ const AppointmentForm = ({ route }) => {
         })
     }
 
-    function handleDoctor(params, specialist) {
-        console.log('Selected Doctor >>>>', params);
+    function handleDoctor(params, specialist, offday) {
+        console.log('Selected Doctor Off Day >>>>', offday);
         setSelectedDoctor({
             id: params.id,
             name: params.name,
-            specialist
+            specialist,
+            offday
         });
     }
 
@@ -165,19 +167,19 @@ const AppointmentForm = ({ route }) => {
     const PLACEMENTS = [
         {
             id: 1,
-            title: 'Appointment Date',
+            title: t('appointment_date'),
         },
         {
             id: 2,
-            title: 'Appointment Time'
+            title: t('appointment_time')
         },
         {
             id: 3,
-            title: 'Appointment Day'
+            title: t('appointment_day')
         },
         {
             id: 4,
-            title: 'Services'
+            title: t('services')
         }
 
     ];
@@ -208,7 +210,7 @@ const AppointmentForm = ({ route }) => {
 
     const renderItem = (item) => (
         <View
-            style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', margin: 10 }}
+            style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}
             key={item.id}
         >
             <RadioButton
@@ -313,111 +315,118 @@ const AppointmentForm = ({ route }) => {
                 errors.deposit_slip = t('deposited_slip_err')
             }
         }
-
         setErrorObj(errors);
-        if (Object.keys(errors).length === 0) {
-            try {
-                setCreateAppLoader(true);
-                let timesSlots = [...timeSlots];
-                let indx = timesSlots.findIndex(x => x.value === time_slot);
-                if (indx != -1) {
-                    //alert(timesSlots[indx].id);
-                    //return
-                    let appDate = moment(selected_date).format('YYYY-MM-DD');
-                    let time_id = timesSlots[indx].id;
-                    const formObj = new FormData();
-                    formObj.append('appdate', appDate)
-                    formObj.append('apptime', time_id)
-                    formObj.append('slot_id', time_id)
-                    formObj.append('DoctorsService', selectedDoctor.specialist == '' ? specialist : selectedDoctor.specialist)
-                    formObj.append('selectdoctory', selectedDoctor.id == undefined ? doctor_id : selectedDoctor.id);
-                    formObj.append('payment_method', payment);
-                    formObj.append('comment', comment);
-                    formObj.append('followup', follow);
-                    formObj.append('followup_id', selected_follow_up);
-                    //formObj.append('bank_deposite_slip', img_obj);
-                    if (payment === 'bank') {
-                        formObj.append('bank_deposite_slip', {
-                            uri: deposit_slip,
-                            type: img_obj.mime,
-                            name: 'photo'
+        let dt = moment(selected_date, "YYYY-MM-DD HH:mm:ss").format('dddd').substring(0, 3).toLowerCase();
+        console.log('Dayy >>>', dt);
+        console.log('off day selected doctor **>>>', selectedDoctor.offday);
+        if (selectedDoctor.offday === dt) {
+            // alert('This is off day of doctor');
+            showAlert(t('alert'), t('doctor_off_day'), t('ok'))
+        }
+        else {
+            if (Object.keys(errors).length === 0) {
+                try {
+                    setCreateAppLoader(true);
+                    let timesSlots = [...timeSlots];
+                    let indx = timesSlots.findIndex(x => x.value === time_slot);
+                    if (indx != -1) {
+                        //alert(timesSlots[indx].id);
+                        //return
+                        let appDate = moment(selected_date).format('YYYY-MM-DD');
+                        let time_id = timesSlots[indx].id;
+                        const formObj = new FormData();
+                        formObj.append('appdate', appDate)
+                        formObj.append('apptime', time_id)
+                        formObj.append('slot_id', time_id)
+                        formObj.append('DoctorsService', selectedDoctor.specialist == '' ? specialist : selectedDoctor.specialist)
+                        formObj.append('selectdoctory', selectedDoctor.id == undefined ? doctor_id : selectedDoctor.id);
+                        formObj.append('payment_method', payment);
+                        formObj.append('comment', comment);
+                        formObj.append('followup', follow);
+                        formObj.append('followup_id', selected_follow_up);
+                        //formObj.append('bank_deposite_slip', img_obj);
+                        if (payment === 'bank') {
+                            formObj.append('bank_deposite_slip', {
+                                uri: deposit_slip,
+                                type: img_obj.mime,
+                                name: 'photo'
+                            }
+                            );
                         }
-                        );
+
+                        let obj = {
+                            appdate: appDate,
+                            apptime: time_slot,
+                            slot_id: time_id,
+                            DoctorsService: selectedDoctor.specialist,
+                            selectdoctory: selectedDoctor.id,
+                            payment_method: payment,
+                            comment: comment,
+                            followup: follow,
+                            followup_id: selected_follow_up,
+                        }
+                        console.log('Data of appointment >>>>', formObj);
+                        // let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
+                        console.log('Link >>>', Global.BASE_URL + '/create-appointment');
+                        // console.log('Image form data >>>>', imgData._parts)
+                        let imageReq = await fetch(Global.BASE_URL + '/create-appointment', {
+                            method: 'Post',
+                            headers: new Headers({
+                                Authorization: 'Bearer ' + userData?.api_token,
+                                // "Content-Type": "application/json",
+                            }),
+                            body: formObj,
+                        });
+
+                        let resJson = await imageReq.json();
+                        console.log('Create Appointment Respons >>>>', resJson);
+                        if (resJson.message === 'Appointment Created') {
+                            showAlert(t('tabibak'), t('appointment_created'), t('ok'))
+                            dispatch(updateAppointments(true));
+                            navigation.navigate('Bottom Tabs', { screen: t('appointments') });
+                        }
+
+                        // let res = await fetch(
+                        //     Global.BASE_URL + '/create-appointment',
+                        //     {
+                        //         method: 'post',
+                        //         body: JSON.stringify(obj),
+                        //         headers: {
+                        //             Authorization: 'Bearer ' + userData?.api_token,
+                        //             'Content-Type': 'application/json',
+                        //             'Accept': 'application/json',
+                        //              //'Content-Type': 'multipart/form-data',
+                        //             //'Accept': 'multipart/form-data',
+                        //             // 'Accept': 'multipart/form-data'
+                        //         },
+                        //     }
+                        // );
+                        // let responseJson = await res.json();
+                        // console.log('Create Appointment Respons >>>>', responseJson);
+                        setCreateAppLoader(false)
+                        // fetch(Global.BASE_URL + '/create-appointment', {
+                        //     method: 'POST',
+                        //     headers: new Headers({
+                        //         Authorization: 'Bearer ' + userData?.api_token,
+                        //         "Content-Type": payment == 'bank' ? "multipart/form-data" : "application/json"
+                        //     }),
+                        //     body: formObj
+                        // })
+                        // //.then((res) => res.json())
+                        // .then(data => {
+                        //    console.log('Api Respons >>>>', data.json());
+                        //    setCreateAppLoader(false)
+                        //   })
+                        //let resJson = await req.json();
+                        // setCreateAppLoader(false);
                     }
 
-                    let obj = {
-                        appdate: appDate,
-                        apptime: time_slot,
-                        slot_id: time_id,
-                        DoctorsService: selectedDoctor.specialist,
-                        selectdoctory: selectedDoctor.id,
-                        payment_method: payment,
-                        comment: comment,
-                        followup: follow,
-                        followup_id: selected_follow_up,
-                    }
-                    console.log('Data of appointment >>>>', formObj);
-                    // let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
-                    console.log('Link >>>', Global.BASE_URL + '/create-appointment');
-                    // console.log('Image form data >>>>', imgData._parts)
-                    let imageReq = await fetch(Global.BASE_URL + '/create-appointment', {
-                        method: 'Post',
-                        headers: new Headers({
-                            Authorization: 'Bearer ' + userData?.api_token,
-                            // "Content-Type": "application/json",
-                        }),
-                        body: formObj,
-                    });
-
-                    let resJson = await imageReq.json();
-                    console.log('Create Appointment Respons >>>>', resJson);
-                    if (resJson.message === 'Appointment Created') {
-                        showAlert(t('tabibak'), t('appointment_created'), t('ok'))
-                        dispatch(updateAppointments(true));
-                        navigation.navigate('Bottom Tabs', { screen: t('appointments') });
-                    }
-
-                    // let res = await fetch(
-                    //     Global.BASE_URL + '/create-appointment',
-                    //     {
-                    //         method: 'post',
-                    //         body: JSON.stringify(obj),
-                    //         headers: {
-                    //             Authorization: 'Bearer ' + userData?.api_token,
-                    //             'Content-Type': 'application/json',
-                    //             'Accept': 'application/json',
-                    //              //'Content-Type': 'multipart/form-data',
-                    //             //'Accept': 'multipart/form-data',
-                    //             // 'Accept': 'multipart/form-data'
-                    //         },
-                    //     }
-                    // );
-                    // let responseJson = await res.json();
-                    // console.log('Create Appointment Respons >>>>', responseJson);
-                    setCreateAppLoader(false)
-                    // fetch(Global.BASE_URL + '/create-appointment', {
-                    //     method: 'POST',
-                    //     headers: new Headers({
-                    //         Authorization: 'Bearer ' + userData?.api_token,
-                    //         "Content-Type": payment == 'bank' ? "multipart/form-data" : "application/json"
-                    //     }),
-                    //     body: formObj
-                    // })
-                    // //.then((res) => res.json())
-                    // .then(data => {
-                    //    console.log('Api Respons >>>>', data.json());
-                    //    setCreateAppLoader(false)
-                    //   })
-                    //let resJson = await req.json();
-                    // setCreateAppLoader(false);
+                } catch (error) {
+                    setCreateAppLoader(false);
+                    console.log('Error of create appointment', error);
                 }
-
-            } catch (error) {
-                setCreateAppLoader(false);
-                console.log('Error of create appointment', error);
             }
         }
-
 
     }
 
@@ -482,8 +491,8 @@ const AppointmentForm = ({ route }) => {
         }
     }
 
-    useEffect(()=>{
-        if(category_id == undefined)  fetchCategories();
+    useEffect(() => {
+        if (category_id == undefined) fetchCategories();
     }, [category_id])
 
     useEffect(() => {
@@ -493,13 +502,13 @@ const AppointmentForm = ({ route }) => {
     }, [selectedCategory.id, category_id])
 
     useEffect(() => {
-         if(doctor_id != undefined) {
+        if (doctor_id != undefined) {
             getFollowUps(doctor_id);
         }
 
     }, [doctor_id])
 
-    useEffect(()=>{
+    useEffect(() => {
         if (selectedDoctor.id != undefined) {
             getFollowUps(selectedDoctor.id);
         }
@@ -525,6 +534,16 @@ const AppointmentForm = ({ route }) => {
                     />
                 </View>
                 : */}
+            {selectedDoctor.offday != null && (
+                <View style={{ marginTop: 10, padding: 5, alignItems: isRTL == 'rtl' ? 'flex-start' : 'flex-end' }}>
+                    <View style={{ padding: 5, paddingHorizontal: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', backgroundColor: Global.main_color, borderRadius: 7 }}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', marginHorizontal: 5, color: 'white' }}>{t('off_day')}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', marginHorizontal: 5, color: 'white' }}>:</Text>
+                        <Text style={{ marginHorizontal: 5, color: 'white' }}>{selectedDoctor.offday}</Text>
+                    </View>
+
+                </View>
+            )}
             <ScrollView contentContainerStyle={styles.contentContainer}>
                 <View style={styles.formContainer}>
                     <View style={{ margin: 10 }}>
@@ -536,7 +555,7 @@ const AppointmentForm = ({ route }) => {
                     </View>
                     <View style={{ margin: 10 }}>
                         <Components.DropDown
-                            placeholder="Select time slot"
+                            placeholder={t('select_time_slot')}
                             list={timeSlots}
                             onChange={(value) => handleChange('time_slot', value())}
                             value={appointmentData.time_slot}
@@ -551,7 +570,7 @@ const AppointmentForm = ({ route }) => {
                     {(appointmentData.time_slot !== '' && category_id == undefined) && (
                         <>
                             <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                <Text style={{ color: Global.main_color, fontWeight: 'bold' }}>{t('category')}</Text>
+                                <Text style={{ color: Global.main_color, fontWeight: 'bold', fontSize: 18 }}>{t('category')}</Text>
                             </View>
                             <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
                                 {categories?.map(item => renderItem(item))}
@@ -581,9 +600,11 @@ const AppointmentForm = ({ route }) => {
                     )}
                     {appointmentData?.time_slot != '' && (
                         <View style={{ margin: 10 }}>
-                            <Text style={{ color: Global.dark_gray, fontWeight: '600', marginVertical: 5 }}>Date, time and service required</Text>
+                            <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                <Text style={{ color: Global.dark_gray, fontWeight: 'bold', marginVertical: 5 }}>{t('date_time_req')}</Text>
+                            </View>
                             <Components.DropDown
-                                placeholder="Follow Up"
+                                placeholder={t('follow_up')}
                                 list={followUp1}
                                 onChange={(value) => handleChange('follow', value())}
                                 value={appointmentData.follow}
@@ -592,7 +613,7 @@ const AppointmentForm = ({ route }) => {
                                 style={styles.dropdown_inner_style}
                                 setOpen={() => setOpenFollowUp1(openFollowUp1 => !openFollowUp1)}
                                 listMode="MODAL"
-                                disabled={(doctor_id == undefined && doctors == null || doctors?.length == 0) ? true : false}
+                                disabled={(doctor_id == undefined && selectedDoctor.id == undefined) ? true : false}
                             />
                         </View>
                     )}
@@ -601,7 +622,7 @@ const AppointmentForm = ({ route }) => {
 
                             <View style={{ margin: 10 }}>
                                 <Components.DropDown
-                                    placeholder="Select Follow Up"
+                                    placeholder={t('select_follow')}
                                     list={followUp2}
                                     onChange={(value) => handleChange('selected_follow_up', value())}
                                     value={appointmentData.selected_follow_up}
@@ -635,7 +656,7 @@ const AppointmentForm = ({ route }) => {
                                                     <View
                                                         style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}
                                                     >
-                                                        <View style={{ flex: 1 }}>
+                                                        <View style={{ flex: 1, alignItems:isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
                                                             <Text style={{ fontWeight: 'bold' }}>{v.title}</Text>
                                                         </View>
                                                         {v.id == 1 && (<Text>{appointmentData?.selected_date ? moment(appointmentData?.selected_date).format("DD/MM/YYYY") : ''}</Text>)}
@@ -652,7 +673,7 @@ const AppointmentForm = ({ route }) => {
                                         <Text>{t('brief_comment')}</Text>
                                     </View>
                                     <Components.InputField
-                                        placeholder="Comment"
+                                        placeholder={t('comment')}
                                         name={'comment'}
                                         handleChange={(name, value) => handleChange(name, value)}
                                         value={appointmentData.comment}
@@ -740,19 +761,19 @@ const AppointmentForm = ({ route }) => {
                                                         style={{ margin: 10 }}
                                                         onPress={() => setAppointmentData({ ...appointmentData, deposit_slip: '' })}
                                                     >
-                                                        <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Remove File</Text>
+                                                        <Text style={{ color: 'red', textDecorationLine: 'underline' }}>{t('remove_file')}</Text>
                                                     </TouchableOpacity>
                                                 </View>
                                                 :
                                                 <>
                                                     <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-                                                        <Text style={{ margin: 10 }}>Deposited Slip</Text>
+                                                        <Text style={{ margin: 10 }}>{t('deposit_slip')}</Text>
 
                                                         <TouchableOpacity
                                                             style={styles.chooseFileBtn}
                                                             onPress={() => addDepositedSlip()}
                                                         >
-                                                            <Text style={{ fontWeight: 'bold' }}>Choose File</Text>
+                                                            <Text style={{ fontWeight: 'bold' }}>{t('choose_file')}</Text>
                                                         </TouchableOpacity>
                                                     </View>
                                                     {errorObj.deposit_slip ? (
@@ -768,7 +789,7 @@ const AppointmentForm = ({ route }) => {
                                     {(appointmentData.payment == 'bank' || appointmentData.payment == 'spot') && (
                                         <View style={{ margin: 10 }}>
                                             <Components.MyButton
-                                                title='Create'
+                                                title={t('create')}
                                                 onClick={handleCreateAppointment}
                                                 loader={createAppLoader}
                                             // titleStyle={{ fontWeight: '500', color: Global.main_color }}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Platform, Text } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Global from '../../Global';
+import { useSelector } from 'react-redux';
 
 export default function DropDown({
   placeholder,
@@ -30,6 +31,9 @@ export default function DropDown({
   setItems,
   badge
 }) {
+  const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+
+  DropDownPicker.setLanguage(default_language === 'عربى' ? 'AR' : 'EN')
   
   return (
      <View
