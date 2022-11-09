@@ -1,2 +1,12 @@
 # TABIBAK
-# This is updated personal access token >>> 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
+# New Version of React Native for APK && Release build changes
+1 android -> build.gradle -> allprojects -> repositories "add this" >>> exclusiveContent {
+           filter {
+               includeGroup "com.facebook.react"
+           }
+           forRepository {
+               maven {
+                   url "$rootDir/../node_modules/react-native/android"
+               }
+           }
+      }
