@@ -115,6 +115,10 @@
         "appointment_date":"تاريخ الموعد",
         "appointment_time":"وقت الموعد",
         "appointment_day":"يوم التعيين",
-        "services":"خدمات"
+        "services":"خدمات",
+        "oops":"عفوًا ، حدث خطأ ما ، حاول لاحقًا",
+        "fees":"مصاريف",
+        "about_doctor":"عن الطبيب"
+
     }
 }

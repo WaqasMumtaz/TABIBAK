@@ -1,8 +1,12 @@
 import { StyleSheet, Text, View , TouchableOpacity, ActivityIndicator} from 'react-native'
 import React from 'react'
 import Global from '../../Global'
+import { useTranslation } from 'react-i18next';
+
 
 const MyButton = ({title , onClick , styleBtn, titleStyle, loader}) => {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir();
  
     const btnStyle = {
         //borderWidth:2,
@@ -14,7 +18,7 @@ const MyButton = ({title , onClick , styleBtn, titleStyle, loader}) => {
         paddingHorizontal:20,
         alignItems:'center',
         justifyContent:'center',
-        flexDirection:'row'
+        flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row'
     }
     const _titleStyle = {
         fontWeight:'bold',
@@ -27,7 +31,7 @@ const MyButton = ({title , onClick , styleBtn, titleStyle, loader}) => {
     style={{...btnStyle, ...styleBtn}}
     >
       {loader && (
-        <View style={{marginRight:8}}>
+        <View style={{marginHorizontal:8}}>
           <ActivityIndicator color={Global.white} size='small'/>
         </View>
       )}

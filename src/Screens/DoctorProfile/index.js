@@ -4,11 +4,16 @@ import Components from '../../Components';
 import Global from '../../Global';
 import TemplateComponents from '../../Components/TemplateComponents';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+
 
 
 const DoctorProfile = ({ route }) => {
     const {doctor_id, name ,bio , category_id, fees, role,specialist, category,offday} = route.params;
     const navigation = useNavigation();
+
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.dir();
 
     function openImage() {
         // alert('test')
@@ -32,19 +37,22 @@ const DoctorProfile = ({ route }) => {
                 <Components.ProfileContainer
                     onClick={openImage}
                 />
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
-                    <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', marginTop: 20 }}>
+                    <View style={{ flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start'}}>
                         <TemplateComponents.HeadingText title={name} />
                         <TemplateComponents.BodyText title={category} _style={{ marginVertical: 10 }} />
                     </View>
-                    <View>
-                        <TemplateComponents.HeadingText title={`Fees : $${fees}`} _style={{ color: Global.main_color }} />
+                    <View style={{flexDirection:isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems:'center'}}>
+                        <TemplateComponents.HeadingText title={t('fees')} _style={{ color: Global.main_color}} />
+                        <TemplateComponents.HeadingText title=':' _style={{ color: Global.main_color, marginHorizontal:5  }} />
+                        <TemplateComponents.HeadingText title={`$${fees}`} _style={{ color: Global.main_color }} />
+
                     </View>
                 </View>
-                <View style={{ paddingVertical: 10 }}>
+                <View style={{ paddingVertical: 10,  flexDirection:isRTL == 'rtl' ? 'row-reverse' : 'row', borderBottomWidth: 1, borderBottomColor: Global.dark_gray,}}>
                     <TemplateComponents.HeadingText
-                        title='About The Doctor'
-                        _style={{ borderBottomWidth: 1, borderBottomColor: Global.dark_gray, lineHeight: 25 }}
+                        title={t('about_doctor')}
+                        _style={{ lineHeight: 25 }}
                     />
                 </View>
                 <View style={{ paddingVertical: 10 }}>
@@ -55,7 +63,7 @@ const DoctorProfile = ({ route }) => {
                 </View>
                 <View style={{margin:20}}/>
                 <Components.MyButton
-                    title='Make Appointment'
+                    title={t('make_appointment')}
                     onClick={handleNavigate}
                 />
             </View>

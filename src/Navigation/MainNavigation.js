@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Screens from '../Screens';
 import BottomNavigation from './BottomNavigation';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next'
 
 
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
   // const [userData, setUserData] = useState(0);
+  const { t, i18n } = useTranslation();
   const { userData } = useSelector(state => state.persistedReducer.userReducer);
+  const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+
+  useEffect(() => {
+      i18n.changeLanguage(default_language)
+  }, [default_language])
 
   return (
     <Stack.Navigator

@@ -10,6 +10,7 @@ import { changeLanguage } from '../../Redux/reducersActions/changeLanguage';
 import { updateUser } from '../../Redux/reducersActions/userReducer';
 import { useTranslation } from 'react-i18next';
 import HttpUtilsFile from '../../Services/HttpUtils'
+import { showAlert } from '../../../Functions'
 
 const Login = ({ handleState }) => {
     let actionSheet = useRef();
@@ -30,13 +31,14 @@ const Login = ({ handleState }) => {
     })
 
     const { t, i18n } = useTranslation();
+    const isRTL = i18n.dir();
 
     // useSelector(state => console.log('<<<<******* Redux Data ******>>>>>>', state.persistedReducer));
 
     let optionArray = [
         'English',
         'عربى',
-        'Cancel',
+        t('cancel'),
     ];
 
     const openSheet = () => {
@@ -75,7 +77,7 @@ const Login = ({ handleState }) => {
                 setLoader(false);
                 console.log('REq Response >>>>', req);
                 if(req.message === 'Login Successful'){
-                    alert(req.message);
+                    // alert(req.message);
                     dispatch(updateUser(req.data));
                 }
                 else {
@@ -85,7 +87,8 @@ const Login = ({ handleState }) => {
                console.log('Login Error >>>>>', error);
                setLoader(false);
             //    dispatch(updateUser(userData));
-               alert('Oop something went wrong, try to later');
+               //alert('Oop something went wrong, try to later');
+               showAlert(t('alert'), t('oops'), t('ok'))
             }
 
             // if(req.data.length == 0) alert(req.message);
@@ -96,18 +99,18 @@ const Login = ({ handleState }) => {
 
     async function selectLang(index) {
         console.log('Language index >>>>>>>>>', index);
-        dispatch(changeLanguage(index == 0 ? 'English' : 'عربى'))
+        dispatch(changeLanguage(index == 0 ? 'en' : 'ar'))
     }
 
-    useEffect(() => {
-        if (default_language === 'عربى') {
-            i18n.changeLanguage('ar')
-        }
-        else if (default_language === 'English') {
-            i18n.changeLanguage('en')
-        }
+    // useEffect(() => {
+    //     if (default_language === 'عربى') {
+    //         i18n.changeLanguage('ar')
+    //     }
+    //     else if (default_language === 'English') {
+    //         i18n.changeLanguage('en')
+    //     }
 
-    }, [default_language])
+    // }, [default_language])
 
     return (
         <KeyboardAwareScrollView
@@ -169,7 +172,7 @@ const Login = ({ handleState }) => {
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <TouchableOpacity style={styles.languageBox} onPress={() => openSheet()}>
-                    <Text style={{ fontWeight: 'bold' }}>{default_language}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>{default_language == 'ar' ? 'عربى' : 'English'}</Text>
                     <View style={{ marginLeft: 10 }}>
                         <FontIcon name="globe" color={Global.buttons_bg} size={20} />
                     </View>
@@ -178,7 +181,7 @@ const Login = ({ handleState }) => {
             </View>
             <ActionSheet
                 ref={actionSheet}
-                title={'Choose your language ?'}
+                title={t('choose_lang')}
                 options={optionArray}
                 cancelButtonIndex={2}
                 destructiveButtonIndex={0}

@@ -200,23 +200,6 @@ const Appointments = () => {
         setModal(false);
     }
 
-    function handleChange(name, value) {
-        console.log('Name >>>>>>', name, 'Value >>>>>>', value);
-        setAuthObj({
-            ...authObj,
-            [name]: value,
-        });
-    }
-
-    function handleSubmit(title) {
-        console.log('Title >>>', title)
-        if (title === 'Favourite') {
-            alert('Added successfully...')
-        }
-        else if (title === 'Delete') {
-            alert('Your process is pending...')
-        }
-    }
 
     function viewReports(params) {
         //console.log('Params >>>', params);
@@ -493,7 +476,8 @@ const Appointments = () => {
             }
             else {
                 setPdfLoader(false);
-                alert('Something went wrong, try later');
+                showAlert(t('alert'), t('oop'), t('ok'))
+                // alert('Something went wrong, try later');
             }
         } catch (error) {
             setPdfLoader(false);
@@ -514,7 +498,6 @@ const Appointments = () => {
 
     async function handleDownloadReport() {
         alert('Process pending...')
-
     }
 
     function closeReportModal(params) {

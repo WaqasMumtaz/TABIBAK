@@ -16,8 +16,9 @@ const More = () => {
   const navigation = useNavigation();
   let actionSheet = useRef();
   const dispatch = useDispatch();
-  const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+  // const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
   const { userData } = useSelector(state => state.persistedReducer.userReducer);
+  const [loader , setLoader] = useState(false);
 
   const { t, i18n } = useTranslation();
 
@@ -26,7 +27,7 @@ const More = () => {
   let optionArray = [
     'English',
     'عربى',
-    'Cancel',
+    t('cancel'),
   ];
   const openSheet = () => {
     actionSheet.current.show();
@@ -70,7 +71,8 @@ const More = () => {
   }
   ]
 
-  async function logout(params) {
+  async function logout() {
+    setLoader(true);
     try {
       let params = {
         api_token: userData?.api_token
@@ -82,10 +84,13 @@ const More = () => {
       // console.log('Query >>>', query)
       let req = await HttpUtilsFile.get('logout?' + query);
       console.log('Logout response .>>>>>', req);
+      setLoader(false);
       dispatch(updateUser(null))
 
     } catch (error) {
       console.log('Error logout >>>>>', error);
+      setLoader(false);
+
     }
   }
 
@@ -122,18 +127,8 @@ const More = () => {
 
   async function selectLang(index) {
     console.log('Language index >>>>>>>>>', index);
-    dispatch(changeLanguage(index == 0 ? 'English' : 'عربى'))
+    dispatch(changeLanguage(index == 0 ? 'en' : 'ar'))
   }
-
-  useEffect(() => {
-    if (default_language === 'عربى') {
-      i18n.changeLanguage('ar')
-    }
-    else if (default_language === 'English') {
-      i18n.changeLanguage('en')
-    }
-
-  }, [default_language])
 
 
   const renderItems = ({ item }) => (
@@ -175,6 +170,7 @@ const More = () => {
           selectLang(index)
         }
       />
+      {loader && <Components.ModalSpinner/>}
     </SafeAreaView>
   )
 }

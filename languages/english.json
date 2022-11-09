@@ -116,6 +116,9 @@
         "appointment_date":"Appointment Date",
         "appointment_time":"Appointment Time",
         "appointment_day":"Appointment Day",
-        "services":"Services"
+        "services":"Services",
+        "oops":"Oop something went wrong, try to later",
+        "fees":"Fees",
+        "about_doctor":"About The Doctor"
     }
 }

@@ -6,6 +6,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { useTranslation } from 'react-i18next'
 import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/password';
 import HttpUtilsFile from '../../Services/HttpUtils';
+import { showAlert } from '../../../Functions'
 
 const SignUp = ({ handleState }) => {
     const phoneInput = useRef(null);
@@ -95,20 +96,26 @@ const SignUp = ({ handleState }) => {
                 family_key,
                 role:'patient'
             }
-            let req = await HttpUtilsFile.post('register', data);
-            console.log('REgister Request Response >>>>', req);
-            setLoader(false);
-            if(req.message === 'Email Already Exist'){
-                alert(req.message)
-            }
-            else {
-                alert(req.message);
-                console.log('Else User Data >>>>', data);
-                if(req.message === 'Patient Registered'){
-                    clearForm();
-                    handleState(1);
+            try {
+                let req = await HttpUtilsFile.post('register', data);
+                console.log('REgister Request Response >>>>', req);
+                setLoader(false);
+                if(req.message === 'Email Already Exist'){
+                    alert(req.message)
                 }
-
+                else {
+                    alert(req.message);
+                    console.log('Else User Data >>>>', data);
+                    if(req.message === 'Patient Registered'){
+                        clearForm();
+                        handleState(1);
+                    }
+    
+                }
+                
+            } catch (error) {
+                console.log('Error >>>', error);
+                showAlert(t('alert'), t('oops'), t('ok'))
             }
         }
     }
