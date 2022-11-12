@@ -119,6 +119,10 @@
         "services":"Services",
         "oops":"Oop something went wrong, try to later",
         "fees":"Fees",
-        "about_doctor":"About The Doctor"
+        "about_doctor":"About The Doctor",
+        "welcome":"Welcome Back",
+        "past_appointments":"Past Appointment",
+        "ongoing":"Ongoing Appointment",
+        "total_cost":"Total Cost"
     }
 }

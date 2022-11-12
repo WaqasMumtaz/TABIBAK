@@ -28,26 +28,18 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
   return home ? (
     <>
       <View style={styles.homeTopBarStyle}>
-        <View style={{flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems:'center' }}>
-          <View style={{flex:1, marginHorizontal:10, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start'}}>
-             <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
-          </View>
+        <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems:'center' }}>
           <View style={[styles.profile_container]}>
-              <IonicIcon name="person" size={40} color={Global.dark_gray} />
-            </View>
+            <IonicIcon name="person" size={40} color={Global.dark_gray} />
+          </View>
+          <View style={{ marginHorizontal: 10, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text style={styles.welcomText}>{t('welcome')}</Text>
+            <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
+          </View>
         </View>
-        {/* <View style={styles.containerText}>
-        <SearchInput
-          placeholder={t('search')}
-          name={'search'}
-          handleChange={(name, value) => handleChange(name, value)}
-          value={searchValue}
-          icon='search-outline'
-        />
-      </View> */}
       </View>
       <View style={{
-        height: 20,
+        height: 28,
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomLeftRadius: 30,
@@ -105,15 +97,15 @@ const styles = StyleSheet.create({
   },
   homeTopBarStyle: {
     backgroundColor: Global.main_color,
-    justifyContent:'flex-end',
-    alignItems:'flex-end',
+    // justifyContent: 'flex-end',
+    // alignItems: 'flex-end',
     //marginTop:20,
     // alignItems:"center",
     // height: '16%',
     //borderBottomRightRadius: 20,
     //borderBottomLeftRadius: 20,
     paddingTop: 15,
-    paddingHorizontal:10
+    paddingHorizontal: 10
   },
   containerText: {
     position: 'relative',
@@ -155,11 +147,15 @@ const styles = StyleSheet.create({
   },
   topBarText: {
     color: Global.white,
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
-    padding: 5,
+    //padding: 5,
     textTransform: 'uppercase',
-
+  },
+  welcomText:{
+    color: Global.white,
+    fontSize:13,
+    fontWeight: 'bold',
   },
   topBarMenuIcon: {
     color: Global.white,

@@ -18,7 +18,7 @@ import DatePicker from './DateTime';
 import ImagePlaceholder from './Image';
 import DoctorCard from './DoctorCard';
 import ProfileContainer from './Profile';
-
+import GraphCard from './GraphCard';
 
 export default {
     MyStatusBar,
@@ -42,4 +42,5 @@ export default {
     ImagePlaceholder,
     DoctorCard,
     ProfileContainer,
+    GraphCard
 }

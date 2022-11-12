@@ -17,5 +17,6 @@ export default {
     email_validation: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/,
     dark_gray:'#a9a9a9',
     orange_clr:'#FFA500',
+    lime_green:'#32CD30',
     BASE_URL
 }

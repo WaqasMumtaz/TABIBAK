@@ -4,7 +4,7 @@ import Components from '../../Components'
 import Global from '../../Global'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import HttpUtilsFile from '../../Services/HttpUtils';
 import cardio from '../../Assets/cardio.png';
 import therapy from '../../Assets/therapy.png';
@@ -12,10 +12,12 @@ import online_doctor from '../../Assets/online_doctor.png';
 import doctor from '../../Assets/doctor.png';
 import family from '../../Assets/family.png';
 import nurse from '../../Assets/nurse.png';
+import { updateUser } from '../../Redux/reducersActions/userReducer'
 
 
 const Home = () => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
     const { height, width } = useWindowDimensions();
     const { t } = useTranslation();
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
@@ -63,10 +65,10 @@ const Home = () => {
 
     console.log('Total Screen Width >>>', Math.ceil(width / 3))
 
-    const renderItem = ({ item }) => (
+    const renderItem = (item , i) => (
         // <Components.MyCard data={item} key={item.id} />
         <TouchableOpacity
-            // key={item.id}
+             key={i}
             style={[styles.card, { width: '28%' }]}
             // elevation={17}
             onPress={() => handleNavigate(item)}
@@ -98,13 +100,18 @@ const Home = () => {
             // console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
             console.log('Req of Categories >>', req);
-            if (req.data.length == 0) {
-                setCategories([])
+            if (req.message === 'Unauthenticated.') {
+                dispatch(updateUser(null))
             }
             else {
-                // let arr = [...req.data];
-                // arr.push({ id: 6, name: 'Family Tree' })
-                setCategories(req.data)
+                if (req.data.length == 0) {
+                    setCategories([])
+                }
+                else {
+                    // let arr = [...req.data];
+                    // arr.push({ id: 6, name: 'Family Tree' })
+                    setCategories(req.data)
+                }
             }
 
         } catch (error) {
@@ -118,13 +125,14 @@ const Home = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Components.TopBar 
-            // title={t('home')} 
-            home={true} 
-            user_name={userData?.name}
+            <Components.TopBar
+                // title={t('home')} 
+                home={true}
+                user_name={userData?.name}
             />
-            <View style={{ flex: 1 , margin:10, marginTop:'10%'}}>
+            <View style={{ flex: 1 }}>
                 {/* <ScrollView contentContainerStyle={styles.contentContainer}> */}
+
                 {categories == null ?
                     <Components.Spinner />
                     : categories?.length == 0 ?
@@ -132,13 +140,38 @@ const Home = () => {
                         :
                         // <View style={{ flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
                         //  {categories.map(item => renderItem(item))}
-                        <FlatList
-                        contentContainerStyle={{alignSelf:'center'}}
-                            data={categories}
-                            renderItem={renderItem}
-                            keyExtractor={item => `item_id${item.id}`}
-                            numColumns={3}
-                        />
+                        <ScrollView>
+                            <View style={{}}>
+                                <Components.GraphCard
+                                    title={t('past_appointments')}
+                                    icon_name={'calendar-outline'}
+                                    data={3}
+                                    box_clr={Global.main_color}
+                                />
+                                <Components.GraphCard
+                                    title={t('ongoing')}
+                                    icon_name={'calendar-outline'}
+                                    data={0}
+                                    box_clr={Global.orange_clr}
+                                />
+                                <Components.GraphCard
+                                    title={t('total_cost')}
+                                    icon_name={'dollar-sign'}
+                                    data={3}
+                                    box_clr={Global.lime_green}
+                                />
+                            </View>
+                            <View style={{flex:1,flexDirection:'row',flexWrap:'wrap', alignItems:'center', justifyContent:'center' }}>
+                                {categories.map((item, i) => renderItem(item, i))}
+                            </View>
+                            {/* <FlatList
+                                contentContainerStyle={{ alignSelf: 'center' }}
+                                data={categories}
+                                renderItem={renderItem}
+                                keyExtractor={item => `item_id${item.id}`}
+                                numColumns={3}
+                            /> */}
+                        </ScrollView>
                     // </View>
                 }
                 {/* </ScrollView> */}
@@ -159,11 +192,12 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     card: {
+        flexDirection:'row',
         //margin: 5,
         // width: 150,
         height: 139,
         borderRadius: 20,
-        margin: 10,
+        margin: 8,
         // justifyContent: 'center',
         // alignItems: 'center',
         padding: 17,
