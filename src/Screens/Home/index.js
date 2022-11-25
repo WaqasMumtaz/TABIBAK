@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, FlatList, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Platform, FlatList, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +12,8 @@ import online_doctor from '../../Assets/online_doctor.png';
 import doctor from '../../Assets/doctor.png';
 import family from '../../Assets/family.png';
 import nurse from '../../Assets/nurse.png';
+import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateUser } from '../../Redux/reducersActions/userReducer'
 
 
@@ -65,10 +67,10 @@ const Home = () => {
 
     console.log('Total Screen Width >>>', Math.ceil(width / 3))
 
-    const renderItem = (item , i) => (
+    const renderItem = (item, i) => (
         // <Components.MyCard data={item} key={item.id} />
         <TouchableOpacity
-             key={i}
+            key={i}
             style={[styles.card, { width: '28%' }]}
             // elevation={17}
             onPress={() => handleNavigate(item)}
@@ -119,8 +121,53 @@ const Home = () => {
         }
     }
 
+    async function requestUserPermission(usr) {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        if (Platform.OS === 'ios') {
+            if (enabled) {
+                // console.log('Authorization status:', authStatus);
+                if (userData != null) {
+                    getToken();
+                }
+            }
+        }
+        else {
+            getToken();
+        }
+    }
+
+    //Background Registerd
+    const getToken = async () => {
+        let fcmToken = await AsyncStorage.getItem('@token');
+        console.log("CHECK @token >>>>>>>", fcmToken);
+        if (!fcmToken) {
+            // let a =   messaging().getToken();
+            messaging()
+                .getToken()
+                .then(async (fcmToken) => {
+                    console.log("FcmToken >>>>>>>>>", fcmToken);
+                    if (fcmToken) {
+                        await AsyncStorage.setItem('@token', fcmToken);
+                    } else {
+                        console.log('[FCMService] User does not have a device token');
+                    }
+                })
+                .catch((error) => {
+                    let err = `FCm token get error${error}`;
+                    console.log('[FCMService] getToken rejected ', err);
+                });
+        } else {
+            console.log("Else Condition FcmToken >>>", fcmToken)
+        }
+    };
+
+
     useEffect(() => {
         fetchCategories();
+        requestUserPermission();
     }, [])
 
     return (
@@ -161,7 +208,7 @@ const Home = () => {
                                     box_clr={Global.lime_green}
                                 />
                             </View>
-                            <View style={{flex:1,flexDirection:'row',flexWrap:'wrap', alignItems:'center', justifyContent:'center' }}>
+                            <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
                                 {categories.map((item, i) => renderItem(item, i))}
                             </View>
                             {/* <FlatList
@@ -192,7 +239,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     card: {
-        flexDirection:'row',
+        flexDirection: 'row',
         //margin: 5,
         // width: 150,
         height: 139,

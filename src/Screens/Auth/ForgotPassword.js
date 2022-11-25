@@ -50,7 +50,7 @@ const ForgotPassword = ({ handleState }) => {
             <View style={{ flex: 1, marginHorizontal: 20 }}>
                 <View style={{ marginBottom: 15 }} />
                 <Components.InputField
-                    placeholder="Email"
+                    placeholder={t('email')}
                     name={'email'}
                     handleChange={(name, value) => handleChange(name, value)}
                     value={authObj.email}

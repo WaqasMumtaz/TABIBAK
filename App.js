@@ -1,6 +1,6 @@
 
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import {
   SafeAreaView,
@@ -10,6 +10,7 @@ import {
   Text,
   useColorScheme,
   View,
+  AppState,
 } from 'react-native';
 
 import {
@@ -26,6 +27,9 @@ import SplashScreen from 'react-native-splash-screen';
 
 import Components from './src/Components';
 import Navigation from './src/Navigation';
+
+import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -65,6 +69,8 @@ const MyTheme = {
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const appState = useRef(AppState.currentState);
+
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -74,8 +80,59 @@ const App = () => {
     backgroundColor: 'red',
   }
 
+  async function onMessageReceived(message) {
+    const { title, body } = message.notification;
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+      sound: 'default',
+      badge: true
+    });
+
+    // Display a notification
+    notifee.displayNotification({
+      title: title,
+      body: body,
+      android: {
+        channelId,
+        sound: 'default',
+      },
+      ios: {
+        critical: true,
+        sound: 'default',
+        // criticalVolume: 1,
+      },
+
+    });
+    notifee
+      .incrementBadgeCount()
+      .then(() => notifee.getBadgeCount())
+      .then(count => console.log('Test Counts >>>>>', count));
+  }
+
   useEffect(()=>{
     SplashScreen.hide();
+
+    let subscription_state = AppState.addEventListener("change", nextAppState => {
+      if (nextAppState === "active") {
+        notifee.setBadgeCount(0).then(() => console.log('Badge count removed'));
+      }
+      appState.current = nextAppState;
+      //setAppStateVisible(appState.current);
+      //console.log("AppState", appState.current);
+    });
+
+    const unsubscribe = messaging().onMessage((e) => onMessageReceived(e));
+    messaging().setBackgroundMessageHandler(async (e) => {
+      onMessageReceived(e);
+    });
+
+    return () => {
+      unsubscribe;
+      console.log('Clean Function App.js File Close');
+      subscription_state?.remove();
+      // subscription.remove();
+    }
   },[])
 
   return (

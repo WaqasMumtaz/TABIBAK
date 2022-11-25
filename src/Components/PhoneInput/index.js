@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import PhoneInput from "react-native-phone-number-input";
 import Global from '../../Global';
+import { useTranslation } from 'react-i18next'
+
 
 const PhoneNumberInput = ({
     value,
@@ -11,11 +13,23 @@ const PhoneNumberInput = ({
     phoneInput,
     disabled
 }) => {
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.dir();
+
+    const input_container_style = {
+        backgroundColor: Global.inputs_bg,
+        borderRadius:12,
+        height:55,
+        width:'100%',
+        flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row',
+        textAlign: isRTL == 'rtl' ? 'right' : 'left',
+    }
 
     return (
         <PhoneInput
             ref={phoneInput}
             defaultValue={value}
+            placeholder={t('phone')}
             // disabled={disabled}
             // disableArrowIcon={disabled}
             defaultCode="OM"
@@ -33,9 +47,9 @@ const PhoneNumberInput = ({
             // withDarkTheme
             // withShadow
             // autoFocus
-            containerStyle={styles.containerStyle}
+            containerStyle={{...input_container_style}}
             textContainerStyle={styles.textContainerStyle}
-            textInputStyle={styles.textInputStyle}
+            textInputStyle={[styles.textInputStyle, {textAlign: isRTL == 'rtl' ? 'right' : 'left'}]}
           />
     )
 }
@@ -47,7 +61,7 @@ const styles = StyleSheet.create({
         backgroundColor: Global.inputs_bg,
         borderRadius:12,
         height:55,
-        width:'100%'
+        width:'100%',
     },
     textContainerStyle:{
         backgroundColor:Global.inputs_bg,

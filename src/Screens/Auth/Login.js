@@ -125,7 +125,7 @@ const Login = ({ handleState }) => {
                 <View style={{ flex: 1, marginHorizontal: 20 }}>
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Email"
+                        placeholder={t('email')}
                         name={'email'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.email}
@@ -134,7 +134,7 @@ const Login = ({ handleState }) => {
                     {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Password"
+                        placeholder={t('password')}
                         secureTextEntry={!authObj.showPass}
                         name={'password'}
                         handleChange={(name, value) => handleChange(name, value)}

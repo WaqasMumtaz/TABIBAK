@@ -3,6 +3,7 @@ import { TextInput, StyleSheet, View, Platform, TouchableOpacity } from 'react-n
 import Icon5 from 'react-native-vector-icons/FontAwesome';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import Global from '../../Global';
+import { useTranslation } from 'react-i18next';
 
 
  function InputField({
@@ -35,15 +36,18 @@ import Global from '../../Global';
     backgroundColor:Global.inputs_bg
   }
 
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir();
+
   return (
-    <View style={inputStyle ? inputStyle : styles.searchSection}>
+    <View style={[inputStyle ? inputStyle : styles.searchSection, {flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }]}>
       {icon && (
         <TouchableOpacity >
           <IonicIcon name={icon} color={Global.inputFieldPlaceHolder} size={20} />
         </TouchableOpacity>
       )}
       <TextInput
-        style={[{...input, ...styleInputs}, multiple ? {minHeight:80 , maxHeight:120} : null]}
+        style={[{...input, ...styleInputs}, {textAlign: isRTL == 'rtl' ? 'right' : 'left'} , multiple ? {minHeight:80 , maxHeight:120} : null]}
         placeholder={placeholder}
         onChangeText={(searchString) => handleChange(name, searchString)}
         underlineColorAndroid="transparent"
@@ -56,7 +60,7 @@ import Global from '../../Global';
         editable={editable}
         maxLength={maxLength}
       />
-      {(placeholder === 'Password' || placeholder === 'Old Password' || placeholder === 'New Password' || placeholder === 'Confirm New Password') && (
+      {(placeholder === t('password') || placeholder === t('old_password') || placeholder === t('new_password') || placeholder === t('confirm_password')) && (
         <TouchableOpacity onPress={() => onPress()} style={styles.passEye}>
           <Icon5 name={secureTextEntry == true ? 'eye-slash' : 'eye'} color={Global.inputFieldPlaceHolder} size={20} />
         </TouchableOpacity>
@@ -69,7 +73,7 @@ export default InputField;
 
 let styles = StyleSheet.create({
   searchSection: {
-    flexDirection: 'row',
+    // flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Global.inputs_bg,

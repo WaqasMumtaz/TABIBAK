@@ -146,7 +146,7 @@ const SignUp = ({ handleState }) => {
                 <View style={{ flex: 1, marginHorizontal: 20 }}>
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="First Name"
+                        placeholder={t('first_name_text')}
                         name={'first_name'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.first_name}
@@ -154,7 +154,7 @@ const SignUp = ({ handleState }) => {
                     {errorObj.first_name ? <Text style={styles.error}>{t('first_name')}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Last Name"
+                        placeholder={t('last_name_text')}
                         name={'last_name'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.last_name}
@@ -176,7 +176,7 @@ const SignUp = ({ handleState }) => {
                      {errorObj.phone ? <Text style={styles.error}>{t('phone_validation')}</Text> : null} 
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Email"
+                        placeholder={t('email')}
                         name={'email'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.email}
@@ -185,14 +185,14 @@ const SignUp = ({ handleState }) => {
                     {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Family key (Optional)"
+                        placeholder={`${t('family_key')} (${t('optional')})`}
                         name={'family_key'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.family_key}
                     />
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder="Password"
+                        placeholder={t('password')}
                         secureTextEntry={!authObj.showPass}
                         name={'password'}
                         handleChange={(name, value) => handleChange(name, value)}

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "435156497669",
+    "project_id": "tabibak-6431b",
+    "storage_bucket": "tabibak-6431b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435156497669:android:13a31c4650245a456e336c",
+        "android_client_info": {
+          "package_name": "com.tabibak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "435156497669-179orft389oge6r28adfhc9027i1eqeu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tabibak",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "435156497669-rk85o5j4ebdc9ebvgqsf0hhhv97bchme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArP2BXYYlDzFxCmetbQp-_SfLwwqRqCSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "435156497669-rk85o5j4ebdc9ebvgqsf0hhhv97bchme.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
