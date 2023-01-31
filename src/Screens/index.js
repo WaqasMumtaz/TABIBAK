@@ -10,6 +10,7 @@ import DoctorsTile from './DoctorsTile';
 import DoctorProfile from "./DoctorProfile";
 import AppointmentForm from "./AppointmentForm";
 import AboutUs from './AboutUs';
+import Learning from "./Learning";
 
 export default {
     Home,
@@ -23,5 +24,6 @@ export default {
     DoctorProfile,
     AppointmentForm,
     Booking,
-    AboutUs
+    AboutUs,
+    Learning
 }

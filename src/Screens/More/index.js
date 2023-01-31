@@ -38,12 +38,16 @@ const More = () => {
     title: t('lang'),
     icon: 'globe',
 
-  }, {
-    id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: t('profile'),
-    icon: 'person',
+  }
+  , 
+  // {
+  //   id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
+  //   title: t('profile'),
+  //   icon: 'person',
 
-  }, {
+  // }, 
+  
+  {
     id: "58694a0f-3da1-471f-bd96-145571e29d72",
     title: t('member'),
     icon: 'person-add'
@@ -51,18 +55,17 @@ const More = () => {
     // icon: "logo-usd",
 
   }, 
-  {
-    id: "68694a0f-3da1-431f-bd56-142371e29d72",
-    title: t('about_us'),
-    icon: 'people-circle-outline',
-  },
+  // {
+  //   id: "68694a0f-3da1-431f-bd56-142371e29d72",
+  //   title: t('about_us'),
+  //   icon: 'people-circle-outline',
+  // },
   // {
   //   id: "28694a0f-3da1-471f-bd96-142456e29d72",
-  //   title: t('about'),
+  //   title: 'Learn',
   //   icon: "information-circle",
 
   // },
-
   {
     id: "28694a0f-3da1-471f-bd96-142456e29d73",
     title: t('logout'),
@@ -112,14 +115,17 @@ const More = () => {
     else if (title === t('lang')) {
       openSheet()
     }
-    else if (title === t('profile')) {
-      navigation.navigate('Profile');
-    }
+    // else if (title === t('profile')) {
+    //   navigation.navigate('Profile');
+    // }
     else if (title === t('member')) {
       navigation.navigate('Family Members');
     }
-    else if(title === t('about_us')){
-      navigation.navigate('About');
+    // else if(title === t('about_us')){
+    //   navigation.navigate('About');
+    // }
+    else if(title === 'Learn'){
+      navigation.navigate('Learn');
     }
 
     // navigation.navigate('Detail', { title , detail, point_1, point_2, point_3 });

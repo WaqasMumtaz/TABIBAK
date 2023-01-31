@@ -4,7 +4,7 @@ import Global from '../../Global'
 import { useTranslation } from 'react-i18next';
 
 
-const MyButton = ({title , onClick , styleBtn, titleStyle, loader}) => {
+const MyButton = ({title , onClick , styleBtn, titleStyle, loader, disabled}) => {
   const { i18n } = useTranslation();
   const isRTL = i18n.dir();
  
@@ -29,6 +29,7 @@ const MyButton = ({title , onClick , styleBtn, titleStyle, loader}) => {
     <TouchableOpacity 
     onPress={()=> onClick()}
     style={{...btnStyle, ...styleBtn}}
+    disabled={disabled}
     >
       {loader && (
         <View style={{marginHorizontal:8}}>

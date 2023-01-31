@@ -36,7 +36,7 @@ function Navigation() {
           <Stack.Screen name="DoctorProfile" component={Screens.DoctorProfile}/>
           <Stack.Screen name="Appointment" component={Screens.AppointmentForm}/>
           <Stack.Screen name="About" component={Screens.AboutUs}/>
-
+          <Stack.Screen name="Learn" component={Screens.Learning}/>
         </>
       }
 

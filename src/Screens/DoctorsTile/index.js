@@ -30,8 +30,9 @@ const DoctorsTile = ({ route }) => {
         role: '',
         category: '',
         specialist:'',
-        offday:null
-
+        offday:null,
+        user_id:''
+        
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [doctorsList, setDoctorsList] = useState(null);
@@ -112,7 +113,7 @@ const DoctorsTile = ({ route }) => {
     function selectDoctor(doctor) {
         console.log('Doctor Off day >>>>>>>', doctor.offday);
         setSelectedDoctor({
-            doctor_id:doctor?.user?.id,
+            doctor_id:doctor?.id,
             name: doctor?.user?.name,
             bio: doctor?.user?.bio,
             category_id: doctor?.category?.id,
@@ -120,7 +121,8 @@ const DoctorsTile = ({ route }) => {
             role: doctor?.user?.role,
             category: doctor?.category?.name,
             specialist:doctor?.specialist,
-            offday:doctor?.offday
+            offday:doctor?.offday,
+            user_id:doctor?.user_id
         })
         setModalVisible(true);
 
@@ -133,7 +135,7 @@ const DoctorsTile = ({ route }) => {
 
     function handleClick(params) {
         console.log('Hanlde click >>>', params);
-        const { name, bio, category_id, fees, role, category, doctor_id, specialist, offday } = selectedDoctor;
+        const { name, bio, category_id, fees, role, category, doctor_id, specialist, offday, user_id } = selectedDoctor;
         if (params === t('profile_view')) {
             setModalVisible(modalVisible => !modalVisible);
             navigation.navigate('DoctorProfile', {
@@ -145,7 +147,8 @@ const DoctorsTile = ({ route }) => {
                 role,
                 category,
                 specialist,
-                offday
+                offday,
+                user_id
             });
         }
         else if (params === t('make_appointment')) {
@@ -159,7 +162,8 @@ const DoctorsTile = ({ route }) => {
                 role,
                 category,
                 specialist,
-                offday
+                offday,
+                user_id
             });
         }
     }

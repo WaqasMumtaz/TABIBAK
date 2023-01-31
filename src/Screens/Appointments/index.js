@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet,PermissionsAndroid,Platform, Text, ScrollView, View, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from 'react-native'
+import { StyleSheet, PermissionsAndroid, Platform, Text, ScrollView, View, SafeAreaView, FlatList, TouchableOpacity, Dimensions } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global';
 import { useTranslation } from 'react-i18next'
@@ -10,6 +10,7 @@ import moment from 'moment';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { downloadFile, showAlert } from '../../../Functions';
+import { WebView } from 'react-native-webview';
 import { updateAppointments } from '../../Redux/reducersActions/updateAppointments';
 
 const windowWidth = Dimensions.get('window').width;
@@ -35,12 +36,13 @@ const Appointments = () => {
     })
     const [reportVisible, setReportVisible] = useState({
         modal: false,
-        app_id: null
+        app_id: null,
+        report: ''
     })
     const { get_appointments } = useSelector(state => state.persistedReducer.updateAppointments);
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     console.log('Redux get_appointments >>>>', get_appointments);
-    const [pdfLoader , setPdfLoader] = useState(false);
+    const [pdfLoader, setPdfLoader] = useState(false);
 
     const medicine_arr = [
         {
@@ -201,12 +203,35 @@ const Appointments = () => {
     }
 
 
-    function viewReports(params) {
-        //console.log('Params >>>', params);
-        setReportVisible({
-            modal: true,
-            app_id: params.id
-        })
+    async function viewReports(params) {
+        console.log('Params >>>', params?.id);
+        try {
+            let idObj = {
+                id: params?.id
+            };
+
+            let query = Object.keys(idObj)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(idObj[k]))
+                .join('&');
+            console.log('Query >>>', query)
+            //return
+            let req = await HttpUtilsFile.get('report_download?' + query, userData?.api_token);
+            console.log('Response of download file >>>>', req);
+            if (req.code == 200) {
+                setReportVisible({
+                    modal: true,
+                    app_id: params.id,
+                    report: req?.data[0]
+                })
+                
+            }
+            else if(req.code === 400){
+                showAlert(t('alert'), t('no_found'), t('ok'))
+            }
+
+        } catch (error) {
+            console.log('Error report >>>', error);
+        }
     }
 
     const renderItem = ({ item }) => {
@@ -225,7 +250,8 @@ const Appointments = () => {
                         <Text style={styles.titleHead}>{t('date')}</Text>
                     </View>
                     <View>
-                        <Text style={{}}>{moment(item?.doctor.user?.created_at).format('DD/MM/yyyy')}</Text>
+                    <Text style={{}}>{item?.appdate}</Text>
+                        {/* <Text style={{}}>{moment(item?.doctor.user?.created_at).format('DD/MM/yyyy')}</Text> */}
                     </View>
                 </View>
                 <View style={{ ...childContainer }}>
@@ -242,29 +268,29 @@ const Appointments = () => {
                         <Text style={styles.titleHead}>{t('status')}</Text>
                     </View>
                     <View>
-                        <Text 
-                        style={[styles.statusStyle, {
-                            color: item?.status === "2" ? 'green' 
-                            : item?.status === "3" ? 'red' 
-                            : item?.status === "1" ? 'green' 
-                            : ((moment(item?.appdate) < today_date) && item?.status === "1" ) ? 'red'
-                            : ((moment(item?.appdate) < today_date) && item?.status === "0" ) ? 'red'
-                            : Global.main_color
-                        }]}
+                        <Text
+                            style={[styles.statusStyle, {
+                                color: item?.status === "2" ? 'green'
+                                    : item?.status === "3" ? 'red'
+                                        : item?.status === "1" ? 'green'
+                                            : ((moment(item?.appdate) < today_date) && item?.status === "1") ? 'red'
+                                                : ((moment(item?.appdate) < today_date) && item?.status === "0") ? 'red'
+                                                    : Global.main_color
+                            }]}
                         >
                             {
-                                item?.status === "2" ? t('completed') 
-                                : item?.status === "3" ? t('cancelled')
-                                : item?.status === "1" ? t('approved')
-                                : ((moment(item?.appdate) < today_date) && item?.status === "1" ) ?
-                                t('cancelled')
-                                : ((moment(item?.appdate) < today_date) && item?.status === "0" ) ? 
-                                t('cancelled')
-                                :
-                                t('pending')
+                                item?.status === "2" ? t('completed')
+                                    : item?.status === "3" ? t('cancelled')
+                                        : item?.status === "1" ? t('approved')
+                                            : ((moment(item?.appdate) < today_date) && item?.status === "1") ?
+                                                t('cancelled')
+                                                : ((moment(item?.appdate) < today_date) && item?.status === "0") ?
+                                                    t('cancelled')
+                                                    :
+                                                    t('pending')
                             }
                         </Text>
-                        
+
                     </View>
                 </View>
                 <View style={{ ...childContainer }}>
@@ -428,29 +454,29 @@ const Appointments = () => {
         if (Platform.OS === 'ios') {
             handleDownload();
         } else {
-          try {
-            const granted = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-              {
-                title: t('storag_perm'),
-                message:
-                  t('perm_msg'),
-              }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-              // Start downloading
-              handleDownload();
-              console.log('Storage Permission Granted.');
-            } else {
-              // If permission denied then show alert
-              showAlert(t('error'), t('file_error'), t('ok'))
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: t('storag_perm'),
+                        message:
+                            t('perm_msg'),
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // Start downloading
+                    handleDownload();
+                    console.log('Storage Permission Granted.');
+                } else {
+                    // If permission denied then show alert
+                    showAlert(t('error'), t('file_error'), t('ok'))
+                }
+            } catch (err) {
+                // To handle permission related exception
+                console.log("++++" + err);
             }
-          } catch (err) {
-            // To handle permission related exception
-            console.log("++++"+err);
-          }
         }
-      };
+    };
 
     function closeLoaderPDF() {
         setPdfLoader(false);
@@ -467,11 +493,11 @@ const Appointments = () => {
             let query = Object.keys(params)
                 .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
                 .join('&');
-             console.log('Query >>>', query)
+            console.log('Query >>>', query)
             setPdfLoader(true);
             let req = await HttpUtilsFile.get('preciption_download?' + query, userData?.api_token);
             console.log('Response of download file >>>>', req);
-            if(req.message === 'Preciption download url'){
+            if (req.code == 200) {
                 downloadFile(req.data, closeLoaderPDF);
             }
             else {
@@ -684,11 +710,12 @@ const Appointments = () => {
                                 <IonicIcon name="close-circle" color={Global.main_color} size={28} />
                             </TouchableOpacity>
                         </View>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text>Currently Unavailable Reports...</Text>
+                        <View style={{ flex: 1 }}>
+                            <WebView source={{ uri:  reportVisible?.report}} />
+                            {/* <Text>Currently Unavailable Reports...</Text> */}
                         </View>
                     </View>
-                    <View style={{ flex: 0.2 }}>
+                    {/* <View style={{ flex: 0.2 }}>
                         <Components.FABComponent
                             visible={true}
                             // iconDetail={{ name: 'add', color: 'white' }}
@@ -699,7 +726,7 @@ const Appointments = () => {
                             onPress={handleDownloadReport}
                             _style={{ borderRadius: 7 }}
                         />
-                    </View>
+                    </View> */}
                 </Components.ModalScreen>
 
             </View>

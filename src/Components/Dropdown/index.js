@@ -81,6 +81,12 @@ export default function DropDown({
           borderColor:Global.iconBackground
         }}
         mode={badge ? "BADGE" : "SIMPLE"}
+        disabledItemLabelStyle={{
+          opacity: 0.5
+        }}
+        disabledStyle={{
+          opacity: 0.5
+        }}
       /> 
    </View>
     

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback} from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, Platform, ActivityIndicator } from 'react-native'
 import Components from '../../Components'
 import Global from '../../Global'
@@ -11,6 +11,10 @@ import { updateUser } from '../../Redux/reducersActions/userReducer';
 import { useTranslation } from 'react-i18next';
 import HttpUtilsFile from '../../Services/HttpUtils'
 import { showAlert } from '../../../Functions'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const Login = ({ handleState }) => {
     let actionSheet = useRef();
@@ -19,10 +23,12 @@ const Login = ({ handleState }) => {
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     // console.log('<<<<<****** userData *******>>>>>', userData, default_language);
     const [loader, setLoader] = useState(false);
+    const [deviceToken , setDeviceToken] = useState(null);
 
     const [authObj, setAuthObj] = useState({
         email: '',
-        password: ''
+        password: '',
+        //deviceToken:null
     })
 
     const [errorObj, setErrorObj] = useState({
@@ -57,28 +63,54 @@ const Login = ({ handleState }) => {
         console.log('User Data ****>>>>>', authObj)
         let { email, password } = authObj;
         let errors = {};
-        if (Global.email_validation.test(email.replace(' ', '')) === false) {
-            errors.email = 'Please Enter a Valid Email.';
+        // if (Global.email_validation.test(email.replace(' ', '')) === false) {
+        //     errors.email = 'Please Enter a Valid Email.';
+        // }
+        if(email === ''){
+            errors.email = t('field_req')
         }
 
         if (password.length < 5) {
             errors.password = 'Password Length should be 8 characters or more.';
         }
-        //return
+        // return
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
             setLoader(true)
             let userData = {
+                email,
                 password,
-                email
+                device_token:deviceToken
             }
+            console.log('Login User Data >>>>', userData);
+           // return;
             try {
-                let req = await HttpUtilsFile.post('login', userData);
+                
+             let req = await HttpUtilsFile.post('login', userData);
+            //    console.log('URL Base of Login >>>>>', Global.BASE_URL + '/login');
+            //    let req = await fetch('https://fahadoman.com/doctorportal/api/v1/login', {
+            //     method: 'POST',
+            //     headers: new Headers({
+            //         Accept: 'application/json',
+            //         'Content-Type': 'application/json'
+            //     }),
+            //     body: JSON.stringify(userData),
+            // });
+
+            // let resJson = await req.json();
                 setLoader(false);
-                console.log('REq Response >>>>', req);
-                if(req.message === 'Login Successful'){
+                //console.log('Login REq Response >>>>', resJson);
+                console.log('Login REq Response >>>>', req);
+               // return
+                if(req.code == 200){
                     // alert(req.message);
-                    dispatch(updateUser(req.data));
+                     if(req.message === 'Patient Login Successful!'){
+                        showAlert(t('alert'), t('patient_login'), t('ok'))
+                        dispatch(updateUser(req.data));
+                     }
+                     else if(req.message === 'email/password wrong'){
+                        showAlert(t('error'), t('email_password_error'), t('ok'))
+                     }
                 }
                 else {
                     alert(req.message);
@@ -102,15 +134,67 @@ const Login = ({ handleState }) => {
         dispatch(changeLanguage(index == 0 ? 'en' : 'ar'))
     }
 
-    // useEffect(() => {
-    //     if (default_language === 'عربى') {
-    //         i18n.changeLanguage('ar')
-    //     }
-    //     else if (default_language === 'English') {
-    //         i18n.changeLanguage('en')
-    //     }
+    useFocusEffect(
+        useCallback(() => {
+          let isActive = true;
+          requestUserPermission(isActive)
+          return () => {
+            isActive = false;
+          };
+        }, [])
+      );
 
-    // }, [default_language])
+    async function requestUserPermission(isActive) {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        if (Platform.OS === 'ios') {
+            if (enabled) {
+                // console.log('Authorization status:', authStatus);
+                if (userData != null) {
+                    getToken(isActive);
+                }
+            }
+        }
+        else {
+            getToken(isActive);
+        }
+    }
+    
+    const getToken = async (isActive) => {
+        let fcmToken = await AsyncStorage.getItem('@token');
+        //console.log("CHECK @token LocalStorage >>>>>>>", fcmToken);
+        if (!fcmToken) {
+            // let a =   messaging().getToken();
+            messaging()
+                .getToken()
+                .then(async (fcmToken) => {
+                    console.log("FcmToken Generated New *******>>>>>>>>>", fcmToken);
+                    if (fcmToken && isActive) {
+                        setDeviceToken(fcmToken)
+                      // handleChange('deviceToken', fcmToken)
+                        await AsyncStorage.setItem('@token', fcmToken);
+                    } else {
+                        console.log('[FCMService] User does not have a device token');
+                    }
+                })
+                .catch((error) => {
+                    let err = `FCm token get error${error}`;
+                    console.log('[FCMService] getToken rejected ', err);
+                });
+        } else {
+            if(isActive) setDeviceToken(fcmToken);
+           // handleChange('deviceToken', fcmToken)
+            console.log("Else Condition @token LocalStorage >>>", fcmToken)
+        }
+    };
+
+    // useEffect(() => {
+    //     requestUserPermission();
+    // }, [])
+
+    //console.log('State Token Value >>>>>', authObj.deviceToken);
 
     return (
         <KeyboardAwareScrollView
@@ -125,13 +209,13 @@ const Login = ({ handleState }) => {
                 <View style={{ flex: 1, marginHorizontal: 20 }}>
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder={t('email')}
+                        placeholder={t('email_phone')}
                         name={'email'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.email}
-                        keyboardType={'email-address'}
+                        // keyboardType={'email-address'}
                     />
-                    {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
+                    {errorObj.email ? <Text style={styles.error}>{errorObj.email}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
                         placeholder={t('password')}

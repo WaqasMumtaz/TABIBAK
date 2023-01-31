@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const DoctorProfile = ({ route }) => {
-    const {doctor_id, name ,bio , category_id, fees, role,specialist, category,offday} = route.params;
+    const {doctor_id, name ,bio , category_id, fees, role,specialist, category,offday, user_id} = route.params;
     const navigation = useNavigation();
 
     const { t, i18n } = useTranslation();
@@ -26,7 +26,9 @@ const DoctorProfile = ({ route }) => {
             category_id,
             specialist,
             category,
-            offday
+            offday,
+            user_id,
+            fees
         });
     }
 

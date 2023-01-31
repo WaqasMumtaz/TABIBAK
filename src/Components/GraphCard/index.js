@@ -15,15 +15,15 @@ const Card = ({ data, title, icon_name, box_clr }) => {
             <View style={{
                 backgroundColor: box_clr,
                 borderRadius: 6,
-                height: 37,
-                width: 37,
+                height: 34,
+                width: 34,
                 alignItems: "center",
                 justifyContent:'center'
             }}>
                 {icon_name === 'dollar-sign' ? 
-                 <FontAwesome5Icon name={icon_name} size={20} color={Global.white} />
+                 <FontAwesome5Icon name={icon_name} size={18} color={Global.white} />
                 :
-                <IonicIcon name={icon_name} size={20} color={Global.white} />
+                <IonicIcon name={icon_name} size={18} color={Global.white} />
               }
             </View>
             <View style={{marginHorizontal:10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems:'center',
         margin:8,
-        padding:10,
+        padding:8,
         backgroundColor: Global.white,
         shadowColor: "#000",
         shadowOffset: {
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         elevation: 6
     },
     titleText:{
-        fontSize:13,
+        fontSize:11,
         fontWeight:'bold',
     }
 })

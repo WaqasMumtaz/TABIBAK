@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // const BASE_URL = 'http://localhost:8000/';
 
-const BASE_URL = 'https://getboxxie.com/doctorportal/public/api';
+//const BASE_URL = 'https://getboxxie.com/doctorportal/public/api';
 // const BASE_URL = 'https://pakjazba.com/api';
- //const BASE_URL = 'https://pure-hollows-17968.herokuapp.com/api';
+const BASE_URL = 'https://fahadoman.com/doctorportal/api/v1';
 
 
 const headersFor = (token) => {
@@ -43,7 +43,7 @@ const hitEndpoint = (method, endpoint, token, body) => {
     
     //console.log(method, endpoint, token, body)
     //  console.log('Check HeadersFor >>>>', headers);
-    //  console.log('URL >>>', url);
+      console.log('URL Calling ***>>>', url);
    // return;
     return fetch(url, { method, credentials, headers, body }).then((response) => {
         return handleErrors(response)

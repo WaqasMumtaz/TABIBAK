@@ -20,7 +20,7 @@ const AppointmentForm = ({ route }) => {
     const isRTL = i18n.dir();
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const { doctor_id, category_id, specialist, name, category, offday } = route.params;
+    const { doctor_id, category_id, specialist, name, category, offday, user_id, fees } = route.params;
     console.log('Appointment Route Category ID >>>', category_id);
     const [appointments, setAppointments] = useState(null);
     const [categories, setCategories] = useState(null);
@@ -75,7 +75,9 @@ const AppointmentForm = ({ route }) => {
         id: undefined,
         name: '',
         specialist: '',
-        offday: offday
+        offday: offday,
+        user_id: undefined,
+        fees: undefined
     });
 
 
@@ -86,13 +88,15 @@ const AppointmentForm = ({ route }) => {
         })
     }
 
-    function handleDoctor(params, specialist, offday) {
-        console.log('Selected Doctor Off Day >>>>', offday);
+    function handleDoctor(params, specialist, offday, data) {
+        console.log('Doctor Total Data >>>', data);
         setSelectedDoctor({
-            id: params.id,
+            id: data?.id,
             name: params.name,
             specialist,
-            offday
+            offday,
+            user_id: data?.user_id,
+            fees: data?.fees,
         });
     }
 
@@ -208,10 +212,10 @@ const AppointmentForm = ({ route }) => {
     }
     ]
 
-    const renderItem = (item) => (
+    const renderItem = (item,i) => (
         <View
             style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}
-            key={item.id}
+            key={i}
         >
             <RadioButton
                 value={selectedCategory.name}
@@ -223,7 +227,42 @@ const AppointmentForm = ({ route }) => {
         </View>
     )
 
-    async function fetchTimeSlot(params) {
+    async function fetchTimeSlot(doctor_id) {
+        try {
+            let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
+            console.log('Time Slot Date Selected >>>', appointmentData.selected_date);
+            let obj = {
+                appdate: appDate,
+                doctor_id,
+            }
+            // console.log('Time Slot Obj >>>', obj);
+            let req = await HttpUtilsFile.post('getdoctorlistnew', obj, userData?.api_token);
+            console.log('Time Slot Response *******>>>>>>>', req);
+            if(req.code == 200){
+                // alert('Under condition')
+                if(req.data.length == 0) setTimeSlots([]);
+                else {
+                    // alert('else')
+                    let slots = [];
+                    for (const iterator of req?.data) {
+                        let obj = {
+                            label: `${moment(iterator.start_time, 'hh:mm A').format('hh:mm A')} - ${moment(iterator.end_time, 'hh:mm A').format('hh:mm A')}`,
+                            value: `${iterator.start_time} - ${iterator.end_time}`,
+                            id: iterator.id,
+                            disabled:iterator.disabled
+                        }
+                        slots.push(obj)
+                    }
+                    // console.log('Slots after change >>>', slots);
+                    setTimeSlots(slots);
+                }
+            }
+
+        } catch (error) {
+            console.log('Fetch Time Slots Error >>>>', error);
+        }
+
+        return
         try {
             let params = {
                 api_token: userData?.api_token
@@ -271,9 +310,9 @@ const AppointmentForm = ({ route }) => {
                 setCategories([])
             }
             else {
-                let arr = [...req.data];
-                arr.push({ id: 6, name: 'Family Tree' })
-                setCategories(arr)
+                //let arr = [...req.data];
+                // arr.push({ id: 6, name: 'Family Tree' })
+                setCategories(req.data)
             }
 
         } catch (error) {
@@ -340,10 +379,12 @@ const AppointmentForm = ({ route }) => {
                         formObj.append('slot_id', time_id)
                         formObj.append('DoctorsService', selectedDoctor.specialist == '' ? specialist : selectedDoctor.specialist)
                         formObj.append('selectdoctory', selectedDoctor.id == undefined ? doctor_id : selectedDoctor.id);
+                        //formObj.append('selectdoctory', selectedDoctor.user_id == undefined ? user_id : selectedDoctor.user_id);
                         formObj.append('payment_method', payment);
                         formObj.append('comment', comment);
                         formObj.append('followup', follow);
                         formObj.append('followup_id', selected_follow_up);
+                        formObj.append('fees', selectedDoctor.fees == undefined ? fees : selectedDoctor.fees)
                         //formObj.append('bank_deposite_slip', img_obj);
                         if (payment === 'bank') {
                             formObj.append('bank_deposite_slip', {
@@ -353,21 +394,10 @@ const AppointmentForm = ({ route }) => {
                             }
                             );
                         }
-
-                        let obj = {
-                            appdate: appDate,
-                            apptime: time_slot,
-                            slot_id: time_id,
-                            DoctorsService: selectedDoctor.specialist,
-                            selectdoctory: selectedDoctor.id,
-                            payment_method: payment,
-                            comment: comment,
-                            followup: follow,
-                            followup_id: selected_follow_up,
-                        }
                         console.log('Data of appointment >>>>', formObj);
+                        //return
                         // let req = await HttpUtilsFile.post('create-appointment', obj, userData?.api_token);
-                        console.log('Link >>>', Global.BASE_URL + '/create-appointment');
+                        // console.log('Link >>>', Global.BASE_URL + '/create-appointment');
                         // console.log('Image form data >>>>', imgData._parts)
                         let imageReq = await fetch(Global.BASE_URL + '/create-appointment', {
                             method: 'Post',
@@ -379,46 +409,19 @@ const AppointmentForm = ({ route }) => {
                         });
 
                         let resJson = await imageReq.json();
-                        console.log('Create Appointment Respons >>>>', resJson);
-                        if (resJson.message === 'Appointment Created') {
+                        console.log('Created Appointment Respons >>>>', resJson);
+                        setCreateAppLoader(false)
+                        if (resJson.code == 200) {
                             showAlert(t('tabibak'), t('appointment_created'), t('ok'))
                             dispatch(updateAppointments(true));
                             navigation.navigate('Bottom Tabs', { screen: t('appointments') });
                         }
-
-                        // let res = await fetch(
-                        //     Global.BASE_URL + '/create-appointment',
-                        //     {
-                        //         method: 'post',
-                        //         body: JSON.stringify(obj),
-                        //         headers: {
-                        //             Authorization: 'Bearer ' + userData?.api_token,
-                        //             'Content-Type': 'application/json',
-                        //             'Accept': 'application/json',
-                        //              //'Content-Type': 'multipart/form-data',
-                        //             //'Accept': 'multipart/form-data',
-                        //             // 'Accept': 'multipart/form-data'
-                        //         },
+                        // else {
+                        //     if (resJson.message === 'Slot Already Booked') {
+                        //         showAlert(t('tabibak'), t('slot_booked'), t('ok'))
                         //     }
-                        // );
-                        // let responseJson = await res.json();
-                        // console.log('Create Appointment Respons >>>>', responseJson);
-                        setCreateAppLoader(false)
-                        // fetch(Global.BASE_URL + '/create-appointment', {
-                        //     method: 'POST',
-                        //     headers: new Headers({
-                        //         Authorization: 'Bearer ' + userData?.api_token,
-                        //         "Content-Type": payment == 'bank' ? "multipart/form-data" : "application/json"
-                        //     }),
-                        //     body: formObj
-                        // })
-                        // //.then((res) => res.json())
-                        // .then(data => {
-                        //    console.log('Api Respons >>>>', data.json());
-                        //    setCreateAppLoader(false)
-                        //   })
-                        //let resJson = await req.json();
-                        // setCreateAppLoader(false);
+                        // }
+
                     }
 
                 } catch (error) {
@@ -445,12 +448,12 @@ const AppointmentForm = ({ route }) => {
             console.log('Obj follow >>>', obj)
             let req = await HttpUtilsFile.post('followup-appointment', obj, userData?.api_token);
             console.log('Req response of follow ups >>>', req);
-            if (req.message == 'Followup  List') {
+            if (req.code == 200) {
                 let arr = [];
                 req.data.map(items => {
                     let obj = {
-                        label: items,
-                        value: items
+                        label: items.id,
+                        value: items.id
                     }
                     arr.push(obj)
                 })
@@ -462,21 +465,23 @@ const AppointmentForm = ({ route }) => {
         }
     }
 
-    async function fetchDoctors(params) {
-        let timesSlots = [...timeSlots];
-        let indx = timesSlots.findIndex(x => x.value === appointmentData.time_slot);
-        if (indx != -1) {
+    async function fetchDoctors(category_id) {
+        //let timesSlots = [...timeSlots];
+        // let indx = timesSlots.findIndex(x => x.value === appointmentData.time_slot);
+        // if (indx != -1) {
             // alert(timesSlots[indx].id);
-            let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
-            let time_id = timesSlots[indx].id;
+            //let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
+            // let time_id = timesSlots[indx].id;
             let obj = {
-                appdate: appDate,
-                slot_id: time_id,
-                category_id: selectedCategory.id
+                //appdate: appDate,
+                // slot_id: time_id,
+               // category_id: selectedCategory.id
+               category_id
             }
             console.log('Doctor API data >>>', obj);
             try {
-                let req = await HttpUtilsFile.post('getdoctorlist', obj, userData?.api_token);
+                let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
+                //let req = await HttpUtilsFile.post('getdoctorlist', obj, userData?.api_token);
                 console.log('Req of Doctors >>', req);
                 if (req.data.length == 0) {
                     setDoctors([])
@@ -487,8 +492,9 @@ const AppointmentForm = ({ route }) => {
 
             } catch (error) {
                 console.log('Error .>>>', error);
+                setDoctors([])
             }
-        }
+        // }
     }
 
     useEffect(() => {
@@ -497,28 +503,30 @@ const AppointmentForm = ({ route }) => {
 
     useEffect(() => {
         if (selectedCategory.id !== undefined && category_id == undefined) {
-            fetchDoctors();
+            fetchDoctors(selectedCategory.id);
         }
     }, [selectedCategory.id, category_id])
 
     useEffect(() => {
-        if (doctor_id != undefined) {
+        if (doctor_id != undefined && appointmentData.selected_date != '') {
             getFollowUps(doctor_id);
+            fetchTimeSlot(doctor_id);
         }
 
-    }, [doctor_id])
+    }, [appointmentData.selected_date])
 
     useEffect(() => {
         if (selectedDoctor.id != undefined) {
             getFollowUps(selectedDoctor.id);
+            fetchTimeSlot(selectedDoctor.id);
         }
-    }, [selectedDoctor.id,])
+    }, [selectedDoctor.id])
 
-    useEffect(() => {
-        fetchTimeSlot();
-    }, [])
+    // useEffect(() => {
+    //     fetchTimeSlot();
+    // }, [])
 
-    // console.log('Selected Doctor .>>>', selectedDoctor);
+    console.log('Selected Doctor .>>>', doctor_id);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -553,28 +561,27 @@ const AppointmentForm = ({ route }) => {
                             onChange={handleChangeDate}
                         />
                     </View>
-                    <View style={{ margin: 10 }}>
-                        <Components.DropDown
-                            placeholder={t('select_time_slot')}
-                            list={timeSlots}
-                            onChange={(value) => handleChange('time_slot', value())}
-                            value={appointmentData.time_slot}
-                            dropDownMaxHeight={150}
-                            open={openTimeSlots}
-                            style={styles.dropdown_inner_style}
-                            setOpen={() => setOpenTimeSlots(openTimeSlots => !openTimeSlots)}
-                            listMode="MODAL"
-                            disabled={appointmentData.selected_date == '' ? true : false}
-                        />
-                    </View>
-                    {(appointmentData.time_slot !== '' && category_id == undefined) && (
+
+                    {(appointmentData.selected_date != '' && category_id == undefined) && ( 
                         <>
-                            <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                                <Text style={{ color: Global.main_color, fontWeight: 'bold', fontSize: 18 }}>{t('category')}</Text>
-                            </View>
-                            <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
-                                {categories?.map(item => renderItem(item))}
-                            </View>
+                            {categories == null ?
+                                <Components.Spinner />
+                                :
+                                categories?.length == 0 ?
+                                    <Components.NoRecord />
+                                    :
+                                    <>
+                                        {categories?.map((item, i) => renderItem(item, i))}
+                                    </>
+
+                            
+                            // <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                            //     <Text style={{ color: Global.main_color, fontWeight: 'bold', fontSize: 18 }}>{t('category')}</Text>
+                            // </View>
+                            // <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
+                            //     {categories?.map(item => renderItem(item))}
+                            // </View>
+                            }
                         </>
                     )}
                     {(selectedCategory.name !== '' && doctor_id == undefined) && (
@@ -598,6 +605,22 @@ const AppointmentForm = ({ route }) => {
 
                         </>
                     )}
+                    <View style={{ margin: 10 }}>
+                        <Components.DropDown
+                            placeholder={t('select_time_slot')}
+                            list={timeSlots}
+                            onChange={(value) => handleChange('time_slot', value())}
+                            value={appointmentData.time_slot}
+                            dropDownMaxHeight={150}
+                            open={openTimeSlots}
+                            style={styles.dropdown_inner_style}
+                            setOpen={() => setOpenTimeSlots(openTimeSlots => !openTimeSlots)}
+                            listMode="MODAL"
+                            disabled={(doctor_id != undefined && appointmentData.selected_date == '') ? true : (doctor_id == undefined && selectedDoctor.id == undefined ) ? true : false}
+                        // disabled={appointmentData.selected_date == '' ? true : false}
+                        />
+                    </View>
+
                     {appointmentData?.time_slot != '' && (
                         <View style={{ margin: 10 }}>
                             <View style={{ flex: 1, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
@@ -656,7 +679,7 @@ const AppointmentForm = ({ route }) => {
                                                     <View
                                                         style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}
                                                     >
-                                                        <View style={{ flex: 1, alignItems:isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
+                                                        <View style={{ flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
                                                             <Text style={{ fontWeight: 'bold' }}>{v.title}</Text>
                                                         </View>
                                                         {v.id == 1 && (<Text>{appointmentData?.selected_date ? moment(appointmentData?.selected_date).format("DD/MM/YYYY") : ''}</Text>)}

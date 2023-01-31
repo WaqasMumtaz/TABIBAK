@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
   maxLength,
   disabled
 }) {
-  //  console.log('TextField *****>>>>>', editable);
+    // console.log('<<<<<****** Child Component TextField Render *****>>>>>');
   const input = {
     flex: 1,
    // marginTop: 5,

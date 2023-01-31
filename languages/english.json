@@ -133,6 +133,13 @@
         "optional":"Optional",
         "old_password":"Old Password",
         "new_password":"New Password",
-        "confirm_password":"Confirm New Password"
+        "confirm_password":"Confirm New Password",
+        "no_found":"No Data Found",
+        "slot_booked":"Slot Already Booked",
+        "email_phone":"Email or Phone",
+        "field_req":"This field is required",
+        "patient_login":"Patient Login Successful!",
+        "email_password_error":"Email/Password Wrong"
+
     }
 }

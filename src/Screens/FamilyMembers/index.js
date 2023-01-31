@@ -221,7 +221,7 @@ const FamilyMembers = () => {
                 let req = await HttpUtilsFile.post('addfamily', obj, userData?.api_token);
                 console.log('Added Member Respons >>>>', req);
                 setLoader(false);
-                if(req.message === 'Patient Registered'){
+                if(req.code == 200){
                     alert(req.message);
                     handleClear();
                     handleModal();

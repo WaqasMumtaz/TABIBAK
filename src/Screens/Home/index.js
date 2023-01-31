@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { StyleSheet, Text, View, SafeAreaView, Platform, FlatList, useWindowDimensions, ScrollView, TouchableOpacity } from 'react-native'
 import Components from '../../Components'
+import { useFocusEffect } from '@react-navigation/native';
 import Global from '../../Global'
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native';
@@ -12,9 +13,8 @@ import online_doctor from '../../Assets/online_doctor.png';
 import doctor from '../../Assets/doctor.png';
 import family from '../../Assets/family.png';
 import nurse from '../../Assets/nurse.png';
-import messaging from '@react-native-firebase/messaging';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateUser } from '../../Redux/reducersActions/userReducer'
+import IonicIcon from 'react-native-vector-icons/Ionicons';
 
 
 const Home = () => {
@@ -24,6 +24,7 @@ const Home = () => {
     const { t } = useTranslation();
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
     const [categories, setCategories] = useState(null);
+    const [record, setRecord] = useState(null);
 
     const [authObj, setAuthObj] = useState({
         search: ''
@@ -80,11 +81,11 @@ const Home = () => {
                 <View style={{ marginVertical: 5 }}>
                     <Components.ImagePlaceholder
                         src={item.id == 1 ? doctor : item.id == 2 ? nurse : item.id == 3 ? therapy : item.id == 4 ? online_doctor : item.id == 5 ? cardio : family}
-                        _style={{ height: 35, width: 35 }}
+                        _style={{ height: 35, width: 35, tintColor: Global.lime_green }}
                     />
                 </View>
-                <View style={{}}>
-                    <Text style={[styles.textStyle, { fontSize: 11 }]}>{item.name}</Text>
+                <View style={{marginVertical:10}}>
+                    <Text style={[styles.textStyle, { fontSize: 11 , fontWeight:'bold'}]}>{item.name}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -99,7 +100,7 @@ const Home = () => {
             let query = Object.keys(params)
                 .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
                 .join('&');
-            // console.log('Query >>>', query)
+             console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
             console.log('Req of Categories >>', req);
             if (req.message === 'Unauthenticated.') {
@@ -121,53 +122,39 @@ const Home = () => {
         }
     }
 
-    async function requestUserPermission(usr) {
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-        if (Platform.OS === 'ios') {
-            if (enabled) {
-                // console.log('Authorization status:', authStatus);
-                if (userData != null) {
-                    getToken();
-                }
-            }
-        }
-        else {
-            getToken();
+    async function getDataRecord() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('dashboard?' + query);
+            console.log('Dashboard DAta >>>>', req);
+            if (req.code == 200) setRecord(req.data);
+
+        } catch (error) {
+            console.log('Error >>>', error);
         }
     }
 
-    //Background Registerd
-    const getToken = async () => {
-        let fcmToken = await AsyncStorage.getItem('@token');
-        console.log("CHECK @token >>>>>>>", fcmToken);
-        if (!fcmToken) {
-            // let a =   messaging().getToken();
-            messaging()
-                .getToken()
-                .then(async (fcmToken) => {
-                    console.log("FcmToken >>>>>>>>>", fcmToken);
-                    if (fcmToken) {
-                        await AsyncStorage.setItem('@token', fcmToken);
-                    } else {
-                        console.log('[FCMService] User does not have a device token');
-                    }
-                })
-                .catch((error) => {
-                    let err = `FCm token get error${error}`;
-                    console.log('[FCMService] getToken rejected ', err);
-                });
-        } else {
-            console.log("Else Condition FcmToken >>>", fcmToken)
-        }
-    };
+    useFocusEffect(
+        React.useCallback(() => {
+            let getRecord = false;
+            getDataRecord()
+            getRecord = true;
+            return () => {
+                getRecord = false
+            };
+        }, [])
+    );
 
 
     useEffect(() => {
         fetchCategories();
-        requestUserPermission();
     }, [])
 
     return (
@@ -192,21 +179,22 @@ const Home = () => {
                                 <Components.GraphCard
                                     title={t('past_appointments')}
                                     icon_name={'calendar-outline'}
-                                    data={3}
+                                    data={record?.past_appointment}
                                     box_clr={Global.main_color}
                                 />
                                 <Components.GraphCard
                                     title={t('ongoing')}
                                     icon_name={'calendar-outline'}
-                                    data={0}
+                                    data={record?.today_appointment}
                                     box_clr={Global.orange_clr}
                                 />
-                                <Components.GraphCard
+                                {/* <Components.GraphCard
                                     title={t('total_cost')}
                                     icon_name={'dollar-sign'}
-                                    data={3}
+                                    data={`$${record?.cost}`}
                                     box_clr={Global.lime_green}
-                                />
+                                /> */}
+                                <AboutUs/>
                             </View>
                             <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
                                 {categories.map((item, i) => renderItem(item, i))}
@@ -227,7 +215,33 @@ const Home = () => {
     )
 }
 
-export default Home
+export default Home;
+
+const AboutUs=()=>{
+  const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir();
+
+    return(
+        <TouchableOpacity 
+      onPress={()=> navigation.navigate('About')}
+        style={[styles.card, { flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }]}>
+        <View style={{
+            backgroundColor: Global.lime_green,
+            borderRadius: 6,
+            height: 34,
+            width: 34,
+            alignItems: "center",
+            justifyContent:'center'
+        }}>
+            <IonicIcon name={'people-circle-outline'} size={25} color={Global.white} />
+        </View>
+        <View style={{marginHorizontal:10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text style={styles.titleText}>{t('about_us')}</Text>
+        </View>
+    </TouchableOpacity>
+    )
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -242,7 +256,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         //margin: 5,
         // width: 150,
-        height: 139,
+        height: 150,
         borderRadius: 20,
         margin: 8,
         // justifyContent: 'center',
@@ -267,6 +281,27 @@ const styles = StyleSheet.create({
         // fontSize:8,
         // lineHeight: 20,
         color: Global.main_color,
-        margin: 8
+        marginVertical: 8
+    },
+    card:{
+        // height: 139,
+        // width: '28%',
+        borderRadius: 10,
+        alignItems:'center',
+        margin:8,
+        padding:8,
+        backgroundColor: Global.white,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6
+    },
+    titleText:{
+        fontSize:11,
+        fontWeight:'bold',
     }
 })

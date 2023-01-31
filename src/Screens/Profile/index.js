@@ -5,13 +5,16 @@ import { hasMixed, hasNumber, hasSpecial, hasValidLength } from '../../Global/pa
 import Components from '../../Components'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useTranslation } from 'react-i18next'
-import { useRTL } from '../../../Functions'
+import { showAlert, useRTL } from '../../../Functions'
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import ActionSheet from 'react-native-actionsheet';
 import ImagePicker from 'react-native-image-crop-picker';
 import HttpUtilsFile from '../../Services/HttpUtils';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUser } from '../../Redux/reducersActions/userReducer';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
+
 
 //const isRTL = Global.isRTL();
 
@@ -21,10 +24,14 @@ const Profile = () => {
     let actionSheet = useRef();
     const navigation = useNavigation()
     // console.log('Custom Function RTL ***>>>>>', isRTL);
+    let dispatch = useDispatch();
+
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
 
     let phoneInput = useRef(null);
     const [loader, setLoader] = useState(false);
+    const [record, setRecord] = useState(null);
+
 
     let optionArray = [
         t('gallery'),
@@ -44,6 +51,9 @@ const Profile = () => {
         password: '',
         family_key: '',
         photo: null,
+        photo_obj: {
+            mime: "image/jpeg"
+        },
         edit: false,
         role: ''
     })
@@ -89,7 +99,7 @@ const Profile = () => {
 
     async function handleSave() {
         // console.log('User Data ****>>>>>', authObj)
-        const { email, password, first_name, last_name, phone, family_key } = authObj;
+        const { email, password, first_name, last_name, phone, family_key, photo, photo_obj } = authObj;
         let errors = {};
         // console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
         //   return
@@ -97,8 +107,10 @@ const Profile = () => {
             errors.email = 'Please enter a valid email.';
         }
         //console.log('Errors >>', errors);
-        if (!hasValidLength(password)) {
-            errors.password = "Your password must have 8 or more characters"
+        if(password != ''){
+            if (!hasValidLength(password)) {
+                errors.password = "Your password must have 8 or more characters"
+            }
         }
         // if (!hasMixed(password)) {
         //     errors.password = "Your password must have upper & lowercase letters"
@@ -112,40 +124,77 @@ const Profile = () => {
         //     errors.password = "Your password must have at least one special character"
         // }
 
-        if (first_name == '') {
+        if (first_name == '' || first_name == null) {
             errors.first_name = 'First Name is required';
 
         }
-        if (last_name == '') {
+        if (last_name == '' || last_name == null) {
             errors.last_name = 'Last Name is required';
 
         }
-         //console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
+        //console.log(phoneInput.current?.isValidNumber(phone), 'PHONE');
         // if (phoneInput.current?.isValidNumber(phone) == false) {
         //     errors.phone = 'Phone number is not valid';
 
         // }
-        console.log('Errors >>>', errors);
+        // console.log('Errors >>>', errors);
         setErrorObj(errors);
         if (Object.keys(errors).length == 0) {
-        //    alert(1)
+            //    alert(1)
             setLoader(true);
-            let obj = {
-                name:`${first_name} ${last_name}`,
-                email:email,
-                phone:phone,
-                password:password,
+            const formObj = new FormData();
+            formObj.append('name', `${first_name} ${last_name}`)
+            formObj.append('email', email);
+            formObj.append('phone', phone);
+            if(password != '') formObj.append('password', password);
+            let keys = Object.keys(photo_obj)
+            if (photo != null) {
+                formObj.append('img', {
+                    uri: photo,
+                    //type:"image/jpeg",
+                    type: photo_obj.mime,
+                    name: 'photo'
+                })
             }
+
+            // let obj = {
+            //     name: `${first_name} ${last_name}`,
+            //     email: email,
+            //     phone: phone,
+            //     password: password,
+            // }
             try {
-                console.log('Edit Member Obj ***>>>>', obj);
-                let req = await HttpUtilsFile.post('user-update', obj, userData?.api_token);
+                console.log('Edit Member Obj ***>>>>', JSON.stringify(formObj));
+                let imageReq = await fetch(Global.BASE_URL + '/user-update', {
+                    method: 'Post',
+                    headers: new Headers({
+                        Authorization: 'Bearer ' + userData?.api_token,
+                        // "Content-Type": "application/json",
+                    }),
+                    body: formObj,
+                });
+
+                let resJson = await imageReq.json();
+                setLoader(false);
+                console.log('Edit Member Respons >>>>', resJson);
+                if (resJson.code == 200) {
+                    // alert(t('updated_user'));
+                    dispatch(updateUser(resJson.data));
+                    showAlert(t('alert'), t('updated_user'), t('ok'))
+                    setAuthObj({ ...authObj, edit: false });
+                }
+                else {
+                    alert(req.message);
+                }
+                return
+                let req = await HttpUtilsFile.post('user-update', formObj, userData?.api_token);
                 console.log('Edit Member Respons >>>>', req);
                 setLoader(false);
-                if(req.message === 'Patient Registered'){
+                if (req.message === 'Patient Registered') {
                     alert(t('updated_user'));
                     setAuthObj({ ...authObj, edit: false });
                     //getUserDetails();
-                }else {
+                } else {
                     alert(req.message);
                 }
 
@@ -162,28 +211,11 @@ const Profile = () => {
                 width: 300,
                 height: 400,
             }).then(async (image) => {
-                console.log('image', image);
-                // const imgData = new FormData();
-                // imgData.append('images', { uri: image.path, name: 'photo', type: 'image/jpg' });
-                // imgData.append('name', image.filename);
-                // imgData.append('company_id', selectedCompany);
-                // imgData.append('user_id', loginUser?.user_id)
-                // console.log('Image form data >>>>', imgData._parts)
-                // let imageReq = await fetch(Global.apiUrl + '/user/image_upload', {
-                //     method: 'Post',
-                //     headers: new Headers({
-                //         Authorization: 'Bearer ' + loginUser?.token,
-                //         // "Content-Type": "application/json",
-                //     }),
-                //     body: imgData,
-                // });
-
-                // let resJson = await imageReq.json();
-                // console.log('Image ResJSon >>>>>', resJson);
-                //if (resJson.status === 'Success') {
+                console.log('image src', image);
                 setAuthObj({
                     ...authObj,
                     photo: image.path,
+                    // photo_obj:image
                 })
 
                 //}
@@ -197,27 +229,10 @@ const Profile = () => {
                 height: 400,
             }).then(async (image) => {
                 console.log('Camera Pic >>', image);
-                // const imgData = new FormData();
-                // imgData.append('images', { uri: image.path, name: 'photo', type: 'image/jpg' });
-                // imgData.append('name', image.filename);
-                // imgData.append('company_id', selectedCompany);
-                // imgData.append('user_id', loginUser?.user_id)
-                // console.log('Image form data >>>>', imgData._parts)
-                // let imageReq = await fetch(Global.apiUrl + '/user/image_upload', {
-                //     method: 'Post',
-                //     headers: new Headers({
-                //         Authorization: 'Bearer ' + loginUser?.token,
-                //         // "Content-Type": "application/json",
-                //     }),
-                //     body: imgData,
-                // });
-
-                // let resJson = await imageReq.json();
-                // console.log('Image ResJSon >>>>>', resJson);
-                // if (resJson.status === 'Success') {
                 setAuthObj({
                     ...authObj,
                     photo: image.path,
+                    //photo_obj:image
                 })
                 //  }
 
@@ -226,7 +241,7 @@ const Profile = () => {
         }
     }
 
-    console.log('Edit user >>>', authObj.edit)
+    // console.log('Edit user >>>', authObj.edit)
     async function getUserDetails() {
         try {
             let params = {
@@ -238,16 +253,17 @@ const Profile = () => {
                 .join('&');
 
             let req = await HttpUtilsFile.get('user_details?' + query);
-            if (req.message === 'Data fetch Successful') {
+            console.log('Fetched user data >>>', req);
+            if (req.code == 200) {
                 setAuthObj({
                     ...authObj,
                     first_name: req?.data?.fname,
                     last_name: req?.data?.lname,
-                    phone:req?.data?.image,
                     role: req?.data?.role,
                     phone: req?.data?.phone,
                     email: req?.data?.email,
-                    family_key: req?.data?.family_name
+                    family_key: req?.data?.family_name,
+                    photo: req?.data?.image
                 })
             }
 
@@ -256,8 +272,29 @@ const Profile = () => {
         }
     }
 
+    async function getDataRecord() {
+        try {
+            let params = {
+                api_token: userData?.api_token
+            };
+
+            let query = Object.keys(params)
+                .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                .join('&');
+            // console.log('Query >>>', query)
+            let req = await HttpUtilsFile.get('dashboard?' + query);
+            console.log('Dashboard DAta >>>>', req);
+            if (req.code == 200) setRecord(req.data);
+
+        } catch (error) {
+            console.log('Error >>>', error);
+        }
+    }
+
     useEffect(() => {
         getUserDetails();
+        getDataRecord();
+
         return () => {
             handleClear()
         }
@@ -303,14 +340,14 @@ const Profile = () => {
                         </TouchableOpacity>
                     </View>
                     {authObj.role && (
-                        <View style={{flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent:'center', alignItems:'center', marginTop:10}}>
-                          <Text style={{fontSize:15, fontWeight:'bold', color:Global.main_color}}>{`${t('role')} :`}</Text>
-                          <Text style={{marginHorizontal:7}}>{`${authObj.role}`}</Text>
+                        <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
+                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: Global.main_color }}>{`${t('role')} :`}</Text>
+                            <Text style={{ marginHorizontal: 7 }}>{`${authObj.role}`}</Text>
                         </View>
                     )}
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                         <Components.InputField
-                            placeholder="First Name"
+                            placeholder={t('first_name_text')}
                             name={'first_name'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.first_name}
@@ -319,7 +356,7 @@ const Profile = () => {
                         {errorObj.first_name ? <Text style={styles.error}>{t('first_name')}</Text> : null}
                         <View style={{ marginBottom: 15 }} />
                         <Components.InputField
-                            placeholder="Last Name"
+                            placeholder={t('last_name_text')}
                             name={'last_name'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.last_name}
@@ -339,19 +376,19 @@ const Profile = () => {
                             </>
                         ) :
                             ( */}
-                                <Components.InputField
-                                    placeholder="Phone"
-                                    name={'phone'}
-                                    handleChange={(name, value) => handleChange(name, value)}
-                                    value={authObj.phone}
-                                    editable={authObj.edit}
-                                />
-                            {/* )
+                        <Components.InputField
+                            placeholder={t('phone')}
+                            name={'phone'}
+                            handleChange={(name, value) => handleChange(name, value)}
+                            value={authObj.phone}
+                            editable={authObj.edit}
+                        />
+                        {/* )
                         } */}
 
                         <View style={{ marginBottom: 15 }} />
                         <Components.InputField
-                            placeholder="Email"
+                            placeholder={t("Email")}
                             name={'email'}
                             handleChange={(name, value) => handleChange(name, value)}
                             value={authObj.email}
@@ -369,8 +406,8 @@ const Profile = () => {
                         /> */}
                         {authObj.edit && (
                             <>
-                              <Components.InputField
-                                    placeholder="Password"
+                                <Components.InputField
+                                    placeholder={t("password")}
                                     secureTextEntry={!authObj.showPass}
                                     name={'password'}
                                     handleChange={(name, value) => handleChange(name, value)}
@@ -386,16 +423,45 @@ const Profile = () => {
                                 ) : (
                                     null
                                 )}
+                                <View style={{ margin: 5 }} />
+
                             </>
                         )}
+                        {/* <View style={{ margin: 2 }} /> */}
+                        <View style={{flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' ,alignItems:'center', borderRadius: 10, padding: 10, height: 50, backgroundColor: Global.inputs_bg }}>
+                            <View style={{
+                                backgroundColor: Global.lime_green,
+                                borderRadius: 6,
+                                height: 34,
+                                width: 34,
+                                alignItems: "center",
+                                justifyContent: 'center'
+                            }}>
+                                <FontAwesome5Icon name={'dollar-sign'} size={18} color={Global.white} />
+                            </View>
+                            <View style={{marginHorizontal:10}}>
+                                <Text style={{
+                                     fontSize:11,
+                                     fontWeight:'bold',
+                                }}>{t('total_cost')}</Text>
+                                <Text>{record?.cost}</Text>
+                            </View>
+                        </View>
+                        {/* <Components.GraphCard
+                                    title={t('total_cost')}
+                                    icon_name={'dollar-sign'}
+                                    data={`$${record?.cost}`}
+                                    box_clr={Global.lime_green}
+                                /> */}
                         {authObj.edit && (
-                            <View style={{ margin: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                                 <View style={{ margin: 10 }}>
                                     <Components.MyButton
                                         title={t('save')}
                                         styleBtn={{ width: 120 }}
                                         loader={loader}
                                         onClick={handleSave}
+                                        disabled={loader}
                                     />
                                 </View>
                                 <View style={{ margin: 10 }}>

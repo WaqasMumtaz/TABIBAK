@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Platform, Linking, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity,Image, ImageBackground, Platform, Linking, Dimensions } from 'react-native';
 import Global from '../../Global';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next'
 import SearchInput from '../SearchInput';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
+import { useSelector, useDispatch } from 'react-redux'
 
 
 export default function TopBar({ title, home = false, backBtn, backIcon = false, user_name }) {
   const navigation = useNavigation();
+  const { userData } = useSelector(state => state.persistedReducer.userReducer);
+  
   const [searchValue, setSearchValue] = useState({
     name: ''
   });
@@ -24,14 +27,23 @@ export default function TopBar({ title, home = false, backBtn, backIcon = false,
     })
   }
 
+  function moveProfile() {
+    navigation.navigate('Profile');
+  }
+
 
   return home ? (
     <>
       <View style={styles.homeTopBarStyle}>
         <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems:'center' }}>
-          <View style={[styles.profile_container]}>
+          <TouchableOpacity style={[styles.profile_container]} onPress={()=> moveProfile()}>
+            {userData?.image ? 
+            <Image source={{uri: userData?.image}} style={{height:50, width:50,borderRadius:50/2}}/>
+            :
             <IonicIcon name="person" size={40} color={Global.dark_gray} />
-          </View>
+
+          }
+          </TouchableOpacity>
           <View style={{ marginHorizontal: 10, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
             <Text style={styles.welcomText}>{t('welcome')}</Text>
             <Text style={styles.topBarText} numberOfLines={1} ellipsizeMode='tail'>{user_name}</Text>
