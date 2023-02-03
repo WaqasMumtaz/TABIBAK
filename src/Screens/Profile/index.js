@@ -143,26 +143,19 @@ const Profile = () => {
             //    alert(1)
             setLoader(true);
             const formObj = new FormData();
-            formObj.append('name', `${first_name} ${last_name}`)
+            formObj.append('fname', `${first_name}`)
+            formObj.append('lname', `${last_name}`)
             formObj.append('email', email);
             formObj.append('phone', phone);
             if(password != '') formObj.append('password', password);
-            let keys = Object.keys(photo_obj)
             if (photo != null) {
-                formObj.append('img', {
+                formObj.append('image', {
                     uri: photo,
-                    //type:"image/jpeg",
                     type: photo_obj.mime,
                     name: 'photo'
                 })
             }
 
-            // let obj = {
-            //     name: `${first_name} ${last_name}`,
-            //     email: email,
-            //     phone: phone,
-            //     password: password,
-            // }
             try {
                 console.log('Edit Member Obj ***>>>>', JSON.stringify(formObj));
                 let imageReq = await fetch(Global.BASE_URL + '/user-update', {

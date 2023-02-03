@@ -237,7 +237,7 @@ const AboutUs=()=>{
             <IonicIcon name={'people-circle-outline'} size={25} color={Global.white} />
         </View>
         <View style={{marginHorizontal:10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text style={styles.titleText}>{t('about_us')}</Text>
+            <Text style={[styles.titleText, {fontSize : isRTL == 'rtl' ? 14 : 12}]}>{t('about_us')}</Text>
         </View>
     </TouchableOpacity>
     )

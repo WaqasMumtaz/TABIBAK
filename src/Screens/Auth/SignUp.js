@@ -30,7 +30,8 @@ const SignUp = ({ handleState }) => {
         password: ''
     })
 
-    const { t } = useTranslation();
+    const { t , i18n} = useTranslation();
+    const isRTL = i18n.dir();
 
     function handleChange(name, value) {
         //  console.log('Name >>>>>>', name, 'Value >>>>>>', value);
@@ -185,7 +186,7 @@ const SignUp = ({ handleState }) => {
                     {errorObj.email ? <Text style={styles.error}>{t('email_validation')}</Text> : null}
                     <View style={{ marginBottom: 15 }} />
                     <Components.InputField
-                        placeholder={`${t('family_key')} (${t('optional')})`}
+                        placeholder={`${t('family_key_optional')}`}
                         name={'family_key'}
                         handleChange={(name, value) => handleChange(name, value)}
                         value={authObj.family_key}
@@ -217,9 +218,9 @@ const SignUp = ({ handleState }) => {
 
                     <View style={{margin:30, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                         <TouchableOpacity style={{}} onPress={() => handleState(1)}>
-                            <Text style={{ color: 'gray' }}>
+                            <Text style={{ color: 'gray', fontSize: isRTL == 'rtl' ? 16 : 13 }}>
                                 {t('already_registerd')}{' '}
-                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('Login')}</Text>
+                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline', fontSize: isRTL == 'rtl' ? 16 : 13 }}>{t('Login')}</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>

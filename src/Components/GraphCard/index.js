@@ -27,7 +27,7 @@ const Card = ({ data, title, icon_name, box_clr }) => {
               }
             </View>
             <View style={{marginHorizontal:10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
-                <Text style={styles.titleText}>{title}</Text>
+                <Text style={[styles.titleText, { fontSize : isRTL == 'rtl' ? 14 : 12}]}>{title}</Text>
                 <Text>{data}</Text>
             </View>
         </View>

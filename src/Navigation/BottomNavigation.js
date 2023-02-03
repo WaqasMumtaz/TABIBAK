@@ -22,11 +22,12 @@ const BottomNavigation = () => {
 
   return (
     <Tab.Navigator
+      initialRouteName={t('home')}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: Global.main_color,
         tabBarStyle: { height: 60, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' },
-        tabBarLabelStyle: { fontSize: 12, marginBottom: 6 },
+        tabBarLabelStyle: { fontSize: isRTL == 'rtl' ? 15 : 12, marginBottom: 6, fontWeight: isRTL == 'rtl' ? 'bold' : '700' },
 
       })}
     >

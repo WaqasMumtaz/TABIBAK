@@ -243,12 +243,12 @@ const Login = ({ handleState }) => {
 
                     <View style={{ flex: 0.5, justifyContent: 'center', alignItems: "center", alignSelf: 'center' }}>
                         <TouchableOpacity style={{ margin: 15 }} onPress={() => handleState(3)}>
-                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('forgot_password')}</Text>
+                            <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' , fontSize: isRTL == 'rtl' ? 16 : 13}}>{t('forgot_password')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleState(2)}>
-                            <Text style={{ color: 'gray' }}>
+                            <Text style={{ color: 'gray',fontSize: isRTL == 'rtl' ? 16 : 13 }}>
                                 {t('not_register')}{' '}
-                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline' }}>{t('create_account')}</Text>
+                                <Text style={{ color: Global.buttons_bg, textDecorationLine: 'underline', fontSize: isRTL == 'rtl' ? 16 : 13 }}>{t('create_account')}</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -256,7 +256,7 @@ const Login = ({ handleState }) => {
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <TouchableOpacity style={styles.languageBox} onPress={() => openSheet()}>
-                    <Text style={{ fontWeight: 'bold' }}>{default_language == 'ar' ? 'عربى' : 'English'}</Text>
+                    <Text style={{ fontWeight: 'bold', fontSize: isRTL == 'rtl' ? 18 : 13 }}>{default_language == 'ar' ? 'عربى' : 'English'}</Text>
                     <View style={{ marginLeft: 10 }}>
                         <FontIcon name="globe" color={Global.buttons_bg} size={20} />
                     </View>

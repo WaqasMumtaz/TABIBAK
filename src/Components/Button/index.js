@@ -36,7 +36,7 @@ const MyButton = ({title , onClick , styleBtn, titleStyle, loader, disabled}) =>
           <ActivityIndicator color={Global.white} size='small'/>
         </View>
       )}
-      <Text style={{..._titleStyle, ...titleStyle}}>{title.toUpperCase()}</Text>
+      <Text style={[{..._titleStyle, ...titleStyle}, {fontSize: isRTL == 'rtl' ? 20 : 16}]}>{title.toUpperCase()}</Text>
     </TouchableOpacity>
   )
 }
