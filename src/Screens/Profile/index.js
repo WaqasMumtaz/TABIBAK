@@ -166,7 +166,7 @@ const Profile = () => {
                     }),
                     body: formObj,
                 });
-
+                console.log('Edit Member Before JSON >>>>', imageReq);
                 let resJson = await imageReq.json();
                 setLoader(false);
                 console.log('Edit Member Respons >>>>', resJson);
@@ -177,17 +177,6 @@ const Profile = () => {
                     setAuthObj({ ...authObj, edit: false });
                 }
                 else {
-                    alert(req.message);
-                }
-                return
-                let req = await HttpUtilsFile.post('user-update', formObj, userData?.api_token);
-                console.log('Edit Member Respons >>>>', req);
-                setLoader(false);
-                if (req.message === 'Patient Registered') {
-                    alert(t('updated_user'));
-                    setAuthObj({ ...authObj, edit: false });
-                    //getUserDetails();
-                } else {
                     alert(req.message);
                 }
 
@@ -220,13 +209,13 @@ const Profile = () => {
             ImagePicker.openCamera({
                 width: 300,
                 height: 400,
-            }).then(async (image) => {
+            }).then((image) => {
                 console.log('Camera Pic >>', image);
-                setAuthObj({
-                    ...authObj,
-                    photo: image.path,
-                    //photo_obj:image
-                })
+                // setAuthObj({
+                //     ...authObj,
+                //     photo: image.path,
+                //     //photo_obj:image
+                // })
                 //  }
 
             });

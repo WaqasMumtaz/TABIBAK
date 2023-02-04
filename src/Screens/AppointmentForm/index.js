@@ -80,7 +80,6 @@ const AppointmentForm = ({ route }) => {
         fees: undefined
     });
 
-
     function handleChange(name, value) {
         setAppointmentData({
             ...appointmentData,

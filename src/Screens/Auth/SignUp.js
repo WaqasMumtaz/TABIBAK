@@ -88,16 +88,20 @@ const SignUp = ({ handleState }) => {
         }
         setErrorObj(errors);
         if (Object.keys(errors).length === 0) {
-            setLoader(true);
+             setLoader(true);
             let data = {
                 email, 
-                name: `${first_name} ${last_name}`, 
+                // name: `${first_name} ${last_name}`,
+                fname: first_name,
+                lname: last_name,
                 phone: `${country_code}${phone}`, 
                 password,
                 family_key,
                 role:'patient'
             }
             try {
+                console.log('Register User Data >>>>', data);
+               // return
                 let req = await HttpUtilsFile.post('register', data);
                 console.log('REgister Request Response >>>>', req);
                 setLoader(false);
