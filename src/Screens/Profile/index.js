@@ -211,12 +211,12 @@ const Profile = () => {
                 height: 400,
             }).then((image) => {
                 console.log('Camera Pic >>', image);
-                // setAuthObj({
-                //     ...authObj,
-                //     photo: image.path,
-                //     //photo_obj:image
-                // })
-                //  }
+                setAuthObj({
+                    ...authObj,
+                    photo: image.path,
+                    //photo_obj:image
+                })
+               //  }
 
             });
 
