@@ -19,15 +19,15 @@ const DoctorCard = ({ data, handleDoctor, selectedDoctor, i }) => {
             <View style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1, alignItems:isRTL =='rtl' ? 'flex-end' : 'flex-start' }}>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                        <Text style={[styles.textStyle, { fontSize: 18 }]}>{data?.user?.name}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 16 }]}>{data?.user?.name}</Text>
                     </View>
                     <View style={{alignItems:isRTL =='rtl' ? 'flex-end' : 'flex-start' }}>
                         {/* <Text style={[styles.textStyle, { fontSize: 15, color: Global.dark_gray }]}>{data?.category?.name}</Text> */}
-                        <Text style={[styles.textStyle, { fontSize: 15,marginTop:4, color: Global.dark_gray }]}>{data?.specialist}</Text>
+                        <Text style={[styles.textStyle, { fontSize: 14,marginTop:3, color: Global.dark_gray }]}>{data?.specialist}</Text>
                     </View>
                 </View>
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text>{t('select_doctor')}</Text>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal:3 }}>
+                    {/* <Text style={{fontSize:12}}>{t('select_doctor')}</Text> */}
                     <RadioButton
                         value={data?.id === selectedDoctor.id ? selectedDoctor.name : ''}
                         status={data?.id === selectedDoctor.id ? 'checked' : 'unchecked'}

@@ -140,6 +140,5 @@
         "field_req":"This field is required",
         "patient_login":"Patient Login Successful!",
         "email_password_error":"Email/Password Wrong"
-
     }
 }

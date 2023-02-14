@@ -176,7 +176,7 @@ const DoctorsTile = ({ route }) => {
             console.log('Category Obj >>>', obj)
 
             let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
-            console.log('Req of Doctors >>', req);
+            console.log('Req Response of Doctors >>', req);
             if (req.data.length > 0) {
                 setDoctorsList(req.data);
             }

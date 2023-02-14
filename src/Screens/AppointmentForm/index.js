@@ -21,7 +21,7 @@ const AppointmentForm = ({ route }) => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { doctor_id, category_id, specialist, name, category, offday, user_id, fees } = route.params;
-    console.log('Appointment Route Category ID >>>', category_id);
+    console.log('Appointment >>>', name);
     const [appointments, setAppointments] = useState(null);
     const [categories, setCategories] = useState(null);
     const [appointmentData, setAppointmentData] = useState({
@@ -47,6 +47,8 @@ const AppointmentForm = ({ route }) => {
         deposit_slip: ''
     })
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+
     const [doctors, setDoctors] = useState(null);
 
     const [createAppLoader, setCreateAppLoader] = useState(false);
@@ -211,18 +213,21 @@ const AppointmentForm = ({ route }) => {
     }
     ]
 
-    const renderItem = (item,i) => (
+    const renderItem = (item, i) => (
         <View
-            style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}
+            style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', margin: 10 }}
             key={i}
         >
             <RadioButton
                 value={selectedCategory.name}
                 status={item.name === selectedCategory.name ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedCategory({ id: item.id, name: item.name })}
+                onPress={() => setSelectedCategory({ id: item.id, name: default_language == 'ar' ? item?.translations[0]?.title : item?.translations[1]?.title })}
                 color={Global.main_color}
             />
-            <Text >{item.name}</Text>
+            <Text >
+                {/* {item.name} */}
+                {default_language == 'ar' ? item?.translations[0]?.title : item?.translations[1]?.title}
+            </Text>
         </View>
     )
 
@@ -237,9 +242,9 @@ const AppointmentForm = ({ route }) => {
             // console.log('Time Slot Obj >>>', obj);
             let req = await HttpUtilsFile.post('getdoctorlistnew', obj, userData?.api_token);
             console.log('Time Slot Response *******>>>>>>>', req);
-            if(req.code == 200){
+            if (req.code == 200) {
                 // alert('Under condition')
-                if(req.data.length == 0) setTimeSlots([]);
+                if (req.data.length == 0) setTimeSlots([]);
                 else {
                     // alert('else')
                     let slots = [];
@@ -248,7 +253,7 @@ const AppointmentForm = ({ route }) => {
                             label: `${moment(iterator.start_time, 'hh:mm A').format('hh:mm A')} - ${moment(iterator.end_time, 'hh:mm A').format('hh:mm A')}`,
                             value: `${iterator.start_time} - ${iterator.end_time}`,
                             id: iterator.id,
-                            disabled:iterator.disabled
+                            disabled: iterator.disabled
                         }
                         slots.push(obj)
                     }
@@ -468,31 +473,31 @@ const AppointmentForm = ({ route }) => {
         //let timesSlots = [...timeSlots];
         // let indx = timesSlots.findIndex(x => x.value === appointmentData.time_slot);
         // if (indx != -1) {
-            // alert(timesSlots[indx].id);
-            //let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
-            // let time_id = timesSlots[indx].id;
-            let obj = {
-                //appdate: appDate,
-                // slot_id: time_id,
-               // category_id: selectedCategory.id
-               category_id
-            }
-            console.log('Doctor API data >>>', obj);
-            try {
-                let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
-                //let req = await HttpUtilsFile.post('getdoctorlist', obj, userData?.api_token);
-                console.log('Req of Doctors >>', req);
-                if (req.data.length == 0) {
-                    setDoctors([])
-                }
-                else {
-                    setDoctors(req.data);
-                }
-
-            } catch (error) {
-                console.log('Error .>>>', error);
+        // alert(timesSlots[indx].id);
+        //let appDate = moment(appointmentData.selected_date).format('YYYY-MM-DD');
+        // let time_id = timesSlots[indx].id;
+        let obj = {
+            //appdate: appDate,
+            // slot_id: time_id,
+            // category_id: selectedCategory.id
+            category_id
+        }
+        console.log('Doctor API data >>>', obj);
+        try {
+            let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
+            //let req = await HttpUtilsFile.post('getdoctorlist', obj, userData?.api_token);
+            console.log('Req of Doctors >>', req);
+            if (req.data.length == 0) {
                 setDoctors([])
             }
+            else {
+                setDoctors(req.data);
+            }
+
+        } catch (error) {
+            console.log('Error .>>>', error);
+            setDoctors([])
+        }
         // }
     }
 
@@ -561,7 +566,7 @@ const AppointmentForm = ({ route }) => {
                         />
                     </View>
 
-                    {(appointmentData.selected_date != '' && category_id == undefined) && ( 
+                    {(appointmentData.selected_date != '' && category_id == undefined) && (
                         <>
                             {categories == null ?
                                 <Components.Spinner />
@@ -573,20 +578,22 @@ const AppointmentForm = ({ route }) => {
                                         {categories?.map((item, i) => renderItem(item, i))}
                                     </>
 
-                            
-                            // <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
-                            //     <Text style={{ color: Global.main_color, fontWeight: 'bold', fontSize: 18 }}>{t('category')}</Text>
-                            // </View>
-                            // <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
-                            //     {categories?.map(item => renderItem(item))}
-                            // </View>
+
+                                // <View style={{ margin: 10, flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }}>
+                                //     <Text style={{ color: Global.main_color, fontWeight: 'bold', fontSize: 18 }}>{t('category')}</Text>
+                                // </View>
+                                // <View style={{ margin: 8, flexDirection: 'row', flexWrap: 'wrap' }}>
+                                //     {categories?.map(item => renderItem(item))}
+                                // </View>
                             }
                         </>
                     )}
                     {(selectedCategory.name !== '' && doctor_id == undefined) && (
                         <>
                             <View style={{ margin: 10 }}>
-                                <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>Choose Doctor</Text>
+                                <View style={{alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start'}}>
+                                    <Text style={{ color: Global.main_color, fontWeight: 'bold', marginVertical: 5 }}>{t('select_doctor')}</Text>
+                                </View>
                                 <ScrollView horizontal={true} >
                                     {doctors == null ?
                                         <Components.Spinner />
@@ -615,7 +622,7 @@ const AppointmentForm = ({ route }) => {
                             style={styles.dropdown_inner_style}
                             setOpen={() => setOpenTimeSlots(openTimeSlots => !openTimeSlots)}
                             listMode="MODAL"
-                            disabled={(doctor_id != undefined && appointmentData.selected_date == '') ? true : (doctor_id == undefined && selectedDoctor.id == undefined ) ? true : false}
+                            disabled={(doctor_id != undefined && appointmentData.selected_date == '') ? true : (doctor_id == undefined && selectedDoctor.id == undefined) ? true : false}
                         // disabled={appointmentData.selected_date == '' ? true : false}
                         />
                     </View>

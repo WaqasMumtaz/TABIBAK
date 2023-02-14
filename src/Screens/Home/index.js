@@ -7,12 +7,13 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux'
 import HttpUtilsFile from '../../Services/HttpUtils';
-import cardio from '../../Assets/cardio.png';
-import therapy from '../../Assets/therapy.png';
-import online_doctor from '../../Assets/online_doctor.png';
-import doctor from '../../Assets/doctor.png';
-import family from '../../Assets/family.png';
-import nurse from '../../Assets/nurse.png';
+import cardio from '../../Assets/Categories/cardio.png';
+import therapy from '../../Assets/Categories/therapy.png';
+import online_doctor from '../../Assets/Categories/nurse-home.png';
+import doctor from '../../Assets/Categories/doctor.png';
+import family from '../../Assets/Categories/family-care.png';
+import nurse from '../../Assets/Categories/nurse-2.png';
+import blood_test from '../../Assets/Categories/blood-test.png';
 import { updateUser } from '../../Redux/reducersActions/userReducer'
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 
@@ -21,8 +22,11 @@ const Home = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { height, width } = useWindowDimensions();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.dir();
     const { userData } = useSelector(state => state.persistedReducer.userReducer);
+    const { default_language } = useSelector(state => state.persistedReducer.changeLanguage);
+
     const [categories, setCategories] = useState(null);
     const [record, setRecord] = useState(null);
 
@@ -62,17 +66,17 @@ const Home = () => {
         console.log('Data clicked >>>>', data);
         navigation.navigate("DoctorsTile", {
             category_id: data.id,
-            category_name: data.name
+            category_name: default_language == 'ar' ? data?.translations[0]?.title : data?.translations[1]?.title
         })
     }
 
-    console.log('Total Screen Width >>>', Math.ceil(width / 3))
+    // console.log('Selected Language ******>>>>>>>', default_language)
 
     const renderItem = (item, i) => (
         // <Components.MyCard data={item} key={item.id} />
         <TouchableOpacity
             key={i}
-            style={[styles.card, { width: '28%' }]}
+            style={[styles.card, { width: '28%', height: 139 }]}
             // elevation={17}
             onPress={() => handleNavigate(item)}
         >
@@ -80,12 +84,20 @@ const Home = () => {
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ marginVertical: 5 }}>
                     <Components.ImagePlaceholder
-                        src={item.id == 1 ? doctor : item.id == 2 ? nurse : item.id == 3 ? therapy : item.id == 4 ? online_doctor : item.id == 5 ? cardio : family}
-                        _style={{ height: 35, width: 35, tintColor: Global.lime_green }}
+                        src={item.title === 'Home Doctor Consultation Visit' ?
+                            doctor : item.title === 'Nurse Visit' ?
+                                nurse : item.title === 'Physiotherapy & Rehabilization' ?
+                                    therapy : item.title === 'Wound Care' ?
+                                        family : item.title === 'Online Doctor Consultation' ?
+                                            online_doctor :
+                                            null}
+                        _style={{ height: 40, width: 40 }}
                     />
                 </View>
-                <View style={{marginVertical:10}}>
-                    <Text style={[styles.textStyle, { fontSize: 11 , fontWeight:'bold'}]}>{item.name}</Text>
+                <View style={{ marginVertical: 10 }}>
+                    <Text style={[styles.textStyle, { fontSize: 11, fontWeight: 'bold' }]}>
+                        {default_language == 'ar' ? item?.translations[0]?.title : item?.translations[1]?.title}
+                    </Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -100,9 +112,9 @@ const Home = () => {
             let query = Object.keys(params)
                 .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
                 .join('&');
-             console.log('Query >>>', query)
+            // console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
-            console.log('Req of Categories >>', req);
+            // console.log('Req of Categories >>', req);
             if (req.message === 'Unauthenticated.') {
                 dispatch(updateUser(null))
             }
@@ -194,7 +206,7 @@ const Home = () => {
                                     data={`$${record?.cost}`}
                                     box_clr={Global.lime_green}
                                 /> */}
-                                <AboutUs/>
+                                <AboutUs />
                             </View>
                             <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
                                 {categories.map((item, i) => renderItem(item, i))}
@@ -217,29 +229,29 @@ const Home = () => {
 
 export default Home;
 
-const AboutUs=()=>{
-  const navigation = useNavigation();
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.dir();
+const AboutUs = () => {
+    const navigation = useNavigation();
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.dir();
 
-    return(
-        <TouchableOpacity 
-      onPress={()=> navigation.navigate('About')}
-        style={[styles.card, { flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }]}>
-        <View style={{
-            backgroundColor: Global.lime_green,
-            borderRadius: 6,
-            height: 34,
-            width: 34,
-            alignItems: "center",
-            justifyContent:'center'
-        }}>
-            <IonicIcon name={'people-circle-outline'} size={25} color={Global.white} />
-        </View>
-        <View style={{marginHorizontal:10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text style={[styles.titleText, {fontSize : isRTL == 'rtl' ? 14 : 12}]}>{t('about_us')}</Text>
-        </View>
-    </TouchableOpacity>
+    return (
+        <TouchableOpacity
+            onPress={() => navigation.navigate('About')}
+            style={[styles.card, { flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row' }]}>
+            <View style={{
+                backgroundColor: Global.lime_green,
+                borderRadius: 6,
+                height: 34,
+                width: 34,
+                alignItems: "center",
+                justifyContent: 'center'
+            }}>
+                <IonicIcon name={'people-circle-outline'} size={25} color={Global.white} />
+            </View>
+            <View style={{ marginHorizontal: 10, flex: 1, alignItems: isRTL == 'rtl' ? 'flex-end' : 'flex-start' }}>
+                <Text style={[styles.titleText, { fontSize: isRTL == 'rtl' ? 14 : 12 }]}>{t('about_us')}</Text>
+            </View>
+        </TouchableOpacity>
     )
 }
 
@@ -283,13 +295,13 @@ const styles = StyleSheet.create({
         color: Global.main_color,
         marginVertical: 8
     },
-    card:{
+    card: {
         // height: 139,
         // width: '28%',
         borderRadius: 10,
-        alignItems:'center',
-        margin:8,
-        padding:8,
+        alignItems: 'center',
+        margin: 8,
+        padding: 8,
         backgroundColor: Global.white,
         shadowColor: "#000",
         shadowOffset: {
@@ -300,8 +312,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 6
     },
-    titleText:{
-        fontSize:11,
-        fontWeight:'bold',
+    titleText: {
+        fontSize: 11,
+        fontWeight: 'bold',
     }
 })
