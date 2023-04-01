@@ -152,8 +152,8 @@ android {
         applicationId "com.tabibak"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true // Add this when added imageLibrary
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()

@@ -3,7 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //const BASE_URL = 'https://getboxxie.com/doctorportal/public/api';
 // const BASE_URL = 'https://pakjazba.com/api';
-const BASE_URL = 'https://fahadoman.com/doctorportal/api/v1';
+// const BASE_URL = 'https://fahadoman.com/doctorportal/api/v1';
+const BASE_URL = 'https://tabibak.om/api/v1';
+
 
 
 const headersFor = (token) => {

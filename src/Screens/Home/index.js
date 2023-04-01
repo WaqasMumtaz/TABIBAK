@@ -84,14 +84,23 @@ const Home = () => {
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ marginVertical: 5 }}>
                     <Components.ImagePlaceholder
-                        src={item.title === 'Home Doctor Consultation Visit' ?
-                            doctor : item.title === 'Nurse Visit' ?
-                                nurse : item.title === 'Physiotherapy & Rehabilization' ?
-                                    therapy : item.title === 'Wound Care' ?
-                                        family : item.title === 'Online Doctor Consultation' ?
-                                            online_doctor :
-                                            null}
+                         src={item.id == 1 ? 
+                            doctor : item.id == 2 ?
+                            nurse : item.id == 3 ? 
+                            therapy : item.id == 7 ?
+                            family : item.id == 8 ?
+                            online_doctor :
+                            null
+                        }
+                        // src={item.title === 'Home Doctor Consultation Visit' ?
+                        //     doctor : item.title === 'Nurse Visit' ?
+                        //         nurse : item.title === 'Physiotherapy & Rehabilization' ?
+                        //             therapy : item.title === 'Wound Care' ?
+                        //                 family : item.title === 'Online Doctor Consultation' ?
+                        //                     online_doctor :
+                        //                     null}
                         _style={{ height: 40, width: 40 }}
+                        size={40}
                     />
                 </View>
                 <View style={{ marginVertical: 10 }}>
@@ -115,6 +124,7 @@ const Home = () => {
             // console.log('Query >>>', query)
             let req = await HttpUtilsFile.get('getcategory?' + query);
             // console.log('Req of Categories >>', req);
+           // console.log('Services Data *****>>>>>', req.data);
             if (req.message === 'Unauthenticated.') {
                 dispatch(updateUser(null))
             }

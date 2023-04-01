@@ -3,7 +3,9 @@
 //const isRTL = useRTL()
 
 //const BASE_URL = 'https://getboxxie.com/doctorportal/public/api';
-const BASE_URL = 'https://fahadoman.com/doctorportal/api/v1'
+// const BASE_URL = 'https://fahadoman.com/doctorportal/api/v1'
+const BASE_URL = 'https://tabibak.om/api/v1'
+
 
 export default {
     main_color:'#0e71b4',

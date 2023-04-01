@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 const DoctorProfile = ({ route }) => {
     const {doctor_id, name ,bio , category_id, fees, role,specialist, category,offday, user_id} = route.params;
     const navigation = useNavigation();
+    console.log('Bio Data ******>>>>>>>>>>>>>', bio);
 
     const { t, i18n } = useTranslation();
     const isRTL = i18n.dir();

@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import NoData from '../../Assets/no_records.png';
+import Global from "../../Global";
 export default function NoRecord({ iconStyle }) {
   return (
     <View style={[styles.container]}>
@@ -17,6 +18,7 @@ const styles = StyleSheet.create({
   },
   img:{
     width: 120, 
-    height: 120
+    height: 120,
+    tintColor:Global.main_color
   }
 });

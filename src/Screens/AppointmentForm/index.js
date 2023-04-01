@@ -189,30 +189,6 @@ const AppointmentForm = ({ route }) => {
 
     ];
 
-    const DOCTORS = [{
-        id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-        name: "Adam",
-        category: selectedCategory.name
-    }, {
-        id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-        name: "John Don",
-        category: selectedCategory.name
-    }, {
-        id: "58694a0f-3da1-471f-bd96-145571e29d72",
-        name: "Saim Duck",
-        category: selectedCategory.name
-    }, {
-        id: "68694a0f-3da1-431f-bd56-142371e29d72",
-        name: "Ben Stroke",
-        category: selectedCategory.name
-
-    }, {
-        id: "28694a0f-3da1-471f-bd96-142456e29d72",
-        name: "Zampa",
-        category: selectedCategory.name
-    }
-    ]
-
     const renderItem = (item, i) => (
         <View
             style={{ flexDirection: isRTL == 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', margin: 10 }}
@@ -220,8 +196,9 @@ const AppointmentForm = ({ route }) => {
         >
             <RadioButton
                 value={selectedCategory.name}
-                status={item.name === selectedCategory.name ? 'checked' : 'unchecked'}
-                onPress={() => setSelectedCategory({ id: item.id, name: default_language == 'ar' ? item?.translations[0]?.title : item?.translations[1]?.title })}
+                status={item.id === selectedCategory.id ? 'checked' : 'unchecked'}
+                // onPress={()=> handleCategories(item)}
+                 onPress={() => setSelectedCategory({ id: item.id, name: default_language == 'ar' ? item?.translations[0]?.title : item?.translations[1]?.title })}
                 color={Global.main_color}
             />
             <Text >

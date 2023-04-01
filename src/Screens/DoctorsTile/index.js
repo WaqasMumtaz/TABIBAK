@@ -111,7 +111,7 @@ const DoctorsTile = ({ route }) => {
     );
 
     function selectDoctor(doctor) {
-        console.log('Doctor Off day >>>>>>>', doctor.offday);
+        console.log('Doctor Off day >>>>>>>', doctor);
         setSelectedDoctor({
             doctor_id:doctor?.id,
             name: doctor?.user?.name,
@@ -177,9 +177,9 @@ const DoctorsTile = ({ route }) => {
 
             let req = await HttpUtilsFile.post('getdoctorlistbycategory', obj, userData?.api_token);
             console.log('Req Response of Doctors >>', req);
-            if (req.data.length > 0) {
+            // if (req.data.length > 0) {
                 setDoctorsList(req.data);
-            }
+            // }
 
         } catch (error) {
             console.log('Error >>>', error);

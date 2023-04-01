@@ -282,6 +282,8 @@ const Profile = () => {
         }
     }, [])
 
+    // console.log('Photo Pic Profile >>>>>>>>>>', authObj.photo)
+
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAwareScrollView
